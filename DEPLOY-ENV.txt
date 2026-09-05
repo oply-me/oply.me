@@ -1,0 +1,24 @@
+# Vercel environment variables
+#
+# Add each of these under Project -> Settings -> Environment Variables.
+# Values are in your local .env.local. NEVER commit that file.
+#
+# NEXT_PUBLIC_* are baked into the browser bundle at build time.
+# Everything else stays server-side.
+
+NEXT_PUBLIC_SUPABASE_URL=<copy from .env.local>
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<copy from .env.local>
+SUPABASE_SERVICE_ROLE_KEY=<copy from .env.local>
+AI_PROVIDER=anthropic
+AI_API_KEY=<copy from .env.local>
+AI_MODEL=claude-opus-5
+CRYPTO_PAYMENT_PROVIDER=nowpayments
+CRYPTO_PAYMENT_API_KEY=<copy from .env.local>
+CRYPTO_PAYMENT_SECRET=<copy from .env.local>
+CRYPTO_PAYMENT_WEBHOOK_SECRET=<copy from .env.local>
+DEV_PAYMENT_MODE=false            # never true in production
+NEXT_PUBLIC_APP_URL=https://oply.me   # must be the live origin, not localhost
+SUPPORT_EMAIL=support@oply.me
+ANALYTICS_KEY=<copy from .env.local>
+NEXT_PUBLIC_ANALYTICS_ENABLED=<copy from .env.local>
+PAYMENT_FEE_RATE=0.01
