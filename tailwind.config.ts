@@ -16,6 +16,12 @@ const config: Config = {
     },
     extend: {
       colors: {
+        /* Written with <alpha-value> so `bg-brand/30` and friends work. */
+        brand: {
+          DEFAULT: "hsl(var(--brand) / <alpha-value>)",
+          2: "hsl(var(--brand-2) / <alpha-value>)",
+          3: "hsl(var(--brand-3) / <alpha-value>)",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -89,12 +95,36 @@ const config: Config = {
         shimmer: {
           "100%": { transform: "translateX(100%)" },
         },
+        /* Slow drift for the hero's colour blooms. */
+        float: {
+          "0%, 100%": { transform: "translate3d(0, 0, 0) scale(1)" },
+          "50%": { transform: "translate3d(0, -18px, 0) scale(1.06)" },
+        },
+        /* Horizontal loop for the tool marquee. The track renders its
+           children twice, so -50% lands exactly on the seam. */
+        marquee: {
+          from: { transform: "translateX(0)" },
+          to: { transform: "translateX(-50%)" },
+        },
+        "spin-slow": {
+          from: { transform: "rotate(0deg)" },
+          to: { transform: "rotate(360deg)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.18s ease-out",
         "accordion-up": "accordion-up 0.18s ease-out",
         "fade-up": "fade-up 0.28s cubic-bezier(0.22, 1, 0.36, 1) both",
         shimmer: "shimmer 1.6s infinite",
+        float: "float 14s ease-in-out infinite",
+        "float-slow": "float 22s ease-in-out infinite",
+        marquee: "marquee 38s linear infinite",
+        "marquee-slow": "marquee 64s linear infinite",
+        "spin-slow": "spin-slow 26s linear infinite",
+      },
+      boxShadow: {
+        brand: "0 18px 40px -18px hsl(var(--brand) / 0.55)",
+        "brand-lg": "0 32px 70px -28px hsl(var(--brand) / 0.65)",
       },
     },
   },

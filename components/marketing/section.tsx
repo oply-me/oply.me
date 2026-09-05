@@ -28,17 +28,26 @@ export function SectionHeading({
   return (
     <div
       className={cn(
-        "max-w-2xl",
+        "flex max-w-2xl flex-col",
         align === "center" && "mx-auto text-center",
         className,
       )}
     >
       {eyebrow && (
-        <p className="text-[13px] font-medium uppercase tracking-wider text-primary">
+        <p
+          className={cn(
+            "inline-flex w-fit items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-[12px] font-semibold uppercase tracking-wider text-primary shadow-sm backdrop-blur",
+            align === "center" && "mx-auto",
+          )}
+        >
+          <span
+            className="h-1.5 w-1.5 rounded-full bg-brand-panel"
+            aria-hidden="true"
+          />
           {eyebrow}
         </p>
       )}
-      <h2 className="text-balance mt-2 text-[1.75rem] font-semibold tracking-[-0.025em] sm:text-[2rem]">
+      <h2 className="text-balance mt-4 text-[1.875rem] first:mt-0 font-semibold tracking-[-0.03em] sm:text-[2.25rem]">
         {title}
       </h2>
       {description && (

@@ -50,6 +50,36 @@ export interface ToolFaq {
   answer: string;
 }
 
+/**
+ * The dominant search intent of a tool's landing page. `commercial` means
+ * someone is comparing tools before picking one; `informational` means they
+ * are still learning the concept. It decides whether the page leads with what
+ * the tool *is* or with what it *does for you*.
+ */
+export type SearchIntent = "informational" | "commercial" | "transactional";
+
+/**
+ * The semantic keyword map for a tool. Public data: it ships to the browser,
+ * powers metadata, JSON-LD and site search, and is never used to stuff copy.
+ *
+ * The five layers are different things and must not be collapsed into one
+ * flat array — `entities` are concepts a crawler expects to co-occur, not
+ * queries anyone types, and `questions` must each have a real answer in `faq`.
+ */
+export interface ToolKeywords {
+  /** The one head term this page should own. Unique across the registry. */
+  primary: string;
+  /** Same intent, different words. 6-10. */
+  secondary: string[];
+  /** 4+ word intent-loaded phrases. 8-14. */
+  longTail: string[];
+  /** Concepts the page should co-occur with. 8-15. */
+  entities: string[];
+  /** Real questions, phrased as questions. 4-8. Should align with `faq`. */
+  questions: string[];
+  intent: SearchIntent;
+}
+
 export interface ToolDefinition {
   slug: string;
   name: string;
@@ -78,6 +108,8 @@ export interface ToolDefinition {
   /** ISO date; a "New" badge shows until then. */
   newUntil?: string;
   related: string[];
+  /** Required: a tool cannot ship without its semantic keyword map. */
+  keywords: ToolKeywords;
   benefits: { title: string; body: string }[];
   howItWorks: string[];
   example: { label: string; value: string };
@@ -188,13 +220,62 @@ Length guide: short = roughly 200-300 words, medium = roughly 500-700 words, lon
         maxLength: 1500,
       },
     ],
-    seoTitle: "AI Writer — Generate Content with AI | Oply",
+    seoTitle: "AI Writer — Generate Articles and Long-Form Content | Oply",
     seoDescription:
-      "Write articles, announcements and long-form content with Oply's AI Writer. Set the topic, audience, tone and length, then edit the draft.",
+      "Oply's AI Writer is an AI content writer and blog post writer in one: give it a topic, audience, tone and length, then edit the draft it returns.",
     featured: true,
     sortOrder: 1,
     enabled: true,
-    related: ["ai-rewriter", "blog-outline-generator", "prompt-generator"],
+    related: ["ai-rewriter", "blog-outline-generator", "ai-summarizer"],
+    keywords: {
+      primary: "ai writer",
+      secondary: [
+        "ai content writer",
+        "ai writing generator",
+        "ai article writer",
+        "blog post writer",
+        "ai content generator",
+        "long form content writer",
+        "ai text generator",
+        "automatic draft writer",
+      ],
+      longTail: [
+        "write a blog post from a topic",
+        "ai tool to write long form articles",
+        "generate a first draft for an article",
+        "write a product launch announcement with ai",
+        "ai writer that lets you set the tone",
+        "turn an outline into a finished draft",
+        "write content for a specific audience",
+        "ai writing tool with a word count target",
+        "write a 1000 word article with ai",
+        "ai writer for founders and marketers",
+        "draft an announcement for a saas launch",
+      ],
+      entities: [
+        "long-form content",
+        "first draft",
+        "content brief",
+        "tone of voice",
+        "target audience",
+        "word count",
+        "markdown",
+        "copywriting",
+        "content marketing",
+        "headline",
+        "editing",
+        "large language model",
+      ],
+      questions: [
+        "How many credits does the AI Writer use?",
+        "Can I edit what the AI writer produces?",
+        "Is the writing original?",
+        "How long a piece can the AI writer produce?",
+        "Can the AI writer match a specific tone of voice?",
+        "Does the AI writer research the topic?",
+      ],
+      intent: "commercial",
+    },
     benefits: [
       {
         title: "Start from a draft, not a blank page",
@@ -226,14 +307,29 @@ Length guide: short = roughly 200-300 words, medium = roughly 500-700 words, lon
           "20 credits per generation. Shorten, expand and improve each count as a new generation at the same cost.",
       },
       {
-        question: "Can I edit the output?",
+        question: "Can I edit what the AI writer produces?",
         answer:
           "Yes. The result is plain editable text — copy it into your editor, or save it to a project and come back to it.",
       },
       {
         question: "Is the writing original?",
         answer:
-          "Each generation is produced fresh from your inputs. It is a draft, not a finished publication — read it, check any facts and edit before publishing.",
+          "Each generation is produced fresh from your inputs. It is a first draft, not a finished publication — read it, check any facts and edit before publishing.",
+      },
+      {
+        question: "How long a piece can the AI writer produce?",
+        answer:
+          "Short is roughly 200-300 words, medium 500-700 and long 1,000-1,400. Put a specific word count in the extra instructions if you need a tighter target.",
+      },
+      {
+        question: "Can the AI writer match a specific tone of voice?",
+        answer:
+          "Six tones ship as presets — professional, friendly, casual, persuasive, creative and technical. Describe the voice further in the extra instructions to narrow it.",
+      },
+      {
+        question: "Does the AI writer research the topic?",
+        answer:
+          "No. It writes from the topic and notes you supply and does not browse the web, so check any facts and figures before you publish.",
       },
     ],
   },
@@ -293,11 +389,59 @@ Keep the original formatting (paragraphs, lists, headings) unless the style call
     ],
     seoTitle: "AI Rewriter — Rewrite Text Online | Oply",
     seoDescription:
-      "Rewrite paragraphs, emails and product copy in a clearer, more professional or more concise style with Oply's AI Rewriter.",
+      "Oply's AI Rewriter is a text rewriter and paraphrasing tool for emails, articles and product copy. Rewrite text online in a clearer, more professional style.",
     featured: true,
     sortOrder: 2,
     enabled: true,
-    related: ["ai-writer", "ai-summarizer", "product-description-generator"],
+    related: ["ai-writer", "reply-generator", "ai-summarizer"],
+    keywords: {
+      primary: "ai rewriter",
+      secondary: [
+        "text rewriter",
+        "paraphrasing tool",
+        "sentence rewriter",
+        "article rewriter",
+        "rewrite text online",
+        "ai paraphraser",
+        "paragraph rewriter",
+        "reword generator",
+      ],
+      longTail: [
+        "rewrite a paragraph to sound more professional",
+        "free ai tool to reword an email",
+        "make my writing clearer without changing the meaning",
+        "rewrite text in plain english",
+        "shorten a paragraph without losing meaning",
+        "rewrite product copy in a different tone",
+        "paraphrase a long article online",
+        "rewrite a sentence to be more concise",
+        "change the tone of an email to be firmer",
+        "rewrite a draft for a general audience",
+      ],
+      entities: [
+        "paraphrase",
+        "tone of voice",
+        "readability",
+        "plain language",
+        "copywriting",
+        "editing",
+        "proofreading",
+        "sentence structure",
+        "word choice",
+        "clarity",
+        "style guide",
+        "large language model",
+      ],
+      questions: [
+        "Does rewriting change the meaning of my text?",
+        "How long can the input be?",
+        "Can this help me get past an AI detector?",
+        "Is an AI rewriter the same as a paraphrasing tool?",
+        "Which rewrite style should I choose?",
+        "Can I rewrite text in another language?",
+      ],
+      intent: "commercial",
+    },
     benefits: [
       {
         title: "Six ways to say it",
@@ -325,18 +469,34 @@ Keep the original formatting (paragraphs, lists, headings) unless the style call
     },
     faq: [
       {
-        question: "Will the rewriter change my facts?",
+        question: "Does rewriting change the meaning of my text?",
         answer:
-          "It is instructed to keep names, numbers and claims exactly as written. Always read the result before publishing — AI output should be checked.",
+          "It should not. The AI rewriter is instructed to preserve meaning, facts, names and numbers and to change only the wording. Compare both versions before you use one.",
       },
       {
         question: "How long can the input be?",
-        answer: "Up to 30,000 characters per rewrite, roughly 5,000 words.",
+        answer:
+          "Up to 30,000 characters per rewrite, roughly 5,000 words — enough for most articles and long emails in a single pass.",
       },
       {
-        question: "Does this make text undetectable as AI?",
+        question: "Can this help me get past an AI detector?",
         answer:
-          "No. Oply does not sell detection evasion, and no tool can honestly promise it. The rewriter is for clarity and tone.",
+          "No. Oply does not sell detection evasion, and no tool can honestly promise it. The rewriter is for clarity, tone and readability.",
+      },
+      {
+        question: "Is an AI rewriter the same as a paraphrasing tool?",
+        answer:
+          "Close, in practice. A paraphrasing tool swaps wording; this rewriter does that and also lets you aim at a style, so the same paragraph can come back plainer or more formal.",
+      },
+      {
+        question: "Which rewrite style should I choose?",
+        answer:
+          "Natural for conversational copy, professional for client-facing writing, simple for plain language, concise to cut length, persuasive for landing pages, and SEO-friendly to keep key terms intact.",
+      },
+      {
+        question: "Can I rewrite text in another language?",
+        answer:
+          "Yes. The output follows the language of the text you paste, so a French paragraph comes back rewritten in French.",
       },
     ],
   },
@@ -390,11 +550,59 @@ Preserve important numbers, names and dates. If the source is inconclusive, say 
     ],
     seoTitle: "AI Summarizer — Summarize Text and Articles | Oply",
     seoDescription:
-      "Summarize long articles, transcripts and reports into a TL;DR, bullet points or a detailed summary with Oply's AI Summarizer.",
+      "Oply's AI Summarizer is a text summarizer and article summarizer in one: paste long text and get a TL;DR, bullet points or a detailed summary you can use.",
     featured: true,
     sortOrder: 3,
     enabled: true,
-    related: ["ai-rewriter", "blog-outline-generator", "ai-writer"],
+    related: ["ai-rewriter", "ai-writer", "reply-generator"],
+    keywords: {
+      primary: "ai summarizer",
+      secondary: [
+        "text summarizer",
+        "article summarizer",
+        "tldr generator",
+        "summary generator",
+        "summarize text online",
+        "bullet point summary tool",
+        "document summarizer",
+        "transcript summarizer",
+      ],
+      longTail: [
+        "summarize a long article into bullet points",
+        "turn meeting notes into a short summary",
+        "get a tldr of a research report",
+        "summarize a transcript into key points",
+        "condense a report into an executive summary",
+        "summarize text without losing the numbers",
+        "make a short summary of a long email thread",
+        "summarize an article in a few sentences",
+        "bullet point summary of a long document",
+        "shorten a report into a one paragraph brief",
+      ],
+      entities: [
+        "tldr",
+        "executive summary",
+        "abstract",
+        "key points",
+        "meeting notes",
+        "transcript",
+        "long document",
+        "bullet points",
+        "reading time",
+        "note taking",
+        "editing",
+        "large language model",
+      ],
+      questions: [
+        "What is the longest text I can summarize?",
+        "Can it summarize a PDF or a URL?",
+        "How accurate is the summary?",
+        "What is the difference between a TL;DR and a detailed summary?",
+        "Can it summarize meeting notes and transcripts?",
+        "Does the summarizer add anything that is not in the source?",
+      ],
+      intent: "commercial",
+    },
     benefits: [
       {
         title: "Four shapes of summary",
@@ -422,7 +630,8 @@ Preserve important numbers, names and dates. If the source is inconclusive, say 
     faq: [
       {
         question: "What is the longest text I can summarize?",
-        answer: "30,000 characters per generation. Split longer documents into sections.",
+        answer:
+          "30,000 characters per generation. Split longer documents into sections and summarize them one at a time.",
       },
       {
         question: "Can it summarize a PDF or a URL?",
@@ -433,6 +642,21 @@ Preserve important numbers, names and dates. If the source is inconclusive, say 
         question: "How accurate is the summary?",
         answer:
           "It reflects the text you paste, but AI can misread emphasis. For anything important, check the summary against the source.",
+      },
+      {
+        question: "What is the difference between a TL;DR and a detailed summary?",
+        answer:
+          "A TL;DR is two or three sentences for a quick decision. A detailed summary runs to roughly 300 words with subheadings that follow the structure of the source.",
+      },
+      {
+        question: "Can it summarize meeting notes and transcripts?",
+        answer:
+          "Yes. Paste the transcript or notes and choose bullet points for the key points, or detailed to keep the shape of the discussion.",
+      },
+      {
+        question: "Does the summarizer add anything that is not in the source?",
+        answer:
+          "It is instructed not to. If the source is inconclusive it should say so rather than supply a conclusion of its own.",
       },
     ],
   },
@@ -506,11 +730,58 @@ Rules:
     ],
     seoTitle: "AI Prompt Generator — Write Better Prompts | Oply",
     seoDescription:
-      "Turn a goal into a structured AI prompt with role, context, task, requirements and output format. Built for ChatGPT, Claude, Gemini and image tools.",
+      "An AI prompt generator that turns a goal into a structured prompt. Works as a ChatGPT prompt generator, Claude prompt generator and image prompt generator.",
     featured: false,
     sortOrder: 4,
     enabled: true,
-    related: ["prompt-optimizer", "ai-writer", "blog-outline-generator"],
+    related: ["prompt-optimizer", "ai-writer", "ai-rewriter"],
+    keywords: {
+      primary: "ai prompt generator",
+      secondary: [
+        "prompt generator",
+        "prompt writing tool",
+        "chatgpt prompt generator",
+        "claude prompt generator",
+        "prompt template generator",
+        "image prompt generator",
+        "ai prompt maker",
+        "prompt builder",
+      ],
+      longTail: [
+        "write a prompt for chatgpt from a goal",
+        "generate a structured prompt for claude",
+        "create a prompt template for image generation",
+        "how to write a prompt for a coding assistant",
+        "turn an idea into a detailed ai prompt",
+        "build a role based prompt for an ai model",
+        "write a system prompt for an assistant",
+        "make a reusable prompt for marketing copy",
+        "generate a prompt with a clear output format",
+        "prompt structure with role context and task",
+      ],
+      entities: [
+        "prompt engineering",
+        "system prompt",
+        "role prompt",
+        "few-shot prompting",
+        "output format",
+        "prompt template",
+        "instruction following",
+        "ChatGPT",
+        "Claude",
+        "Gemini",
+        "text-to-image model",
+        "large language model",
+      ],
+      questions: [
+        "Which AI platforms does this support?",
+        "How is this different from the Prompt Optimizer?",
+        "Can I save generated prompts?",
+        "What makes a good AI prompt?",
+        "Can the AI prompt generator write image prompts?",
+      ],
+      intent: "informational",
+    },
     benefits: [
       {
         title: "A real structure, every time",
@@ -539,7 +810,7 @@ Rules:
       {
         question: "Which AI platforms does this support?",
         answer:
-          "The generated prompt is plain text and works anywhere. Choosing a platform adjusts the structure and level of technical detail.",
+          "The generated prompt is plain text and works anywhere. Choosing a platform adjusts the structure and the level of technical detail.",
       },
       {
         question: "How is this different from the Prompt Optimizer?",
@@ -548,7 +819,18 @@ Rules:
       },
       {
         question: "Can I save generated prompts?",
-        answer: "Yes — save any result to your favorites or to a project.",
+        answer:
+          "Yes — save any result to your favorites or to a project and reuse it as a prompt template.",
+      },
+      {
+        question: "What makes a good AI prompt?",
+        answer:
+          "A clear role, enough context, one specific task, checkable requirements, a stated output format and explicit constraints. The generator writes all six so none get forgotten.",
+      },
+      {
+        question: "Can the AI prompt generator write image prompts?",
+        answer:
+          "Yes. Choose Image AI and the output is shaped around subject, style, composition and lighting instead of the standard prose sections.",
       },
     ],
   },
@@ -597,11 +879,58 @@ Keep the user's intent. Do not add subject-matter requirements they never asked 
     ],
     seoTitle: "AI Prompt Optimizer — Improve Your Prompts | Oply",
     seoDescription:
-      "Paste a prompt and get an optimized version with a breakdown of what changed — clarity, context, structure, constraints and output format.",
+      "Paste a prompt into Oply's Prompt Optimizer and get a clearer version plus what changed — a prompt improver and prompt engineering tool in a single run.",
     featured: true,
     sortOrder: 5,
     enabled: true,
-    related: ["prompt-generator", "ai-writer", "seo-meta-generator"],
+    related: ["prompt-generator", "ai-rewriter", "ai-writer"],
+    keywords: {
+      primary: "prompt optimizer",
+      secondary: [
+        "prompt improver",
+        "prompt rewriting tool",
+        "prompt engineering tool",
+        "improve an ai prompt",
+        "optimize a chatgpt prompt",
+        "prompt refinement tool",
+        "prompt debugging tool",
+        "better ai prompts",
+      ],
+      longTail: [
+        "fix a prompt that gives vague answers",
+        "make an ai prompt more specific and reliable",
+        "improve a chatgpt prompt that is not working",
+        "add constraints and output format to a prompt",
+        "rewrite a prompt for more consistent results",
+        "see what changed after optimizing a prompt",
+        "shorten a prompt without losing instructions",
+        "turn a vague request into a clear instruction",
+        "optimize a prompt for a coding assistant",
+        "why my ai prompt keeps ignoring instructions",
+      ],
+      entities: [
+        "prompt engineering",
+        "clarity",
+        "constraints",
+        "output format",
+        "specificity",
+        "instruction following",
+        "token efficiency",
+        "system prompt",
+        "context",
+        "edge case",
+        "prompt iteration",
+        "large language model",
+      ],
+      questions: [
+        "Does this work for image prompts?",
+        "Will the optimized prompt work on any AI?",
+        "How much does a run cost?",
+        "Why does my prompt give inconsistent results?",
+        "What does the prompt optimizer actually change?",
+      ],
+      intent: "commercial",
+    },
     benefits: [
       {
         title: "See what changed",
@@ -639,7 +968,18 @@ Keep the user's intent. Do not add subject-matter requirements they never asked 
       },
       {
         question: "How much does a run cost?",
-        answer: "10 credits per optimization.",
+        answer:
+          "10 credits per optimization, which covers the rewritten prompt and the list of changes.",
+      },
+      {
+        question: "Why does my prompt give inconsistent results?",
+        answer:
+          "Usually because it leaves something open — no output format, no constraints, or a task that can be read two ways. Those are the areas the optimizer reports on.",
+      },
+      {
+        question: "What does the prompt optimizer actually change?",
+        answer:
+          "It returns the rewritten prompt plus three to six labelled changes across clarity, context, structure, constraints, output format and specificity, so you can see the reasoning.",
       },
     ],
   },
@@ -723,13 +1063,64 @@ Never keyword-stuff. Never promise rankings. Count characters carefully — stay
         ],
       },
     ],
-    seoTitle: "AI Meta Description Generator — SEO Titles | Oply",
+    seoTitle: "Meta Description Generator — SEO Titles and Tags | Oply",
     seoDescription:
-      "Generate SEO titles and meta descriptions with Oply's simple AI SEO tools. Live character counts keep every tag inside search-friendly limits.",
+      "A meta description generator and SEO title generator with live character counts. Oply's meta tag generator also writes the URL slug and Open Graph copy.",
     featured: true,
     sortOrder: 6,
     enabled: true,
-    related: ["schema-generator", "blog-outline-generator", "prompt-optimizer"],
+    related: ["schema-generator", "blog-outline-generator", "product-description-generator"],
+    keywords: {
+      primary: "meta description generator",
+      secondary: [
+        "seo title generator",
+        "meta tag generator",
+        "title tag generator",
+        "page title generator",
+        "open graph tag generator",
+        "serp snippet tool",
+        "seo metadata tool",
+        "url slug generator",
+      ],
+      longTail: [
+        "write a meta description under 160 characters",
+        "generate an seo title for a blog post",
+        "meta description generator with character count",
+        "write title tags for a product page",
+        "create open graph title and description",
+        "generate a url slug from a page topic",
+        "meta tags for a commercial landing page",
+        "write metadata for a category page",
+        "seo title and description for documentation pages",
+        "meta description for an ecommerce product listing",
+      ],
+      entities: [
+        "meta description",
+        "title tag",
+        "SERP",
+        "search snippet",
+        "click-through rate",
+        "focus keyword",
+        "character limit",
+        "Open Graph",
+        "URL slug",
+        "on-page SEO",
+        "search intent",
+        "truncation",
+        "content management system",
+        "structured data",
+        "rich results",
+      ],
+      questions: [
+        "What length should a meta description be?",
+        "How long should an SEO title tag be?",
+        "Will this improve my rankings?",
+        "Does the meta description generator use my focus keyword?",
+        "Does it generate a URL slug and Open Graph tags?",
+        "Can I generate metadata in another language?",
+      ],
+      intent: "commercial",
+    },
     benefits: [
       {
         title: "Character counts you can trust",
@@ -761,9 +1152,24 @@ Never keyword-stuff. Never promise rankings. Count characters carefully — stay
           "Around 140-160 characters is the usual guidance, since search engines truncate longer text. Oply targets that range and shows you the count.",
       },
       {
+        question: "How long should an SEO title tag be?",
+        answer:
+          "Roughly 50-60 characters, because search results cut off longer titles. The generator aims at that range and reports the length of every field.",
+      },
+      {
         question: "Will this improve my rankings?",
         answer:
           "Well-written metadata can improve click-through rate, but no tool can guarantee rankings and Oply will not claim otherwise.",
+      },
+      {
+        question: "Does the meta description generator use my focus keyword?",
+        answer:
+          "It places the primary keyword you enter once, naturally, in the title and the description. Secondary keywords are optional and are used only where they fit.",
+      },
+      {
+        question: "Does it generate a URL slug and Open Graph tags?",
+        answer:
+          "Yes. One run returns the SEO title, meta description, slug, Open Graph title and Open Graph description, each with its own copy button.",
       },
       {
         question: "Can I generate metadata in another language?",
@@ -845,13 +1251,64 @@ Do not add aggregateRating or review unless the user supplied real values. Retur
           "Only supply real values. Anything you leave out is omitted rather than invented.",
       },
     ],
-    seoTitle: "JSON-LD Schema Generator — Structured Data | Oply",
+    seoTitle: "Schema Markup Generator — JSON-LD Structured Data | Oply",
     seoDescription:
-      "Generate schema.org JSON-LD for articles, products, FAQs, local businesses and more. Copy or download valid structured data.",
+      "Oply's schema markup generator is a JSON-LD generator and structured data generator for Article, Product, FAQ and LocalBusiness. Copy or download the output.",
     featured: false,
     sortOrder: 7,
     enabled: true,
-    related: ["seo-meta-generator", "blog-outline-generator", "product-description-generator"],
+    related: ["seo-meta-generator", "product-description-generator", "blog-outline-generator"],
+    keywords: {
+      primary: "schema markup generator",
+      secondary: [
+        "json-ld generator",
+        "structured data generator",
+        "schema.org generator",
+        "faq schema generator",
+        "product schema generator",
+        "article schema generator",
+        "breadcrumb schema generator",
+        "local business schema tool",
+      ],
+      longTail: [
+        "generate json-ld for a product page",
+        "create faqpage structured data for a blog post",
+        "write schema markup for a local business",
+        "add structured data to a website page",
+        "generate breadcrumb markup for a category page",
+        "json-ld for an article with author and date",
+        "check structured data with the rich results test",
+        "schema markup for a software application page",
+        "download structured data as a json file",
+        "where to put json-ld on a page",
+      ],
+      entities: [
+        "schema.org",
+        "JSON-LD",
+        "structured data",
+        "rich results",
+        "FAQPage",
+        "Article",
+        "Product",
+        "LocalBusiness",
+        "BreadcrumbList",
+        "Rich Results Test",
+        "microdata",
+        "search snippet",
+        "validator",
+        "on-page SEO",
+        "content management system",
+      ],
+      questions: [
+        "Does adding schema guarantee rich results?",
+        "Which schema.org types are supported?",
+        "Is the output validated?",
+        "Where do I put the JSON-LD?",
+        "What is the difference between JSON-LD and microdata?",
+        "Can I download the structured data as a file?",
+      ],
+      intent: "commercial",
+    },
     benefits: [
       {
         title: "Ten common types",
@@ -883,6 +1340,11 @@ Do not add aggregateRating or review unless the user supplied real values. Retur
           "No. Valid structured data makes a page eligible for some rich result types, but search engines decide what to show. Always test with an official validator before relying on it.",
       },
       {
+        question: "Which schema.org types are supported?",
+        answer:
+          "Article, Product, FAQPage, LocalBusiness, Organization, Person, Event, SoftwareApplication, BreadcrumbList and WebSite.",
+      },
+      {
         question: "Is the output validated?",
         answer:
           "Oply checks that the output is well-formed JSON and shows you the parsed result. Run it through Google's Rich Results Test or the Schema.org validator for a full check.",
@@ -891,6 +1353,16 @@ Do not add aggregateRating or review unless the user supplied real values. Retur
         question: "Where do I put the JSON-LD?",
         answer:
           "Inside a script tag with type=\"application/ld+json\" in the head or body of the page it describes.",
+      },
+      {
+        question: "What is the difference between JSON-LD and microdata?",
+        answer:
+          "Both express structured data. JSON-LD sits in one script tag away from your markup, while microdata is written as attributes inside the HTML. Google recommends JSON-LD.",
+      },
+      {
+        question: "Can I download the structured data as a file?",
+        answer:
+          "Yes. Every result copies as text or downloads as a .json file you can hand to a developer.",
       },
     ],
   },
@@ -979,13 +1451,63 @@ Use only the features and benefits supplied. Do not invent materials, dimensions
         ],
       },
     ],
-    seoTitle: "AI Product Description Generator | Oply",
+    seoTitle: "Product Description Generator — AI Product Copy | Oply",
     seoDescription:
-      "Generate product descriptions, bullet points, SEO titles, meta descriptions, tags and a CTA from your product details.",
+      "Oply's product description generator is an ecommerce copywriting tool and product copy generator: short and long copy, bullets, SEO tags and a CTA per run.",
     featured: true,
     sortOrder: 8,
     enabled: true,
-    related: ["seo-meta-generator", "ai-writer", "ai-rewriter"],
+    related: ["seo-meta-generator", "ai-rewriter", "ai-writer"],
+    keywords: {
+      primary: "product description generator",
+      secondary: [
+        "ecommerce copywriting tool",
+        "shopify product description generator",
+        "amazon listing generator",
+        "product copy generator",
+        "product listing writer",
+        "ai product description writer",
+        "product bullet point generator",
+        "store listing copy tool",
+      ],
+      longTail: [
+        "write a product description for shopify",
+        "generate bullet points for an amazon listing",
+        "product copy from a list of features",
+        "write a short and long product description",
+        "product description with an seo title and tags",
+        "write listing copy for a handmade product",
+        "turn product specs into selling copy",
+        "product description in a premium brand tone",
+        "write a call to action for a product page",
+        "product copy for a marketplace listing",
+      ],
+      entities: [
+        "e-commerce",
+        "product listing",
+        "features and benefits",
+        "bullet points",
+        "Shopify",
+        "WooCommerce",
+        "marketplace listing",
+        "conversion copywriting",
+        "brand tone",
+        "product title",
+        "call to action",
+        "meta description",
+        "copywriting",
+        "on-page SEO",
+      ],
+      questions: [
+        "What does one generation include?",
+        "Will it invent product specifications?",
+        "Does it work for Shopify and Amazon listings?",
+        "Can I generate copy for a whole catalog?",
+        "Can I set the brand tone?",
+        "Is the copy unique per product?",
+      ],
+      intent: "commercial",
+    },
     benefits: [
       {
         title: "A full listing, not one paragraph",
@@ -1012,19 +1534,34 @@ Use only the features and benefits supplied. Do not invent materials, dimensions
     },
     faq: [
       {
+        question: "What does one generation include?",
+        answer:
+          "A short description, a long description, four to six bullet points, an SEO title, a meta description, six to ten tags and a call to action.",
+      },
+      {
+        question: "Will it invent product specifications?",
+        answer:
+          "It is instructed not to. Supply accurate features and it will write around them; leave a detail out and it is omitted rather than guessed.",
+      },
+      {
+        question: "Does it work for Shopify and Amazon listings?",
+        answer:
+          "Yes. Each block copies on its own, so the descriptions, bullet points and tags drop straight into Shopify, WooCommerce or a marketplace listing.",
+      },
+      {
         question: "Can I generate copy for a whole catalog?",
         answer:
           "One product per generation today. Bulk generation is on the roadmap — each run costs 15 credits.",
       },
       {
-        question: "Will it invent product specifications?",
+        question: "Can I set the brand tone?",
         answer:
-          "It is instructed not to. Supply accurate features and it will write around them; leave a detail out and it will be omitted rather than guessed.",
+          "Six tones are available — premium, friendly, minimal, playful, technical and luxury — and the copy is written to match the one you pick.",
       },
       {
         question: "Is the copy unique per product?",
         answer:
-          "Each generation is produced from your inputs, so different products produce different copy. Review before publishing.",
+          "Each generation is produced from your inputs, so different products produce different copy. Review it before publishing.",
       },
     ],
   },
@@ -1090,11 +1627,59 @@ Rules:
     ],
     seoTitle: "AI Reply Generator — Draft Email Replies | Oply",
     seoDescription:
-      "Paste a message and get a professional, friendly or firm reply in three lengths. Built for email, support tickets and client messages.",
+      "An AI reply generator for email, tickets and client messages. Use it as an email reply generator or customer support reply generator — three lengths per run.",
     featured: true,
     sortOrder: 9,
     enabled: true,
     related: ["ai-rewriter", "ai-writer", "ai-summarizer"],
+    keywords: {
+      primary: "ai reply generator",
+      secondary: [
+        "email reply generator",
+        "email response generator",
+        "customer support reply generator",
+        "professional email writer",
+        "client reply generator",
+        "message reply writer",
+        "respond to an email with ai",
+        "follow up email writer",
+      ],
+      longTail: [
+        "write a professional reply to a client email",
+        "how to politely decline a request by email",
+        "draft a customer support reply from a ticket",
+        "reply to an unhappy customer message",
+        "write a firm but polite follow up email",
+        "respond to a client asking about a deadline",
+        "short friendly reply to a chat message",
+        "draft three versions of the same reply",
+        "reply to a message in a matching tone",
+        "write a reply that sets a clear boundary",
+      ],
+      entities: [
+        "email etiquette",
+        "tone of voice",
+        "customer support",
+        "follow-up",
+        "client communication",
+        "support ticket",
+        "polite decline",
+        "professional email",
+        "message draft",
+        "placeholder",
+        "business communication",
+        "editing",
+      ],
+      questions: [
+        "Does Oply read my inbox?",
+        "Can it match the tone of the original message?",
+        "Will it invent dates or prices I did not give it?",
+        "How do I politely decline a request by email?",
+        "Can I use this for customer support?",
+        "How much does a reply cost?",
+      ],
+      intent: "commercial",
+    },
     benefits: [
       {
         title: "Three lengths at once",
@@ -1126,13 +1711,29 @@ Rules:
           "No. There is no email integration — you paste the message you want to reply to, and nothing else is accessed.",
       },
       {
+        question: "Can it match the tone of the original message?",
+        answer:
+          "You choose the tone — professional, friendly, short, polite, firm or customer support — and add the relationship in the context field so the reply lands the way you intend.",
+      },
+      {
+        question: "Will it invent dates or prices I did not give it?",
+        answer:
+          "No. Anything it cannot know comes back as a clearly marked placeholder such as [DATE], so you fill in the real value before sending.",
+      },
+      {
+        question: "How do I politely decline a request by email?",
+        answer:
+          "Paste the request and set the tone to polite or firm. The reply generator drafts a clear no with a reason and, where one applies, an alternative.",
+      },
+      {
         question: "Can I use this for customer support?",
         answer:
           "Yes, the Customer Support tone is built for it. Review each reply before sending; it is a draft, not an autoresponder.",
       },
       {
         question: "How much does a reply cost?",
-        answer: "5 credits, which covers all three lengths.",
+        answer:
+          "5 credits, which covers all three lengths.",
       },
     ],
   },
@@ -1202,11 +1803,61 @@ Cover the topic properly for the stated goal and audience. Do not pad with gener
     ],
     seoTitle: "Blog Outline Generator — AI Content Outlines | Oply",
     seoDescription:
-      "Generate a blog post outline with H1, intro angle, H2 and H3 structure, key points and FAQ ideas from a topic and keyword.",
+      "A blog outline generator and article outline generator in one: H1, intro angle, H2 and H3 structure, key points and FAQ ideas — and a usable content brief.",
     featured: false,
     sortOrder: 10,
     enabled: true,
     related: ["ai-writer", "seo-meta-generator", "ai-summarizer"],
+    keywords: {
+      primary: "blog outline generator",
+      secondary: [
+        "article outline generator",
+        "content outline tool",
+        "blog post structure generator",
+        "blog post plan generator",
+        "heading structure generator",
+        "content brief generator",
+        "blog structure tool",
+        "post outline maker",
+      ],
+      longTail: [
+        "create an outline for a blog post",
+        "generate h2 and h3 headings for an article",
+        "plan a blog post around a primary keyword",
+        "content outline for a comparison article",
+        "blog outline with faq ideas at the end",
+        "structure a long article before writing it",
+        "turn a topic into a section by section plan",
+        "outline a post for a specific audience",
+        "content brief for a writer to follow",
+        "how many sections should a blog post have",
+      ],
+      entities: [
+        "content brief",
+        "article structure",
+        "H2",
+        "H3",
+        "heading hierarchy",
+        "topic cluster",
+        "search intent",
+        "introduction hook",
+        "conclusion",
+        "FAQ section",
+        "content strategy",
+        "long-form content",
+        "on-page SEO",
+        "key points",
+      ],
+      questions: [
+        "Can I turn the outline into a full post?",
+        "Does it write the H2 and H3 headings for me?",
+        "How many sections does it generate?",
+        "What is a content brief?",
+        "Does the outline include FAQ ideas?",
+        "Does it research the topic?",
+      ],
+      intent: "informational",
+    },
     benefits: [
       {
         title: "Structure before prose",
@@ -1238,9 +1889,24 @@ Cover the topic properly for the stated goal and audience. Do not pad with gener
           "Yes — copy a section into the AI Writer with the key points as instructions, and write the post one section at a time.",
       },
       {
+        question: "Does it write the H2 and H3 headings for me?",
+        answer:
+          "Yes. Each section comes back with an H2, two to four key points and up to three H3 subsections, so the heading hierarchy is already sound.",
+      },
+      {
         question: "How many sections does it generate?",
         answer:
           "Between four and seven H2 sections, each with key points and up to three H3 subsections.",
+      },
+      {
+        question: "What is a content brief?",
+        answer:
+          "A short plan a writer works from: the angle, the audience, the heading structure and the points each section has to cover. The outline this tool returns is that plan.",
+      },
+      {
+        question: "Does the outline include FAQ ideas?",
+        answer:
+          "Yes. Every outline ends with three to five follow-up questions you can answer on the page or turn into separate posts.",
       },
       {
         question: "Does it research the topic?",
@@ -1344,7 +2010,10 @@ export function getActiveCategorySlugs(): string[] {
   return Array.from(new Set(getEnabledTools().map((t) => t.category)));
 }
 
-export function isNewTool(tool: ToolDefinition, now = new Date()): boolean {
+export function isNewTool(
+  tool: Pick<ToolDefinition, "newUntil">,
+  now = new Date(),
+): boolean {
   return Boolean(tool.newUntil && new Date(tool.newUntil) > now);
 }
 
@@ -1363,10 +2032,22 @@ export function getPublicTools(): PublicTool[] {
   return getEnabledTools().map(toPublicTool);
 }
 
-/** Simple relevance search over name, description, category and slug. */
+/**
+ * Relevance search over name, category and the tool's semantic keyword map.
+ *
+ * Name and category still outrank everything, so typing a tool's name never
+ * loses to a keyword match. Below them the keyword layers are weighted by how
+ * specific they are: owning a head term beats being a synonym, which beats
+ * merely co-occurring with a concept. This is what makes "paraphrase" find the
+ * AI Rewriter even though the word appears nowhere in its name or description.
+ */
 export function searchTools(query: string): ToolDefinition[] {
   const q = query.trim().toLowerCase();
   if (!q) return getEnabledTools();
+
+  const hits = (terms: string[]) =>
+    terms.some((term) => term.toLowerCase().includes(q));
+
   return getEnabledTools()
     .map((tool) => {
       const haystack = [
@@ -1382,10 +2063,27 @@ export function searchTools(query: string): ToolDefinition[] {
       if (tool.name.toLowerCase().startsWith(q)) score += 100;
       if (tool.name.toLowerCase().includes(q)) score += 50;
       if (tool.category.includes(q)) score += 25;
+      if (tool.keywords.primary.toLowerCase().includes(q)) score += 80;
+      if (hits(tool.keywords.secondary)) score += 40;
+      if (hits(tool.keywords.longTail) || hits(tool.keywords.entities)) score += 15;
       if (haystack.includes(q)) score += 10;
       return { tool, score };
     })
     .filter((r) => r.score > 0)
     .sort((a, b) => b.score - a.score || a.tool.sortOrder - b.tool.sortOrder)
     .map((r) => r.tool);
+}
+
+/**
+ * The flat keyword list a page emits as `<meta name="keywords">`. Ordered
+ * most-relevant-first and capped, because a 40-term list is noise.
+ */
+export function toolMetaKeywords(tool: ToolDefinition, limit = 15): string[] {
+  return Array.from(
+    new Set([
+      tool.keywords.primary,
+      ...tool.keywords.secondary,
+      ...tool.keywords.longTail,
+    ]),
+  ).slice(0, limit);
 }
