@@ -12,6 +12,7 @@ export const metadata = buildMetadata({
   description:
     "Browse Oply's AI tools by category — AI, SEO, Business and E-commerce. Every category runs on the same account and credit balance.",
   path: "/categories",
+  keywords: categories.filter((c) => c.enabled).map((c) => c.primaryKeyword),
 });
 
 export default async function CategoriesPage() {

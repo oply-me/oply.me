@@ -8,7 +8,15 @@ interface BuildMetadataOptions {
   /** Set for dashboard/admin/auth pages. */
   noIndex?: boolean;
   type?: "website" | "article";
+  /**
+   * Semantic keywords for the page, most relevant first. Capped on the way out
+   * — a long list is noise, and the tag is a weak signal at the best of times.
+   */
+  keywords?: string[];
 }
+
+/** Upper bound on the emitted keyword list. */
+const MAX_KEYWORDS = 15;
 
 export function buildMetadata({
   title,
@@ -16,6 +24,7 @@ export function buildMetadata({
   path = "/",
   noIndex = false,
   type = "website",
+  keywords,
 }: BuildMetadataOptions = {}): Metadata {
   const url = `${siteConfig.url}${path === "/" ? "" : path}`;
   const fullTitle = title
@@ -29,6 +38,13 @@ export function buildMetadata({
     // otherwise append the brand a second time.
     title: { absolute: fullTitle },
     description,
+    ...(keywords?.length
+      ? {
+          keywords: Array.from(new Set(keywords))
+            .filter(Boolean)
+            .slice(0, MAX_KEYWORDS),
+        }
+      : {}),
     alternates: { canonical: url },
     openGraph: {
       title: fullTitle,

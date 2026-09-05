@@ -14,7 +14,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ["", "weekly", 1],
       ["/tools", "weekly", 0.9],
       ["/pricing", "monthly", 0.9],
-      ["/categories", "monthly", 0.7],
+      ["/categories", "weekly", 0.8],
       ["/features", "monthly", 0.6],
       ["/roadmap", "monthly", 0.5],
       ["/about", "yearly", 0.4],
@@ -31,11 +31,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority,
   }));
 
+  // Spokes. Ranked just below their category hubs: a hub is the pillar page
+  // that should absorb the broad query and pass it down.
   const toolRoutes: MetadataRoute.Sitemap = tools.map((tool) => ({
     url: `${siteConfig.url}/tools/${tool.slug}`,
     lastModified: now,
     changeFrequency: "weekly",
-    priority: 0.8,
+    priority: 0.7,
   }));
 
   const categoryRoutes: MetadataRoute.Sitemap = categories
@@ -44,7 +46,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${siteConfig.url}/categories/${category.slug}`,
       lastModified: now,
       changeFrequency: "weekly",
-      priority: 0.6,
+      priority: 0.8,
     }));
 
   return [...staticRoutes, ...toolRoutes, ...categoryRoutes];

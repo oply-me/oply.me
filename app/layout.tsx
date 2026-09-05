@@ -5,7 +5,7 @@ import { Toaster } from "@/components/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { JsonLd } from "@/components/json-ld";
 import { organizationJsonLd, websiteJsonLd } from "@/lib/seo/jsonld";
-import { siteConfig } from "@/config/site";
+import { siteConfig, siteKeywords } from "@/config/site";
 import "./globals.css";
 
 const inter = Inter({
@@ -28,16 +28,9 @@ export const metadata: Metadata = {
   },
   description: siteConfig.description,
   applicationName: siteConfig.name,
-  keywords: [
-    "AI tools",
-    "AI writer",
-    "AI rewriter",
-    "AI summarizer",
-    "SEO meta generator",
-    "schema generator",
-    "prompt optimizer",
-    "product description generator",
-  ],
+  // Authored in config/site.ts so the site-wide list cannot drift from the
+  // per-page keyword maps.
+  keywords: siteKeywords,
   authors: [{ name: siteConfig.name, url: siteConfig.url }],
   creator: siteConfig.name,
   openGraph: {

@@ -44,6 +44,10 @@ export function softwareApplicationJsonLd(tool: ToolDefinition) {
     operatingSystem: "Web",
     url: `${siteConfig.url}/tools/${tool.slug}`,
     description: tool.seoDescription,
+    // Search-facing terms and the concepts the page is about. `about` uses the
+    // entity layer, not the query layer — these are things, not searches.
+    keywords: [tool.keywords.primary, ...tool.keywords.secondary].join(", "),
+    about: tool.keywords.entities.map((name) => ({ "@type": "Thing", name })),
     offers: {
       "@type": "Offer",
       price: "9.00",

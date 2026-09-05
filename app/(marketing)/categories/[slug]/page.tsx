@@ -28,8 +28,9 @@ export async function generateMetadata({
 
   return buildMetadata({
     title: `${category.name} AI Tools`,
-    description: category.description,
+    description: category.seoDescription,
     path: `/categories/${slug}`,
+    keywords: [category.primaryKeyword, ...category.keywords],
   });
 }
 

@@ -40,3 +40,52 @@ export const siteConfig = {
 } as const;
 
 export type SiteConfig = typeof siteConfig;
+
+/**
+ * Site-level keyword clusters. These belong to `/`, `/pricing` and `/features`
+ * rather than to any single tool — no tool page should own "no subscription ai
+ * tools", and no tool page should have to.
+ *
+ * Kept here so the root layout cannot drift from the copy: `siteKeywords` is
+ * what actually ships as the site-wide `<meta name="keywords">`.
+ */
+export const keywordClusters = {
+  /** Brand and navigational terms. */
+  brand: [
+    "Oply",
+    "oply ai tools",
+    "oply.me",
+    "Oply AI",
+  ],
+  /** The category-level terms the hub pages roll up into. */
+  category: [
+    "AI tools",
+    "AI writing tools",
+    "SEO tools",
+    "AI business tools",
+    "AI ecommerce tools",
+    "AI productivity tools",
+    "content writing tools",
+    "prompt engineering tools",
+  ],
+  /** How the product is bought — the pricing and features pages own these. */
+  commercial: [
+    "ai tools one time payment",
+    "no subscription ai tools",
+    "ai credits",
+    "lifetime ai tools",
+    "pay once ai tools",
+    "ai tools without a monthly plan",
+    "buy ai credits",
+    "credit based ai tools",
+  ],
+} as const;
+
+/** Flattened, de-duplicated site-wide keyword list for the root layout. */
+export const siteKeywords: string[] = Array.from(
+  new Set([
+    ...keywordClusters.brand,
+    ...keywordClusters.category,
+    ...keywordClusters.commercial,
+  ]),
+);

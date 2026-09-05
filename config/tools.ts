@@ -279,15 +279,15 @@ Length guide: short = roughly 200-300 words, medium = roughly 500-700 words, lon
     benefits: [
       {
         title: "Start from a draft, not a blank page",
-        body: "Give the tool a topic and audience and get a structured first draft you can shape into the final piece.",
+        body: "Give the AI writer a topic and an audience and it returns a structured first draft you can shape into the final piece.",
       },
       {
         title: "Control the voice",
-        body: "Six tones and three lengths, so the output matches the channel you are writing for.",
+        body: "Six tones and three lengths, so an announcement and a blog post do not come back sounding identical.",
       },
       {
-        title: "Refine without retyping",
-        body: "Shorten, expand or improve the result in one click instead of writing a new prompt each time.",
+        title: "One tool for every format",
+        body: "Articles, launch copy and long-form drafts all come from the same AI content writer, so you are not switching to a separate blog post writer for the next piece.",
       },
     ],
     howItWorks: [
@@ -445,15 +445,15 @@ Keep the original formatting (paragraphs, lists, headings) unless the style call
     benefits: [
       {
         title: "Six ways to say it",
-        body: "Switch between natural, professional, simple, concise, persuasive and SEO-friendly without rewriting your prompt.",
+        body: "Switch the text rewriter between natural, professional, simple, concise, persuasive and SEO-friendly without rewriting your prompt.",
       },
       {
         title: "Meaning stays put",
-        body: "The rewriter is told to preserve facts, names and numbers — it changes how the text reads, not what it claims.",
+        body: "As a paraphrasing tool it changes the wording, not the content — facts, names and numbers come through exactly as you wrote them.",
       },
       {
         title: "Handles long text",
-        body: "Paste up to 30,000 characters, which covers most articles and long emails in one pass.",
+        body: "Paste up to 30,000 characters and rewrite text online in a single pass, which covers most articles and long emails.",
       },
     ],
     howItWorks: [
@@ -606,15 +606,15 @@ Preserve important numbers, names and dates. If the source is inconclusive, say 
     benefits: [
       {
         title: "Four shapes of summary",
-        body: "A one-line TL;DR for a message, bullets for notes, or a detailed breakdown when you need the structure too.",
+        body: "A TL;DR for a quick decision, bullets for notes, or a detailed breakdown that follows the structure of the source.",
       },
       {
         title: "Stays inside the source",
-        body: "The summarizer is instructed to use only what is in the text, so it does not quietly add claims of its own.",
+        body: "The AI summarizer uses only what is in the text you paste, so it does not quietly add claims of its own.",
       },
       {
-        title: "Built for long input",
-        body: "Handles up to 30,000 characters — long enough for most articles and meeting transcripts.",
+        title: "Articles, reports and transcripts",
+        body: "The same text summarizer takes a news article, a research report or a meeting transcript — up to 30,000 characters in one run.",
       },
     ],
     howItWorks: [
@@ -651,7 +651,7 @@ Preserve important numbers, names and dates. If the source is inconclusive, say 
       {
         question: "Can it summarize meeting notes and transcripts?",
         answer:
-          "Yes. Paste the transcript or notes and choose bullet points for the key points, or detailed to keep the shape of the discussion.",
+          "Yes — as a transcript summarizer it works from the raw text. Paste the transcript or notes, then choose bullet points for the key points or detailed to keep the shape of the discussion.",
       },
       {
         question: "Does the summarizer add anything that is not in the source?",
@@ -789,11 +789,11 @@ Rules:
       },
       {
         title: "Platform aware",
-        body: "Prompts for image models are shaped differently from prompts for coding assistants.",
+        body: "The AI prompt generator shapes an image prompt around subject, style and lighting, and a coding prompt around language and runtime.",
       },
       {
         title: "Cheap to iterate",
-        body: "At 5 credits a run, it is practical to generate a few variants and keep the best.",
+        body: "At 5 credits a run it is practical to generate several variants and keep the best one as a reusable prompt template.",
       },
     ],
     howItWorks: [
@@ -810,7 +810,7 @@ Rules:
       {
         question: "Which AI platforms does this support?",
         answer:
-          "The generated prompt is plain text and works anywhere. Choosing a platform adjusts the structure and the level of technical detail.",
+          "The generated prompt is plain text and works anywhere — use it as a ChatGPT prompt generator, a Claude prompt generator or an image prompt generator. Picking a platform adjusts the structure and the level of technical detail.",
       },
       {
         question: "How is this different from the Prompt Optimizer?",
@@ -934,7 +934,7 @@ Keep the user's intent. Do not add subject-matter requirements they never asked 
     benefits: [
       {
         title: "See what changed",
-        body: "Every run lists the specific improvements, so you learn the pattern instead of just copying output.",
+        body: "Every run lists the specific improvements, so the prompt improver teaches you the pattern instead of just handing back output.",
       },
       {
         title: "Keeps your intent",
@@ -942,7 +942,7 @@ Keep the user's intent. Do not add subject-matter requirements they never asked 
       },
       {
         title: "Side-by-side",
-        body: "Your original stays on screen next to the optimized version for a direct comparison.",
+        body: "Your original stays on screen next to the optimized version, so you can see exactly what the prompt engineering tool changed.",
       },
     ],
     howItWorks: [
@@ -1124,15 +1124,15 @@ Never keyword-stuff. Never promise rankings. Count characters carefully — stay
     benefits: [
       {
         title: "Character counts you can trust",
-        body: "Every field shows its length against the recommended limit, so nothing gets truncated in results.",
+        body: "Every field in the meta description generator shows its length against the recommended limit, so nothing gets truncated in results.",
       },
       {
         title: "Open Graph included",
-        body: "Social card title and description are generated alongside the search tags, in one run.",
+        body: "The SEO title generator, the URL slug and the social card copy all come out of the same run as the description.",
       },
       {
         title: "Intent-aware",
-        body: "Commercial and informational pages get different phrasing rather than one generic template.",
+        body: "Commercial and informational pages get different phrasing from the meta tag generator rather than one generic template.",
       },
     ],
     howItWorks: [
@@ -1311,16 +1311,16 @@ Do not add aggregateRating or review unless the user supplied real values. Retur
     },
     benefits: [
       {
-        title: "Ten common types",
-        body: "Article, Product, FAQ, LocalBusiness, Organization, Person, Event, SoftwareApplication, Breadcrumb and WebSite.",
+        title: "Ten schema.org types",
+        body: "The JSON-LD generator covers Article, Product, FAQ, LocalBusiness, Organization, Person, Event, SoftwareApplication, Breadcrumb and WebSite.",
       },
       {
         title: "No invented values",
-        body: "The generator omits properties you did not supply instead of filling them with placeholder data or fake ratings.",
+        body: "The schema markup generator omits properties you did not supply instead of filling them with placeholder data or invented ratings.",
       },
       {
         title: "Copy or download",
-        body: "Take the JSON-LD as text or download a .json file to hand to a developer.",
+        body: "Take the output of the structured data generator as text, or download a .json file to hand to a developer.",
       },
     ],
     howItWorks: [
@@ -1511,7 +1511,7 @@ Use only the features and benefits supplied. Do not invent materials, dimensions
     benefits: [
       {
         title: "A full listing, not one paragraph",
-        body: "Short copy, long copy, bullets, SEO tags and a CTA all come out of a single generation.",
+        body: "The product description generator returns short copy, long copy, bullet points, SEO tags and a CTA in a single run.",
       },
       {
         title: "Sticks to your specs",
@@ -1519,7 +1519,7 @@ Use only the features and benefits supplied. Do not invent materials, dimensions
       },
       {
         title: "Ready to paste",
-        body: "Each block copies separately, so it drops straight into Shopify, WooCommerce or a marketplace listing.",
+        body: "Each block copies separately, so the ecommerce copywriting tool drops straight into Shopify, WooCommerce or a marketplace listing.",
       },
     ],
     howItWorks: [
@@ -1546,7 +1546,7 @@ Use only the features and benefits supplied. Do not invent materials, dimensions
       {
         question: "Does it work for Shopify and Amazon listings?",
         answer:
-          "Yes. Each block copies on its own, so the descriptions, bullet points and tags drop straight into Shopify, WooCommerce or a marketplace listing.",
+          "Yes. It doubles as a Shopify product description generator and an Amazon listing generator — each block copies on its own, so descriptions, bullet points and tags paste straight in.",
       },
       {
         question: "Can I generate copy for a whole catalog?",
@@ -1683,11 +1683,11 @@ Rules:
     benefits: [
       {
         title: "Three lengths at once",
-        body: "Short, standard and detailed versions from a single run, so you can pick the one that fits the channel.",
+        body: "The AI reply generator returns short, standard and detailed versions from one run, so you can pick the one that fits the channel.",
       },
       {
         title: "Tone you control",
-        body: "Firm when you need a boundary, supportive when it is a customer ticket.",
+        body: "Firm when you need a boundary, supportive when it is a support ticket — the email reply generator matches the tone you pick, not a house style.",
       },
       {
         title: "Marks what it cannot know",
@@ -1728,7 +1728,7 @@ Rules:
       {
         question: "Can I use this for customer support?",
         answer:
-          "Yes, the Customer Support tone is built for it. Review each reply before sending; it is a draft, not an autoresponder.",
+          "Yes — the Customer Support tone makes it a usable customer support reply generator. Review each reply before sending; it is a draft, not an autoresponder.",
       },
       {
         question: "How much does a reply cost?",
@@ -1803,7 +1803,7 @@ Cover the topic properly for the stated goal and audience. Do not pad with gener
     ],
     seoTitle: "Blog Outline Generator — AI Content Outlines | Oply",
     seoDescription:
-      "A blog outline generator and article outline generator in one: H1, intro angle, H2 and H3 structure, key points and FAQ ideas — and a usable content brief.",
+      "A blog outline generator and article outline generator: H1, intro angle, H2 and H3 structure, key points and FAQ ideas. Doubles as a content brief generator.",
     featured: false,
     sortOrder: 10,
     enabled: true,
@@ -1861,15 +1861,15 @@ Cover the topic properly for the stated goal and audience. Do not pad with gener
     benefits: [
       {
         title: "Structure before prose",
-        body: "Decide what the post argues and in what order before spending time on sentences.",
+        body: "The blog outline generator settles what the post argues, and in what order, before you spend time on sentences.",
       },
       {
         title: "H2s and H3s together",
-        body: "Each section comes with key points and optional subsections, so the hierarchy is already sound.",
+        body: "Each section comes with key points and optional subsections, so the heading hierarchy is already sound before you write a word.",
       },
       {
         title: "FAQ ideas included",
-        body: "Realistic follow-up questions you can answer on the page or use as future posts.",
+        body: "Every run of the article outline generator ends with realistic follow-up questions you can answer on the page or turn into future posts.",
       },
     ],
     howItWorks: [
@@ -1901,7 +1901,7 @@ Cover the topic properly for the stated goal and audience. Do not pad with gener
       {
         question: "What is a content brief?",
         answer:
-          "A short plan a writer works from: the angle, the audience, the heading structure and the points each section has to cover. The outline this tool returns is that plan.",
+          "A short plan a writer works from: the angle, the audience, the heading structure and the points each section has to cover. That is exactly what this content brief generator returns.",
       },
       {
         question: "Does the outline include FAQ ideas?",

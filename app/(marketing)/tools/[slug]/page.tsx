@@ -11,7 +11,12 @@ import { ToolCard } from "@/components/marketing/tool-card";
 import { ToolWorkspace } from "@/components/tools/tool-workspace";
 import { Badge } from "@/components/ui/badge";
 import { getCategory } from "@/config/categories";
-import { getEnabledTools, isNewTool, toPublicTool } from "@/config/tools";
+import {
+  getEnabledTools,
+  isNewTool,
+  toolMetaKeywords,
+  toPublicTool,
+} from "@/config/tools";
 import { findTool, getRelatedTools } from "@/lib/tools/registry";
 import { getSessionUser } from "@/lib/auth/guards";
 import { getCreditSummary } from "@/lib/credits";
@@ -40,6 +45,7 @@ export async function generateMetadata({
     title: tool.seoTitle,
     description: tool.seoDescription,
     path: `/tools/${tool.slug}`,
+    keywords: toolMetaKeywords(tool),
   });
 }
 
