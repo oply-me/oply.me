@@ -1,0 +1,188 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import { Search, X } from "lucide-react";
+import { ToolCard } from "@/components/marketing/tool-card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import type { CategoryDefinition } from "@/config/categories";
+import type { PublicTool } from "@/config/tools";
+import { cn } from "@/lib/utils";
+
+type SortKey = "popular" | "newest" | "az";
+
+export function ToolsExplorer({
+  tools,
+  categories,
+  initialQuery = "",
+  initialCategory = "all",
+}: {
+  tools: PublicTool[];
+  categories: CategoryDefinition[];
+  initialQuery?: string;
+  initialCategory?: string;
+}) {
+  const [query, setQuery] = useState(initialQuery);
+  const [category, setCategory] = useState(initialCategory);
+  const [sort, setSort] = useState<SortKey>("popular");
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+
+    let list = tools.filter((tool) => {
+      if (category !== "all" && tool.category !== category) return false;
+      if (!q) return true;
+      return [tool.name, tool.description, tool.tagline, tool.category, tool.slug]
+        .join(" ")
+        .toLowerCase()
+        .includes(q);
+    });
+
+    list = [...list].sort((a, b) => {
+      if (sort === "az") return a.name.localeCompare(b.name);
+      if (sort === "newest") {
+        // Newest first, using the "New" window then sort order as a proxy.
+        const aNew = a.newUntil ? new Date(a.newUntil).getTime() : 0;
+        const bNew = b.newUntil ? new Date(b.newUntil).getTime() : 0;
+        return bNew - aNew || b.sortOrder - a.sortOrder;
+      }
+      // "popular": featured first, then the curated order.
+      if (a.featured !== b.featured) return a.featured ? -1 : 1;
+      return a.sortOrder - b.sortOrder;
+    });
+
+    return list;
+  }, [tools, query, category, sort]);
+
+  const availableCategories = categories.filter((c) =>
+    tools.some((t) => t.category === c.slug),
+  );
+
+  return (
+    <div>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="relative flex-1">
+          <Search
+            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+            aria-hidden="true"
+          />
+          <Input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search tools…"
+            aria-label="Search tools"
+            className="pl-9"
+          />
+          {query && (
+            <button
+              type="button"
+              onClick={() => setQuery("")}
+              aria-label="Clear search"
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+
+        <Select value={sort} onValueChange={(v) => setSort(v as SortKey)}>
+          <SelectTrigger className="sm:w-40" aria-label="Sort tools">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="popular">Popular</SelectItem>
+            <SelectItem value="newest">Newest</SelectItem>
+            <SelectItem value="az">A–Z</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div
+        className="scroll-area mt-4 flex gap-2 overflow-x-auto pb-1"
+        role="group"
+        aria-label="Filter by category"
+      >
+        <FilterPill
+          active={category === "all"}
+          onClick={() => setCategory("all")}
+        >
+          All
+        </FilterPill>
+        {availableCategories.map((c) => (
+          <FilterPill
+            key={c.slug}
+            active={category === c.slug}
+            onClick={() => setCategory(c.slug)}
+          >
+            {c.label}
+          </FilterPill>
+        ))}
+      </div>
+
+      {filtered.length === 0 ? (
+        <div className="mt-12 rounded-xl border border-dashed border-border py-16 text-center">
+          <p className="text-[15px] font-medium">No tools match that search.</p>
+          <p className="mt-1.5 text-sm text-muted-foreground">
+            Try a different word, or clear the filters.
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            className="mt-5"
+            onClick={() => {
+              setQuery("");
+              setCategory("all");
+            }}
+          >
+            Clear filters
+          </Button>
+        </div>
+      ) : (
+        <>
+          <p className="mt-6 text-xs text-muted-foreground" aria-live="polite">
+            {filtered.length} {filtered.length === 1 ? "tool" : "tools"}
+          </p>
+          <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {filtered.map((tool) => (
+              <ToolCard key={tool.slug} tool={tool} />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function FilterPill({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={cn(
+        "shrink-0 rounded-full border px-3.5 py-1.5 text-[13px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        active
+          ? "border-primary bg-primary text-primary-foreground"
+          : "border-border bg-background text-muted-foreground hover:bg-accent hover:text-foreground",
+      )}
+    >
+      {children}
+    </button>
+  );
+}

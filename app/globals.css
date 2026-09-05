@@ -1,0 +1,207 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   Oply design tokens
+   A neutral interface with a single accent. Every colour used in a component
+   comes from these variables — nothing hardcodes a hex value.
+   ========================================================================== */
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 224 12% 8%;
+
+    --surface: 240 12% 98%;
+    --card: 0 0% 100%;
+    --card-foreground: 224 12% 8%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 12% 8%;
+
+    /* Oply accent — a single indigo-violet, used sparingly */
+    --primary: 254 78% 58%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 240 10% 96%;
+    --secondary-foreground: 224 12% 14%;
+
+    --muted: 240 10% 96%;
+    --muted-foreground: 232 6% 45%;
+
+    --accent: 240 10% 95%;
+    --accent-foreground: 224 12% 12%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 152 62% 36%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 35 92% 46%;
+    --warning-foreground: 0 0% 100%;
+
+    --border: 240 8% 90%;
+    --input: 240 8% 88%;
+    --ring: 254 78% 58%;
+
+    --radius: 0.625rem;
+  }
+
+  .dark {
+    --background: 240 8% 5%;
+    --foreground: 240 12% 96%;
+
+    --surface: 240 7% 8%;
+    --card: 240 7% 8%;
+    --card-foreground: 240 12% 96%;
+
+    --popover: 240 7% 9%;
+    --popover-foreground: 240 12% 96%;
+
+    --primary: 254 88% 70%;
+    --primary-foreground: 250 40% 10%;
+
+    --secondary: 240 6% 14%;
+    --secondary-foreground: 240 12% 94%;
+
+    --muted: 240 6% 14%;
+    --muted-foreground: 240 6% 60%;
+
+    --accent: 240 6% 16%;
+    --accent-foreground: 240 12% 94%;
+
+    --destructive: 0 72% 58%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 152 52% 46%;
+    --success-foreground: 150 40% 8%;
+
+    --warning: 35 90% 58%;
+    --warning-foreground: 35 40% 10%;
+
+    --border: 240 6% 17%;
+    --input: 240 6% 20%;
+    --ring: 254 88% 70%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings:
+      "cv02" 1,
+      "cv03" 1,
+      "cv04" 1,
+      "ss01" 1;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Visible, consistent focus for keyboard users only. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  ::selection {
+    @apply bg-primary/20;
+  }
+
+  /* Thin scrollbars inside panels so long output does not look heavy. */
+  .scroll-area {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+  .scroll-area::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .scroll-area::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-border;
+  }
+  .scroll-area::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+@layer components {
+  /* Subtle grid used behind the hero. */
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, hsl(var(--border) / 0.5) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--border) / 0.5) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  /* Rendered AI output. Kept readable without a typography plugin. */
+  .prose-output {
+    @apply text-[15px] leading-7 text-foreground;
+  }
+  .prose-output h1,
+  .prose-output h2,
+  .prose-output h3 {
+    @apply mb-2 mt-6 font-semibold tracking-tight text-foreground first:mt-0;
+  }
+  .prose-output h1 {
+    @apply text-xl;
+  }
+  .prose-output h2 {
+    @apply text-lg;
+  }
+  .prose-output h3 {
+    @apply text-base;
+  }
+  .prose-output p {
+    @apply mb-4 last:mb-0;
+  }
+  .prose-output ul,
+  .prose-output ol {
+    @apply mb-4 space-y-1.5 pl-5;
+  }
+  .prose-output ul {
+    @apply list-disc;
+  }
+  .prose-output ol {
+    @apply list-decimal;
+  }
+  .prose-output strong {
+    @apply font-semibold;
+  }
+  .prose-output code {
+    @apply rounded bg-muted px-1.5 py-0.5 font-mono text-[13px];
+  }
+  .prose-output blockquote {
+    @apply my-4 border-l-2 border-border pl-4 text-muted-foreground;
+  }
+  .prose-output a {
+    @apply text-primary underline underline-offset-4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
