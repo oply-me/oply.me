@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -59,6 +60,8 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -83,6 +86,7 @@ export default function RootLayout({
           </TooltipProvider>
         </ThemeProvider>
         <JsonLd data={[organizationJsonLd(), websiteJsonLd()]} />
+        {GA_MEASUREMENT_ID && <GoogleAnalytics gaId={GA_MEASUREMENT_ID} />}
       </body>
     </html>
   );
