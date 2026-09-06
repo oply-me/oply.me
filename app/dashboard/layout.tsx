@@ -3,7 +3,9 @@ import { AnnouncementBanner } from "@/components/dashboard/announcement-banner";
 import { ToolSearch } from "@/components/tool-search";
 import { requireUser } from "@/lib/auth/guards";
 import { getCreditSummary } from "@/lib/credits";
-import { listPublicTools } from "@/lib/tools/registry";
+import { getNotifications } from "@/lib/dashboard/notifications";
+import { listTools } from "@/lib/tools/registry";
+import { toSearchItem } from "@/lib/tools/search-item";
 import { createClient } from "@/lib/supabase/server";
 import { buildMetadata } from "@/lib/seo/metadata";
 
@@ -19,7 +21,7 @@ export default async function DashboardLayout({
 
   const [credits, tools, announcementResult] = await Promise.all([
     getCreditSummary(user.id),
-    listPublicTools(),
+    listTools(),
     supabase
       .from("announcements")
       .select("id, title, message, link_url, link_label")
@@ -28,6 +30,13 @@ export default async function DashboardLayout({
   ]);
 
   const announcement = announcementResult.data?.[0] ?? null;
+
+  // Needs the balance, so it cannot join the Promise.all above.
+  const notifications = await getNotifications(
+    user.id,
+    credits.balance,
+    user.profile?.notifications_seen_at ?? null,
+  );
 
   return (
     <div className="min-h-dvh bg-background">
@@ -39,6 +48,8 @@ export default async function DashboardLayout({
           isAdmin: user.profile?.role === "admin",
         }}
         balance={credits.balance}
+        notifications={notifications.items}
+        unreadCount={notifications.unreadCount}
       />
 
       <div className="lg:pl-[260px]">
@@ -49,7 +60,7 @@ export default async function DashboardLayout({
       </div>
 
       {/* Mounted globally so Cmd/Ctrl+K works from any dashboard page. */}
-      <ToolSearch tools={tools} trigger="hidden" />
+      <ToolSearch tools={tools.map(toSearchItem)} trigger="hidden" />
     </div>
   );
 }

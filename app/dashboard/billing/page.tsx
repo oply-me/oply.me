@@ -1,7 +1,9 @@
 import Link from "next/link";
-import { CreditCard } from "lucide-react";
+import { CheckCircle2, Coins, CreditCard, ReceiptText } from "lucide-react";
 import { PageHeader } from "@/components/dashboard/page-header";
+import { StatCard } from "@/components/dashboard/stat-card";
 import { EmptyState } from "@/components/empty-state";
+import { Reveal } from "@/components/reveal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,7 +13,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  tableRowClass,
 } from "@/components/ui/table";
+import { paymentProviderLabel } from "@/lib/payments/labels";
 import { requireUser } from "@/lib/auth/guards";
 import { getCreditSummary } from "@/lib/credits";
 import { createClient } from "@/lib/supabase/server";
@@ -68,25 +72,27 @@ export default async function BillingPage() {
       />
 
       <div className="mb-8 grid gap-4 sm:grid-cols-3">
-        <div className="rounded-xl border border-border bg-card p-5">
-          <p className="text-[13px] text-muted-foreground">Plan</p>
-          <p className="mt-2 text-lg font-semibold">Pay as you go</p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            No recurring charge
-          </p>
-        </div>
-        <div className="rounded-xl border border-border bg-card p-5">
-          <p className="text-[13px] text-muted-foreground">Credit balance</p>
-          <p className="mt-2 text-lg font-semibold tabular-nums">
-            {formatNumber(credits.balance)}
-          </p>
-        </div>
-        <div className="rounded-xl border border-border bg-card p-5">
-          <p className="text-[13px] text-muted-foreground">Completed orders</p>
-          <p className="mt-2 text-lg font-semibold tabular-nums">
-            {(orders ?? []).filter((o) => o.status === "completed").length}
-          </p>
-        </div>
+        <StatCard
+          label="Plan"
+          value="Pay as you go"
+          icon={CreditCard}
+          size="sm"
+          footer={
+            <p className="text-xs text-muted-foreground">No recurring charge</p>
+          }
+        />
+        <StatCard
+          label="Credit balance"
+          value={credits.balance}
+          icon={Coins}
+          size="sm"
+        />
+        <StatCard
+          label="Completed orders"
+          value={(orders ?? []).filter((o) => o.status === "completed").length}
+          icon={CheckCircle2}
+          size="sm"
+        />
       </div>
 
       <h2 className="mb-4 text-[15px] font-semibold">Order history</h2>
@@ -107,14 +113,20 @@ export default async function BillingPage() {
                 <TableHead>Plan</TableHead>
                 <TableHead>Amount</TableHead>
                 <TableHead>Credits</TableHead>
+                <TableHead>Method</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead />
               </TableRow>
             </TableHeader>
             <TableBody>
-              {(orders ?? []).map((order) => (
-                <TableRow key={order.id}>
+              {(orders ?? []).map((order, i) => (
+                <Reveal
+                  as="tr"
+                  key={order.id}
+                  delay={Math.min(i, 8) * 0.04}
+                  className={tableRowClass}
+                >
                   <TableCell className="font-mono text-xs text-muted-foreground">
                     {order.id.slice(0, 8)}
                   </TableCell>
@@ -125,6 +137,9 @@ export default async function BillingPage() {
                   <TableCell className="tabular-nums">
                     {formatNumber(order.credits)}
                   </TableCell>
+                  <TableCell className="whitespace-nowrap text-muted-foreground">
+                    {paymentProviderLabel(order.payment_provider)}
+                  </TableCell>
                   <TableCell>
                     <Badge variant={STATUS_VARIANT[order.status]}>
                       {STATUS_LABEL[order.status]}
@@ -133,14 +148,21 @@ export default async function BillingPage() {
                   <TableCell className="whitespace-nowrap text-muted-foreground">
                     {formatDate(order.created_at)}
                   </TableCell>
-                  <TableCell>
-                    {(order.status === "pending" || order.status === "processing") && (
+                  <TableCell className="whitespace-nowrap">
+                    {order.status === "pending" || order.status === "processing" ? (
                       <Button asChild size="sm" variant="outline">
                         <Link href={`/checkout/${order.id}`}>View</Link>
                       </Button>
-                    )}
+                    ) : order.status === "completed" ? (
+                      <Button asChild size="sm" variant="outline">
+                        <Link href={`/dashboard/billing/${order.id}/receipt`}>
+                          <ReceiptText />
+                          Receipt
+                        </Link>
+                      </Button>
+                    ) : null}
                   </TableCell>
-                </TableRow>
+                </Reveal>
               ))}
             </TableBody>
           </Table>

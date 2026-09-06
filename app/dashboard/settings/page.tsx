@@ -1,5 +1,9 @@
 import { PageHeader } from "@/components/dashboard/page-header";
 import { SettingsForm } from "@/components/dashboard/settings-form";
+import {
+  ChangePasswordForm,
+  DeleteAccountForm,
+} from "@/components/dashboard/security-forms";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Badge } from "@/components/ui/badge";
 import { requireUser } from "@/lib/auth/guards";
@@ -68,10 +72,32 @@ export default async function SettingsPage() {
             </div>
           </dl>
           <p className="mt-6 border-t border-border pt-4 text-[13px] leading-relaxed text-muted-foreground">
-            Your email, role and credit balance can only be changed by Oply. To
-            change your password, log out and use the reset link on the login
-            page. To delete your account and its data, contact support.
+            Your email, role and credit balance can only be changed by Oply.
           </p>
+        </section>
+
+        <section className="rounded-xl border border-border bg-card p-6">
+          <h2 className="text-[15px] font-semibold">Password</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Your current password is required, so a signed-in browser left
+            unattended cannot be used to lock you out.
+          </p>
+          <div className="mt-5">
+            <ChangePasswordForm />
+          </div>
+        </section>
+
+        <section className="rounded-xl border border-destructive/30 bg-card p-6">
+          <h2 className="text-[15px] font-semibold">Delete account</h2>
+          <p className="mt-1 max-w-prose text-sm leading-relaxed text-muted-foreground">
+            Permanently deletes your account and everything attached to it —
+            generations, saved results, projects, order records and any
+            remaining credit balance. This cannot be undone, and unused credits
+            are not refunded.
+          </p>
+          <div className="mt-5">
+            <DeleteAccountForm email={user.email} />
+          </div>
         </section>
       </div>
     </div>

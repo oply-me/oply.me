@@ -48,7 +48,7 @@ const GROUPS = [
       {
         question: "How do I pay?",
         answer:
-          "Through a crypto payment provider. The supported currencies and networks shown at checkout are exactly the ones that provider is configured to accept — we do not advertise networks we cannot settle.",
+          "By card through Paddle, or in crypto through our crypto payment provider — pick either at checkout. The card and crypto options shown are exactly the ones configured on this deployment, and the currencies and networks listed are the ones that provider can actually settle.",
       },
       {
         question: "When are credits added to my account?",
@@ -59,6 +59,11 @@ const GROUPS = [
         question: "What if I pay and nothing happens?",
         answer:
           "Crypto confirmations can lag behind the payment. Your order page shows the live status. If it has not resolved within an hour, contact support with your order ID.",
+      },
+      {
+        question: "Can I get a refund?",
+        answer:
+          "Credit purchases are final. Credits are delivered the moment payment confirms, and every new account gets welcome credits so you can try the tools before paying. We still refund duplicate charges and credits that were paid for but never arrived, and a failed generation always returns its credits automatically. Full detail is in the Refund Policy.",
       },
     ],
   },
@@ -98,7 +103,7 @@ const GROUPS = [
       {
         question: "Can I delete my account?",
         answer:
-          "Yes. Email support and we will remove your account and its data. Unused credits are not transferable.",
+          "Yes, from Settings in your dashboard. Deletion is immediate and permanent: your generations, saved results, projects and order records go with it, and any unused credits are forfeited rather than refunded.",
       },
       {
         question: "Can I use Oply on my phone?",

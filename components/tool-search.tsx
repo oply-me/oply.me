@@ -2,13 +2,26 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Command } from "cmdk";
-import { Search } from "lucide-react";
-import { ToolIcon } from "@/components/icon";
+import dynamic from "next/dynamic";
+import { Loader2, Search } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import type { PublicTool } from "@/config/tools";
-import { categoryMap } from "@/config/categories";
+import type { ToolSearchItem } from "@/lib/tools/search-item";
 import { cn } from "@/lib/utils";
+
+/* `cmdk` and the tool list only matter once the dialog is open, so they load
+   then rather than in every page's initial bundle. */
+const ToolSearchPalette = dynamic(
+  () =>
+    import("@/components/tool-search-palette").then((m) => m.ToolSearchPalette),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex h-24 items-center justify-center">
+        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+      </div>
+    ),
+  },
+);
 
 /**
  * Global tool search. Opens on Cmd/Ctrl+K anywhere it is mounted, and closes
@@ -19,7 +32,13 @@ export function ToolSearch({
   trigger = "button",
   className,
 }: {
-  tools: PublicTool[];
+  /**
+   * Deliberately the compact shape, not `PublicTool`: the full definition
+   * carries prompts, fields, FAQ and keyword layers, and serialising all 15 of
+   * them into every page was 68KB of RSC payload for a palette that reads five
+   * fields. See lib/tools/search-item.ts.
+   */
+  tools: ToolSearchItem[];
   trigger?: "button" | "hidden";
   className?: string;
 }) {
@@ -64,50 +83,7 @@ export function ToolSearch({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="overflow-hidden p-0 sm:max-w-xl" hideClose>
           <DialogTitle className="sr-only">Search tools</DialogTitle>
-          <Command
-            className="[&_[cmdk-input-wrapper]]:border-b [&_[cmdk-input-wrapper]]:border-border"
-            loop
-          >
-            <div
-              cmdk-input-wrapper=""
-              className="flex items-center gap-2 px-4"
-            >
-              <Search
-                className="h-4 w-4 shrink-0 text-muted-foreground"
-                aria-hidden="true"
-              />
-              <Command.Input
-                placeholder="Search tools by name, category or task…"
-                className="h-12 w-full bg-transparent text-[15px] outline-none placeholder:text-muted-foreground"
-              />
-            </div>
-            <Command.List className="scroll-area max-h-80 overflow-y-auto p-2">
-              <Command.Empty className="py-10 text-center text-sm text-muted-foreground">
-                No tools match that search.
-              </Command.Empty>
-              {tools.map((tool) => (
-                <Command.Item
-                  key={tool.slug}
-                  value={`${tool.name} ${tool.description} ${tool.category} ${tool.slug}`}
-                  onSelect={() => go(`/tools/${tool.slug}`)}
-                  className="flex cursor-pointer items-center gap-3 rounded-md px-2.5 py-2.5 text-sm data-[selected=true]:bg-accent"
-                >
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-                    <ToolIcon name={tool.icon} className="h-4 w-4" />
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block font-medium">{tool.name}</span>
-                    <span className="block truncate text-xs text-muted-foreground">
-                      {tool.description}
-                    </span>
-                  </span>
-                  <span className="shrink-0 text-xs text-muted-foreground">
-                    {categoryMap.get(tool.category)?.name ?? tool.category}
-                  </span>
-                </Command.Item>
-              ))}
-            </Command.List>
-          </Command>
+          <ToolSearchPalette tools={tools} onSelect={go} />
         </DialogContent>
       </Dialog>
     </>

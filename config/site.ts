@@ -15,6 +15,19 @@ export const siteConfig = {
   /** Default input ceiling; individual tools may lower or raise it. */
   defaultMaxInputChars: 10_000,
   longFormMaxInputChars: 30_000,
+  /**
+   * Only accounts that actually exist. An empty entry here renders nothing
+   * rather than a dead link — do not add a network until the handle is real.
+   */
+  social: [
+    { title: "X", href: "https://x.com/oply", icon: "x" },
+    { title: "GitHub", href: "https://github.com/oply", icon: "github" },
+    {
+      title: "LinkedIn",
+      href: "https://linkedin.com/company/oply",
+      icon: "linkedin",
+    },
+  ],
   nav: [
     { title: "Tools", href: "/tools" },
     { title: "Categories", href: "/categories" },

@@ -55,7 +55,14 @@ export default async function FavoritesPage() {
       ) : (
         <FavoritesList
           items={items}
-          tools={tools.map((t) => ({ slug: t.slug, icon: t.icon }))}
+          tools={tools.map((t) => ({
+            slug: t.slug,
+            name: t.name,
+            icon: t.icon,
+            category: t.category,
+            tagline: t.tagline,
+            creditCost: t.creditCost,
+          }))}
         />
       )}
     </div>

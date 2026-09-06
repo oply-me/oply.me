@@ -10,8 +10,8 @@ import {
 import { Hero } from "@/components/marketing/hero";
 import { HowItWorks } from "@/components/marketing/how-it-works";
 import { SoftBackdrop, OrbitRing } from "@/components/marketing/backdrop";
-import { Reveal } from "@/components/marketing/reveal";
-import { AnimatedStat } from "@/components/marketing/animated-stat";
+import { Reveal } from "@/components/reveal";
+import { AnimatedStat } from "@/components/animated-stat";
 import { Section, SectionHeading } from "@/components/marketing/section";
 import { ToolCard } from "@/components/marketing/tool-card";
 import { CategoryCard } from "@/components/marketing/category-card";
@@ -53,7 +53,7 @@ const HOME_FAQ = [
   {
     question: "How do I pay?",
     answer:
-      "Checkout is handled by a crypto payment provider, with the settlement currencies that provider supports. Credits are added once the payment is confirmed on-chain.",
+      "Pay by card through Paddle or in crypto — whichever you prefer at checkout. Credits are added once the payment provider confirms the transaction.",
   },
   {
     question: "Will more tools be added?",

@@ -60,10 +60,17 @@ what makes payments actually work.
 ```bash
 curl -s -o /dev/null -w "%{http_code}\n" https://oply.me
 curl -s https://oply.me/robots.txt
-curl -s https://oply.me/sitemap.xml | grep -c "<loc>"        # expect 26
+curl -s https://oply.me/sitemap.xml | grep -c "<loc>"        # expect 32
 curl -s -o /dev/null -w "%{http_code}\n" https://oply.me/dashboard   # expect 307
 curl -s -X POST https://oply.me/api/payments/webhook -d '{}'         # expect 401
+curl -s -o /dev/null -w "%{http_code}\n" https://oply.me/opengraph-image  # expect 200
+curl -s -o /dev/null -w "%{http_code}\n" \
+  https://oply.me/google1c3bba0784a1ef59.html                        # expect 200
 ```
+
+The Search Console verification file must live in `public/` — Next.js does not
+serve files from the repo root, so a copy sitting there returns 404 and
+verification silently never completes.
 
 Then sign up on the live site, run one tool, and confirm credits move.
 

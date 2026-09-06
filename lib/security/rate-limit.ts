@@ -64,6 +64,11 @@ export const RATE_LIMITS = {
   contact: { limit: 5, windowMs: 300_000 },
   /** General authenticated API traffic. */
   api: { limit: 60, windowMs: 60_000 },
+  /**
+   * Credential-checking endpoints. Tight, because both re-verify a password
+   * and would otherwise be an online guessing oracle against a known email.
+   */
+  credentials: { limit: 5, windowMs: 900_000 },
 } as const;
 
 export async function rateLimit(

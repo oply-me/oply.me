@@ -42,10 +42,14 @@ export function ToolCardPreview({ tool }: { tool: PublicTool }) {
         <AnimatePresence mode="wait">
           <motion.p
             key={label}
-            initial={reduceMotion ? undefined : { opacity: 0 }}
+            /* The targets stay put and only the duration collapses: dropping
+               `initial` under reduced motion changed the rendered style, and
+               SSR never sees the media query, so it desynchronised
+               hydration. */
+            initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={reduceMotion ? undefined : { opacity: 0 }}
-            transition={{ duration: 0.4 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: reduceMotion ? 0 : 0.4 }}
             className="line-clamp-2 text-[12.5px] leading-snug text-foreground/80"
           >
             {text}

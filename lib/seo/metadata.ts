@@ -13,6 +13,13 @@ interface BuildMetadataOptions {
    * — a long list is noise, and the tag is a weak signal at the best of times.
    */
   keywords?: string[];
+  /**
+   * Set false on a route that ships its own colocated `opengraph-image.tsx`.
+   * Setting `openGraph` here replaces the inherited object wholesale, which
+   * silently dropped the root image from every page — so the default is
+   * attached explicitly, and routes with a better image opt out.
+   */
+  defaultOgImage?: boolean;
 }
 
 /** Upper bound on the emitted keyword list. */
@@ -25,8 +32,19 @@ export function buildMetadata({
   noIndex = false,
   type = "website",
   keywords,
+  defaultOgImage = true,
 }: BuildMetadataOptions = {}): Metadata {
   const url = `${siteConfig.url}${path === "/" ? "" : path}`;
+  const images = defaultOgImage
+    ? [
+        {
+          url: `${siteConfig.url}/opengraph-image`,
+          width: 1200,
+          height: 630,
+          alt: `${siteConfig.name} — ${siteConfig.tagline}`,
+        },
+      ]
+    : undefined;
   const fullTitle = title
     ? title.includes(siteConfig.name)
       ? title
@@ -53,11 +71,13 @@ export function buildMetadata({
       siteName: siteConfig.name,
       type,
       locale: "en_US",
+      ...(images ? { images } : {}),
     },
     twitter: {
       card: "summary_large_image",
       title: fullTitle,
       description,
+      ...(images ? { images: images.map((i) => i.url) } : {}),
     },
     robots: noIndex
       ? { index: false, follow: false, nocache: true }

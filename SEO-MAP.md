@@ -57,20 +57,47 @@ Hubs with no live tools are excluded from `/categories`, the sitemap and
 
 Tools link to the tools they share `entities` with, not their neighbours in
 `sortOrder`. Every tool links up to its hub via the category badge; every hub
-lists its tools.
+lists its tools. `tests/tool-registry.test.ts` fails if a `related` slug does
+not exist.
 
 ```
-ai-writer            → ai-rewriter, blog-outline-generator, ai-summarizer
-ai-rewriter          → ai-writer, reply-generator, ai-summarizer
-ai-summarizer        → ai-rewriter, ai-writer, reply-generator
-prompt-generator     → prompt-optimizer, ai-writer, ai-rewriter
-prompt-optimizer     → prompt-generator, ai-rewriter, ai-writer
-seo-meta-generator   → schema-generator, blog-outline-generator, product-description-generator
-schema-generator     → seo-meta-generator, product-description-generator, blog-outline-generator
-product-description  → seo-meta-generator, ai-rewriter, ai-writer
-reply-generator      → ai-rewriter, ai-writer, ai-summarizer
-blog-outline         → ai-writer, seo-meta-generator, ai-summarizer
+ai-writer                     → ai-rewriter, blog-outline-generator, ai-summarizer
+ai-rewriter                   → ai-writer, reply-generator, ai-summarizer
+ai-summarizer                 → ai-rewriter, ai-writer, reply-generator
+prompt-generator              → prompt-optimizer, ai-writer, ai-rewriter
+prompt-optimizer              → prompt-generator, ai-rewriter, ai-writer
+seo-meta-generator            → schema-generator, blog-outline-generator, product-description-generator
+schema-generator              → seo-meta-generator, product-description-generator, blog-outline-generator
+product-description-generator → seo-meta-generator, ai-rewriter, ai-writer
+reply-generator               → ai-rewriter, ai-writer, ai-summarizer
+blog-outline-generator        → ai-writer, seo-meta-generator, ai-summarizer
+ai-logo-icon-generator        → ai-thumbnail-generator, ai-social-post-graphic, ai-product-photo-generator
+ai-thumbnail-generator        → ai-social-post-graphic, ai-logo-icon-generator, ai-background-remover
+ai-social-post-graphic        → ai-thumbnail-generator, ai-logo-icon-generator, ai-product-photo-generator
+ai-product-photo-generator    → ai-background-remover, product-description-generator, ai-social-post-graphic
+ai-background-remover         → ai-product-photo-generator, ai-thumbnail-generator, ai-social-post-graphic
 ```
+
+### Navigational link surfaces
+
+Beyond `related`, every public page carries the same three link surfaces, all
+generated from `getEnabledTools()` so none of them can drift from what ships:
+
+| Surface | Links out to | Source |
+|---|---|---|
+| Header mega-menu | 4 tools per category, each category hub, `/tools` | `lib/tools/menu.ts` |
+| Mobile nav accordion | the same set, nested by category | `lib/tools/menu.ts` |
+| Footer | `/tools`, every category hub with tools, product, company and legal pages | `components/marketing/footer.tsx` |
+| ⌘K palette | every tool | `lib/tools/search-item.ts` |
+
+The mega-menu and palette live inside Radix overlays, so their markup is not
+in the served HTML — they are user navigation, not crawlable link equity. The
+footer is the surface that actually carries hub and category links to a
+crawler, which is why every category with at least one tool is listed there.
+
+A crawl of the built site (breadth-first from `/`, following in-DOM `<a href>`)
+found **no orphaned pages and no crawlable public page missing from the
+sitemap**; the least-linked page has 18 inbound internal links.
 
 ## Where the data is used
 
@@ -80,7 +107,10 @@ blog-outline         → ai-writer, seo-meta-generator, ai-summarizer
 | `<meta name="keywords">` on a hub | `primaryKeyword` + `keywords` |
 | `<meta name="keywords">` site-wide | `siteKeywords` |
 | `SoftwareApplication` JSON-LD | `keywords` (comma-joined), `about` (entities as `Thing` nodes) |
+| `HowTo` JSON-LD (tool pages) | `howItWorks`, marking up the visible numbered list |
+| `CollectionPage` JSON-LD (hubs) | `seoDescription`, `keywords`, and the hub's real tool list |
 | `FAQPage` JSON-LD | `faq`, which every `questions` entry must match |
+| Open Graph image (per tool/hub) | name, tagline, credit cost, `categoryColors()` hue |
 | Site search ranking | `primary` +80, `secondary` +40, `longTail`/`entities` +15 |
 | Hub meta description | `seoDescription` |
 

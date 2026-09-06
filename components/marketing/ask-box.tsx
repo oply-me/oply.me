@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowUp, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -28,9 +28,15 @@ export function AskBox({
 }) {
   const router = useRouter();
   const [value, setValue] = useState("");
-  const [placeholder] = useState(
-    () => EXAMPLES[Math.floor(Math.random() * EXAMPLES.length)],
-  );
+  /**
+   * Picked after mount, not in the initialiser: this component is server
+   * rendered, and `Math.random()` on both sides gave the server and the client
+   * different placeholders, which failed hydration on the homepage hero.
+   */
+  const [placeholder, setPlaceholder] = useState(EXAMPLES[0]);
+  useEffect(() => {
+    setPlaceholder(EXAMPLES[Math.floor(Math.random() * EXAMPLES.length)]);
+  }, []);
 
   function submit(e: React.FormEvent) {
     e.preventDefault();

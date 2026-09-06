@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion, useReducedMotion } from "framer-motion";
 import { Check, CreditCard, Loader2, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +23,7 @@ export function PricingTable({
   cryptoConfigured?: boolean;
 }) {
   const router = useRouter();
+  const reduceMotion = useReducedMotion();
   const [pendingPlan, setPendingPlan] = useState<string | null>(null);
   // Card first when both are available — lower friction for most buyers.
   const [method, setMethod] = useState<PaymentMethod>(
@@ -107,8 +109,12 @@ export function PricingTable({
 
       <div className="grid gap-6 lg:grid-cols-4">
         {pricingPlans.map((plan) => (
-          <div
+          /* The card is not itself clickable — its CTA is — so it lifts on
+             hover like ToolCard but takes no whileTap. */
+          <motion.div
             key={plan.id}
+            whileHover={reduceMotion ? {} : { y: -4 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
             className={cn(
               "relative flex flex-col rounded-xl border bg-card p-6 transition-shadow",
               plan.highlight
@@ -162,7 +168,7 @@ export function PricingTable({
                 </li>
               ))}
             </ul>
-          </div>
+          </motion.div>
         ))}
       </div>
     </div>

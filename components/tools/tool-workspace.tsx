@@ -19,6 +19,7 @@ import { DownloadButton } from "@/components/tools/download-button";
 import { FieldRenderer } from "@/components/tools/field-renderer";
 import { GenerationProgress } from "@/components/tools/generation-progress";
 import { ImageResultView } from "@/components/tools/image-result-view";
+import { ResultReveal } from "@/components/tools/result-reveal";
 import { ToolExampleToggle } from "@/components/tools/tool-example-toggle";
 import {
   OutlineOutput,
@@ -303,7 +304,9 @@ export function ToolWorkspace({
           ) : error ? (
             <ErrorPanel error={error} onRetry={() => run("generate")} />
           ) : result ? (
-            <ResultView tool={tool} result={result} input={input} />
+            <ResultReveal resultKey={result.generationId}>
+              <ResultView tool={tool} result={result} input={input} />
+            </ResultReveal>
           ) : (
             <IdleState tool={tool} />
           )}

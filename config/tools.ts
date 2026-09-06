@@ -2051,7 +2051,11 @@ Compose a clean, printable logo: balanced, legible at small sizes, and free of w
     featured: false,
     sortOrder: 11,
     enabled: true,
-    related: ["ai-thumbnail-generator"],
+    related: [
+      "ai-thumbnail-generator",
+      "ai-social-post-graphic",
+      "ai-product-photo-generator",
+    ],
     keywords: {
       primary: "ai logo generator",
       secondary: [
@@ -2240,7 +2244,11 @@ If asked to include the title text, render it large, legible and high-contrast â
     featured: false,
     sortOrder: 12,
     enabled: true,
-    related: ["ai-social-post-graphic"],
+    related: [
+      "ai-social-post-graphic",
+      "ai-logo-icon-generator",
+      "ai-background-remover",
+    ],
     keywords: {
       primary: "ai thumbnail generator",
       secondary: [
@@ -2419,7 +2427,11 @@ Compose an image that supports the caption's message without needing to render t
     featured: false,
     sortOrder: 13,
     enabled: true,
-    related: ["ai-thumbnail-generator"],
+    related: [
+      "ai-thumbnail-generator",
+      "ai-logo-icon-generator",
+      "ai-product-photo-generator",
+    ],
     keywords: {
       primary: "ai social post graphic generator",
       secondary: [
@@ -2591,7 +2603,11 @@ Keep the product itself as the clear subject and change only the setting around 
     featured: false,
     sortOrder: 14,
     enabled: true,
-    related: ["ai-background-remover", "product-description-generator"],
+    related: [
+      "ai-background-remover",
+      "product-description-generator",
+      "ai-social-post-graphic",
+    ],
     keywords: {
       primary: "ai product photo generator",
       secondary: [
@@ -2757,7 +2773,11 @@ If asked to remove the background, produce a clean cutout of the subject on a tr
     featured: false,
     sortOrder: 15,
     enabled: true,
-    related: ["ai-product-photo-generator", "ai-rewriter"],
+    related: [
+      "ai-product-photo-generator",
+      "ai-thumbnail-generator",
+      "ai-social-post-graphic",
+    ],
     keywords: {
       primary: "ai background remover",
       secondary: [

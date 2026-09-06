@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { LegalPage } from "@/components/marketing/legal-page";
 import { siteConfig } from "@/config/site";
 import { buildMetadata } from "@/lib/seo/metadata";
@@ -11,7 +12,7 @@ export const metadata = buildMetadata({
 
 export default function TermsPage() {
   return (
-    <LegalPage title="Terms of Service" updated="January 2025">
+    <LegalPage title="Terms of Service" updated="September 2026">
       <p>
         By creating an account or using {siteConfig.name}, you agree to these
         terms.
@@ -39,9 +40,17 @@ export default function TermsPage() {
       <h2>3. Payments</h2>
       <p>
         Credit packs are one-time purchases. Prices are shown in USD. Payment is
-        processed by a third-party crypto payment provider, and credits are added
-        to your account only after that provider confirms the transaction.
-        Blockchain confirmation times are outside our control.
+        processed by a third-party provider — by card through Paddle, which acts
+        as Merchant of Record for those transactions, or in crypto through our
+        crypto payment provider. Credits are added to your account only after
+        that provider confirms the transaction. Blockchain confirmation times
+        are outside our control.
+      </p>
+      <p>
+        Credit purchases are final except in the narrow cases set out in the{" "}
+        <Link href="/refund-policy">Refund Policy</Link>, which forms part of
+        these Terms. Nothing in it limits the consumer rights that apply where
+        you live.
       </p>
 
       <h2>4. Acceptable use</h2>

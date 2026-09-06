@@ -11,7 +11,11 @@ import { categories, getCategory } from "@/config/categories";
 import { getActiveCategorySlugs, toPublicTool } from "@/config/tools";
 import { listTools, listToolsByCategory } from "@/lib/tools/registry";
 import { buildMetadata } from "@/lib/seo/metadata";
-import { breadcrumbJsonLd, faqJsonLd } from "@/lib/seo/jsonld";
+import {
+  breadcrumbJsonLd,
+  collectionPageJsonLd,
+  faqJsonLd,
+} from "@/lib/seo/jsonld";
 
 export function generateStaticParams() {
   return getActiveCategorySlugs().map((slug) => ({ slug }));
@@ -31,6 +35,8 @@ export async function generateMetadata({
     description: category.seoDescription,
     path: `/categories/${slug}`,
     keywords: [category.primaryKeyword, ...category.keywords],
+    // Colocated opengraph-image.tsx wins here — see buildMetadata.
+    defaultOgImage: false,
   });
 }
 
@@ -80,6 +86,7 @@ export default async function CategoryPage({
             { name: category.name, path: `/categories/${slug}` },
           ]),
           faqJsonLd(faq),
+          collectionPageJsonLd(category, tools),
         ]}
       />
 

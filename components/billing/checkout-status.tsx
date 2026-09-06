@@ -192,6 +192,19 @@ export function CheckoutStatus({
         </div>
       </dl>
 
+      {/* Stated at the point of purchase, not only on the policy page — the
+          refund stance has to be visible where the money is actually spent. */}
+      <p className="mt-6 border-t border-border pt-5 text-xs leading-relaxed text-muted-foreground">
+        Credits are delivered as soon as payment confirms, and credit purchases
+        are final. Duplicate charges and credits that never arrive are still
+        refunded, and a failed generation always returns its credits
+        automatically — see the{" "}
+        <Link href="/refund-policy" className="text-primary hover:underline">
+          Refund Policy
+        </Link>
+        . This does not affect the consumer rights that apply where you live.
+      </p>
+
       {/* Payment details */}
       {!isFinal && (
         <div className="mt-6 space-y-4 border-t border-border pt-6">

@@ -25,7 +25,14 @@ export function AnimatedStat({
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
   const reduceMotion = useReducedMotion();
-  const [display, setDisplay] = useState(reduceMotion ? value : 0);
+  /**
+   * Always seeded at 0, never at `value`: `useReducedMotion` reads
+   * `matchMedia` and so returns `true` on the client's first render but not
+   * during SSR, which made a reduced-motion visitor's first paint disagree
+   * with the server's and threw away the hydrated tree. The effect below
+   * puts the real number in on mount instead.
+   */
+  const [display, setDisplay] = useState(0);
 
   useEffect(() => {
     if (!inView || reduceMotion) {

@@ -32,8 +32,11 @@ export function ToolCard({
   return (
     <MotionLink
       href={`/tools/${tool.slug}`}
-      whileHover={reduceMotion ? undefined : { y: -4 }}
-      whileTap={reduceMotion ? undefined : { scale: 0.98 }}
+      /* Empty objects, not `undefined`: Framer adds a `tabindex` to an element
+         that has a `whileTap`, and SSR never sees the reduced-motion media
+         query, so dropping the prop entirely desynchronises hydration. */
+      whileHover={reduceMotion ? {} : { y: -4 }}
+      whileTap={reduceMotion ? {} : { scale: 0.98 }}
       transition={{ duration: 0.18, ease: "easeOut" }}
       style={
         {

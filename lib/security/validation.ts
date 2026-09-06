@@ -29,6 +29,27 @@ export const contactSchema = z.object({
     .max(5_000, "Please keep your message under 5,000 characters."),
 });
 
+/** Matches the 8-character floor already enforced by the reset-password form. */
+export const MIN_PASSWORD_LENGTH = 8;
+
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1, "Enter your current password."),
+  newPassword: z
+    .string()
+    .min(MIN_PASSWORD_LENGTH, `Use at least ${MIN_PASSWORD_LENGTH} characters.`)
+    .max(72, "Passwords are limited to 72 characters."),
+});
+
+export const deleteAccountSchema = z.object({
+  /** Typed confirmation, so a stray click cannot destroy an account. */
+  confirmation: z.literal("DELETE"),
+  password: z.string().min(1, "Enter your password to confirm."),
+});
+
+export const newsletterSchema = z.object({
+  email: z.string().trim().toLowerCase().email("Enter a valid email address."),
+});
+
 export const projectSchema = z.object({
   name: z.string().min(1, "Give the project a name.").max(120),
   description: z.string().max(500).optional().nullable(),

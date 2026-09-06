@@ -2,7 +2,9 @@ import Link from "next/link";
 import { ArrowRight, Coins, Sparkles, TrendingUp } from "lucide-react";
 import { AskBox } from "@/components/marketing/ask-box";
 import { ToolCard } from "@/components/marketing/tool-card";
-import { ToolIcon } from "@/components/icon";
+import { Reveal } from "@/components/reveal";
+import { StatCard } from "@/components/dashboard/stat-card";
+import { ToolTile } from "@/components/tools/tool-tile";
 import { Button } from "@/components/ui/button";
 import { toPublicTool, type ToolDefinition } from "@/config/tools";
 import { siteConfig } from "@/config/site";
@@ -10,7 +12,7 @@ import { requireUser } from "@/lib/auth/guards";
 import { getCreditSummary, getMonthlyUsage } from "@/lib/credits";
 import { listTools } from "@/lib/tools/registry";
 import { createClient } from "@/lib/supabase/server";
-import { cn, formatNumber, greeting, timeAgo } from "@/lib/utils";
+import { greeting, timeAgo } from "@/lib/utils";
 
 /** Onboarding answer → the tools we surface first. */
 const RECOMMENDATIONS: Record<string, string[]> = {
@@ -106,53 +108,33 @@ export default async function DashboardPage() {
 
       {/* Stats */}
       <div className="mb-10 grid gap-4 sm:grid-cols-3">
-        <div
-          className={cn(
-            "rounded-xl border bg-card p-5",
-            low ? "border-warning/40" : "border-border",
-          )}
-        >
-          <div className="flex items-center justify-between">
-            <p className="text-[13px] text-muted-foreground">Credit balance</p>
-            <Coins
-              className={cn(
-                "h-4 w-4",
-                low ? "text-warning" : "text-muted-foreground",
-              )}
-              aria-hidden="true"
-            />
-          </div>
-          <p
-            className={cn(
-              "mt-2 text-2xl font-semibold tabular-nums",
-              low && "text-warning",
-            )}
-          >
-            {formatNumber(credits.balance)}
-          </p>
-          <Button asChild size="sm" variant={low ? "default" : "outline"} className="mt-4">
-            <Link href="/pricing">Buy Credits</Link>
-          </Button>
-        </div>
+        <StatCard
+          label="Credit balance"
+          value={credits.balance}
+          icon={Coins}
+          emphasis={low ? "warning" : "default"}
+          footer={
+            <Button asChild size="sm" variant={low ? "default" : "outline"}>
+              <Link href="/pricing">Buy Credits</Link>
+            </Button>
+          }
+        />
 
-        <div className="rounded-xl border border-border bg-card p-5">
-          <div className="flex items-center justify-between">
-            <p className="text-[13px] text-muted-foreground">Used this month</p>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-          </div>
-          <p className="mt-2 text-2xl font-semibold tabular-nums">
-            {formatNumber(monthlyUsage)}
-          </p>
-          <p className="mt-4 text-xs text-muted-foreground">
-            credits across all tools
-          </p>
-        </div>
+        <StatCard
+          label="Used this month"
+          value={monthlyUsage}
+          icon={TrendingUp}
+          footer={
+            <Link
+              href="/dashboard/usage"
+              className="text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+            >
+              See usage over time
+            </Link>
+          }
+        />
 
-        <div className="rounded-xl border border-border bg-card p-5">
-          <div className="flex items-center justify-between">
-            <p className="text-[13px] text-muted-foreground">Most used this week</p>
-            <Sparkles className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-          </div>
+        <StatCard label="Most used this week" icon={Sparkles}>
           {topTools.length > 0 ? (
             <ul className="mt-2.5 space-y-1.5">
               {topTools.map(({ tool, count }) => (
@@ -177,31 +159,34 @@ export default async function DashboardPage() {
               Nothing yet this week.
             </p>
           )}
-        </div>
+        </StatCard>
       </div>
 
       {/* Recently used */}
       {recentTools.length > 0 && (
-        <Section title="Recently used" href="/dashboard/history" linkLabel="View history">
+        <Section title="Recently used" href="/dashboard/activity" linkLabel="View activity">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {recentTools.map(({ tool, at }) => (
-              <Link
-                key={tool.slug}
-                href={`/tools/${tool.slug}`}
-                className="group flex items-center gap-3 rounded-lg border border-border bg-card p-3.5 transition-colors hover:border-primary/40"
-              >
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                  <ToolIcon name={tool.icon} className="h-4 w-4" />
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[13px] font-medium">
-                    {tool.name}
+            {recentTools.map(({ tool, at }, i) => (
+              <Reveal key={tool.slug} delay={i * 0.06}>
+                <Link
+                  href={`/tools/${tool.slug}`}
+                  className="group flex items-center gap-3 rounded-lg border border-border bg-card p-3.5 transition-colors hover:border-primary/40"
+                >
+                  <ToolTile
+                    icon={tool.icon}
+                    category={tool.category}
+                    className="transition-transform duration-300 group-hover:scale-105"
+                  />
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-[13px] font-medium">
+                      {tool.name}
+                    </span>
+                    <span className="block text-[11px] text-muted-foreground">
+                      {timeAgo(at)}
+                    </span>
                   </span>
-                  <span className="block text-[11px] text-muted-foreground">
-                    {timeAgo(at)}
-                  </span>
-                </span>
-              </Link>
+                </Link>
+              </Reveal>
             ))}
           </div>
         </Section>
@@ -218,8 +203,10 @@ export default async function DashboardPage() {
         linkLabel="All tools"
       >
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {recommended.map((tool) => (
-            <ToolCard key={tool.slug} tool={toPublicTool(tool)} />
+          {recommended.map((tool, i) => (
+            <Reveal key={tool.slug} delay={i * 0.06}>
+              <ToolCard tool={toPublicTool(tool)} className="h-full" />
+            </Reveal>
           ))}
         </div>
       </Section>
@@ -228,8 +215,10 @@ export default async function DashboardPage() {
       {favoriteTools.length > 0 && (
         <Section title="Your favorites" href="/dashboard/favorites" linkLabel="Saved results">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {favoriteTools.slice(0, 3).map((tool) => (
-              <ToolCard key={tool.slug} tool={toPublicTool(tool)} />
+            {favoriteTools.slice(0, 3).map((tool, i) => (
+              <Reveal key={tool.slug} delay={i * 0.06}>
+                <ToolCard tool={toPublicTool(tool)} className="h-full" />
+              </Reveal>
             ))}
           </div>
         </Section>

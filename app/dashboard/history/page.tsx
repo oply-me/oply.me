@@ -56,6 +56,8 @@ export default async function HistoryPage({
             name: t.name,
             icon: t.icon,
             category: t.category,
+            tagline: t.tagline,
+            creditCost: t.creditCost,
           }))}
           favoriteIds={[...favoriteIds]}
           activeTool={params.tool ?? null}

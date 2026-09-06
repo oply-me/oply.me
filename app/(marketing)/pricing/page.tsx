@@ -47,7 +47,7 @@ const PRICING_FAQ = [
   {
     question: "Can I get a refund?",
     answer:
-      "Credits are digital goods delivered instantly. See the Refund Policy for the specific circumstances where a refund applies.",
+      "Credit purchases are final. Credits are digital goods delivered the moment payment confirms, and every new account gets welcome credits so you can try the tools before buying. We still refund duplicate charges, and credits that were paid for but never arrived. See the Refund Policy for the full detail.",
   },
 ];
 

@@ -24,6 +24,7 @@ import { buildMetadata } from "@/lib/seo/metadata";
 import {
   breadcrumbJsonLd,
   faqJsonLd,
+  howToJsonLd,
   softwareApplicationJsonLd,
 } from "@/lib/seo/jsonld";
 
@@ -46,6 +47,9 @@ export async function generateMetadata({
     description: tool.seoDescription,
     path: `/tools/${tool.slug}`,
     keywords: toolMetaKeywords(tool),
+    // This route ships its own opengraph-image.tsx, tinted with the tool's
+    // category hue; the site-wide default would override it.
+    defaultOgImage: false,
   });
 }
 
@@ -76,6 +80,7 @@ export default async function ToolPage({
             { name: tool.name, path: `/tools/${tool.slug}` },
           ]),
           faqJsonLd(tool.faq),
+          howToJsonLd(tool),
         ]}
       />
 
@@ -161,7 +166,9 @@ export default async function ToolPage({
       </Section>
 
       {/* ----------------------------------------------------- How it works */}
-      <Section className="border-t border-border bg-surface">
+      {/* The id is the anchor each HowToStep in the JSON-LD points at, so the
+          markup resolves to the visible list rather than a dead fragment. */}
+      <Section id="how-it-works" className="border-t border-border bg-surface">
         <div className="container">
           <div className="grid gap-10 lg:grid-cols-2">
             <div>

@@ -375,3 +375,35 @@
     transform: none !important;
   }
 }
+
+/* ---------------------------------------------------------------------------
+ * Print
+ *
+ * Only the billing receipt is meant to be printed. The dashboard chrome
+ * (sidebar, mobile bar, toasts) is marked `print:hidden` at the component
+ * level; this strips the page background and padding so the sheet starts at
+ * the top of the paper rather than 260px in.
+ * ------------------------------------------------------------------------- */
+@media print {
+  :root {
+    color-scheme: light;
+  }
+
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  /* The dashboard shell offsets its main column for the fixed sidebar. */
+  .lg\:pl-\[260px\] {
+    padding-left: 0 !important;
+  }
+
+  main {
+    padding: 0 !important;
+  }
+
+  a[href]::after {
+    content: "";
+  }
+}

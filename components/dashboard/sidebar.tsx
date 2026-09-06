@@ -4,6 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  Activity,
+  BarChart3,
   Coins,
   CreditCard,
   FolderKanban,
@@ -19,9 +21,15 @@ import {
   X,
 } from "lucide-react";
 import { Logo } from "@/components/logo";
+import { NotificationBell } from "@/components/dashboard/notification-bell";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,6 +39,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { siteConfig } from "@/config/site";
+import type { NotificationItem } from "@/lib/dashboard/notifications";
 import { cn, formatNumber, initials } from "@/lib/utils";
 
 const NAV = [
@@ -38,6 +47,8 @@ const NAV = [
   { title: "All Tools", href: "/dashboard/tools", icon: LayoutGrid },
   { title: "Projects", href: "/dashboard/projects", icon: FolderKanban },
   { title: "History", href: "/dashboard/history", icon: History },
+  { title: "Activity", href: "/dashboard/activity", icon: Activity },
+  { title: "Usage", href: "/dashboard/usage", icon: BarChart3 },
   { title: "Favorites", href: "/dashboard/favorites", icon: Star },
 ];
 
@@ -57,9 +68,13 @@ export interface SidebarUser {
 export function Sidebar({
   user,
   balance,
+  notifications,
+  unreadCount,
 }: {
   user: SidebarUser;
   balance: number;
+  notifications: NotificationItem[];
+  unreadCount: number;
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
@@ -229,6 +244,7 @@ export function Sidebar({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+        <NotificationBell items={notifications} unreadCount={unreadCount} />
         <ThemeToggle align="end" />
       </div>
     </div>
@@ -237,7 +253,7 @@ export function Sidebar({
   return (
     <>
       {/* Mobile bar */}
-      <div className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-background/90 px-4 backdrop-blur lg:hidden">
+      <div className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-background/90 px-4 backdrop-blur lg:hidden print:hidden">
         <Button
           variant="ghost"
           size="icon"
@@ -250,33 +266,31 @@ export function Sidebar({
         <Link href="/dashboard" aria-label="Oply dashboard">
           <Logo />
         </Link>
-        <Link
-          href="/dashboard/credits"
-          className={cn(
-            "rounded-full border px-2.5 py-1 text-xs font-medium tabular-nums",
-            low ? "border-warning/40 text-warning" : "border-border text-muted-foreground",
-          )}
-        >
-          {formatNumber(balance)}
-        </Link>
+        <div className="flex items-center gap-1">
+          <NotificationBell items={notifications} unreadCount={unreadCount} />
+          <Link
+            href="/dashboard/credits"
+            className={cn(
+              "rounded-full border px-2.5 py-1 text-xs font-medium tabular-nums",
+              low ? "border-warning/40 text-warning" : "border-border text-muted-foreground",
+            )}
+          >
+            {formatNumber(balance)}
+          </Link>
+        </div>
       </div>
 
-      {/* Mobile drawer */}
-      {mobileOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div
-            className="absolute inset-0 bg-black/50"
-            onClick={() => setMobileOpen(false)}
-            aria-hidden="true"
-          />
-          <div className="absolute inset-y-0 left-0 w-[280px] border-r border-border bg-background shadow-xl">
-            {content}
-          </div>
-        </div>
-      )}
+      {/* Mobile drawer. Radix Dialog under the hood, so escape, the focus
+          trap and scroll lock come for free; Framer gives it the spring. */}
+      <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+        <SheetContent side="left" portalClassName="lg:hidden">
+          <SheetTitle className="sr-only">Dashboard menu</SheetTitle>
+          {content}
+        </SheetContent>
+      </Sheet>
 
       {/* Desktop sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-[260px] border-r border-border bg-surface lg:block">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-[260px] border-r border-border bg-surface lg:block print:hidden">
         {content}
       </aside>
     </>

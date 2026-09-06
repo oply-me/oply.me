@@ -30,10 +30,6 @@ export function HeroHeadline({
     return () => clearInterval(id);
   }, [words.length, reduceMotion]);
 
-  if (reduceMotion) {
-    return <span className={className}>{words[0]}.</span>;
-  }
-
   return (
     <span className={cn("inline-grid", className)}>
       <AnimatePresence mode="wait">
@@ -42,7 +38,13 @@ export function HeroHeadline({
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.35, ease: "easeOut" }}
+          /* Reduced motion holds on the first word (the interval above never
+             starts) and lands it instantly. Rendering a different element for
+             that case desynchronised hydration: `useReducedMotion` reads
+             `matchMedia`, which SSR does not have. */
+          transition={
+            reduceMotion ? { duration: 0 } : { duration: 0.35, ease: "easeOut" }
+          }
           className="col-start-1 row-start-1"
         >
           {words[index]}.

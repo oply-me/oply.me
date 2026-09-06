@@ -31,16 +31,16 @@ const TableBody = React.forwardRef<
 ));
 TableBody.displayName = "TableBody";
 
+/**
+ * Exported so a row rendered by something other than `TableRow` — an animated
+ * `<Reveal as="tr">`, for instance — still looks like a table row.
+ */
+const tableRowClass =
+  "border-b border-border transition-colors hover:bg-muted/40 data-[state=selected]:bg-muted";
+
 const TableRow = React.forwardRef<HTMLTableRowElement, React.ComponentProps<"tr">>(
   ({ className, ...props }, ref) => (
-    <tr
-      ref={ref}
-      className={cn(
-        "border-b border-border transition-colors hover:bg-muted/40 data-[state=selected]:bg-muted",
-        className,
-      )}
-      {...props}
-    />
+    <tr ref={ref} className={cn(tableRowClass, className)} {...props} />
   ),
 );
 TableRow.displayName = "TableRow";
@@ -66,4 +66,12 @@ const TableCell = React.forwardRef<HTMLTableCellElement, React.ComponentProps<"t
 );
 TableCell.displayName = "TableCell";
 
-export { Table, TableHeader, TableBody, TableRow, TableHead, TableCell };
+export {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+  tableRowClass,
+};

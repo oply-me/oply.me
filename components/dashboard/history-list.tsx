@@ -6,8 +6,10 @@ import { useRouter } from "next/navigation";
 import { ChevronDown, Star, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { CopyButton } from "@/components/copy-button";
-import { ToolIcon } from "@/components/icon";
+import { Reveal } from "@/components/reveal";
 import { Markdown } from "@/components/tools/markdown";
+import { ToolHoverCard } from "@/components/tools/tool-hover-card";
+import { ToolTile } from "@/components/tools/tool-tile";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -44,6 +46,8 @@ interface ToolMeta {
   name: string;
   icon: string;
   category: string;
+  tagline: string;
+  creditCost: number;
 }
 
 export function HistoryList({
@@ -177,7 +181,7 @@ export function HistoryList({
       </p>
 
       <ul className="space-y-3">
-        {filtered.map((item) => {
+        {filtered.map((item, i) => {
           const tool = toolBySlug.get(item.tool_slug);
           const isOpen = expanded === item.id;
           const output =
@@ -185,23 +189,30 @@ export function HistoryList({
             (item.output_json ? JSON.stringify(item.output_json, null, 2) : "");
 
           return (
-            <li
+            <Reveal
+              as="li"
               key={item.id}
+              /* Capped so a 100-row history does not stagger for four
+                 seconds before the last row shows up. */
+              delay={Math.min(i, 8) * 0.04}
               className="rounded-xl border border-border bg-card"
             >
               <div className="flex items-start gap-3 p-4">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                  <ToolIcon name={tool?.icon ?? "Sparkles"} className="h-4 w-4" />
-                </span>
+                <ToolTile
+                  icon={tool?.icon ?? "Sparkles"}
+                  category={tool?.category}
+                />
 
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <Link
-                      href={`/tools/${item.tool_slug}`}
-                      className="text-[13.5px] font-medium hover:text-primary"
-                    >
-                      {item.tool_name}
-                    </Link>
+                    <ToolHoverCard tool={tool}>
+                      <Link
+                        href={`/tools/${item.tool_slug}`}
+                        className="text-[13.5px] font-medium hover:text-primary"
+                      >
+                        {item.tool_name}
+                      </Link>
+                    </ToolHoverCard>
                     {item.status === "failed" && (
                       <Badge variant="destructive">Failed</Badge>
                     )}
@@ -280,7 +291,7 @@ export function HistoryList({
                   )}
                 </div>
               )}
-            </li>
+            </Reveal>
           );
         })}
       </ul>

@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { LegalPage } from "@/components/marketing/legal-page";
 import { FooterCta } from "@/components/marketing/cta";
 import { siteConfig } from "@/config/site";
+import { getEnabledTools } from "@/config/tools";
 import { buildMetadata } from "@/lib/seo/metadata";
 
 export const metadata = buildMetadata({
@@ -11,6 +13,10 @@ export const metadata = buildMetadata({
 });
 
 export default function AboutPage() {
+  /* Read from the registry so the sentence below cannot drift again — it said
+     "ten tools" while fifteen shipped. */
+  const toolCount = getEnabledTools().length;
+
   return (
     <>
       <LegalPage title="About Oply" updated="January 2025">
@@ -27,11 +33,14 @@ export default function AboutPage() {
 
         <h2>What we are building</h2>
         <p>
-          The product is deliberately small at launch — ten tools covering
-          writing, rewriting, summarizing, prompts, SEO metadata, structured
-          data, product copy, replies and outlines. Everything is built around a
-          tool registry, so new tools ship as configuration rather than as a
-          redesign.
+          The product is deliberately small — {toolCount} tools covering{" "}
+          <Link href="/categories/ai">writing, rewriting and summarizing</Link>,
+          prompts, <Link href="/categories/seo">SEO metadata and structured
+          data</Link>, <Link href="/categories/ecommerce">product copy</Link>,
+          replies and outlines, and a set of{" "}
+          <Link href="/categories/images">image tools</Link>. Everything is
+          built around a tool registry, so new tools ship as configuration
+          rather than as a redesign.
         </p>
 
         <h2>How we think about pricing</h2>

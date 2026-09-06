@@ -1,9 +1,18 @@
+"use client";
+
 import Link from "next/link";
+import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { ToolIcon } from "@/components/icon";
 import { categoryColors, type CategoryDefinition } from "@/config/categories";
 import { cn } from "@/lib/utils";
 
+const MotionLink = motion.create(Link);
+
+/**
+ * Hover/tap behaviour is deliberately identical to `ToolCard` — the two grids
+ * sit on the same pages, and two different lift idioms read as a bug.
+ */
 export function CategoryCard({
   category,
   toolCount,
@@ -14,10 +23,17 @@ export function CategoryCard({
   className?: string;
 }) {
   const c = categoryColors(category.slug);
+  const reduceMotion = useReducedMotion();
 
   return (
-    <Link
+    <MotionLink
       href={`/categories/${category.slug}`}
+      /* Empty objects, not `undefined`: Framer adds a `tabindex` to an
+         element that has a `whileTap`, and SSR never sees the reduced-motion
+         media query, so dropping the prop entirely desynchronises hydration. */
+      whileHover={reduceMotion ? {} : { y: -4 }}
+      whileTap={reduceMotion ? {} : { scale: 0.98 }}
+      transition={{ duration: 0.18, ease: "easeOut" }}
       style={
         {
           "--tile": c.tile,
@@ -29,7 +45,7 @@ export function CategoryCard({
       }
       className={cn(
         "group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card p-6",
-        "transition-all duration-200 hover:-translate-y-1 hover:[border-color:var(--edge)] hover:[box-shadow:var(--glow)]",
+        "transition-[border-color,box-shadow] duration-200 hover:[border-color:var(--edge)] hover:[box-shadow:var(--glow)]",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         className,
       )}
@@ -59,6 +75,6 @@ export function CategoryCard({
         {toolCount} {toolCount === 1 ? "tool" : "tools"}
         <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-1" />
       </span>
-    </Link>
+    </MotionLink>
   );
 }

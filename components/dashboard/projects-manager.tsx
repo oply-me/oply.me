@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { FolderKanban, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { EmptyState } from "@/components/empty-state";
+import { Reveal } from "@/components/reveal";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -17,7 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { formatDate } from "@/lib/utils";
+import { formatDate, formatNumber, timeAgo } from "@/lib/utils";
 
 interface Project {
   id: string;
@@ -25,6 +26,12 @@ interface Project {
   description: string | null;
   created_at: string;
   itemCount: number;
+  /** Sum of `credits_used` across every generation filed under the project. */
+  creditsUsed: number;
+  /** Distinct tools represented in the project. */
+  toolCount: number;
+  /** When something was last filed here. Null for an empty project. */
+  lastActivity: string | null;
 }
 
 export function ProjectsManager({ projects }: { projects: Project[] }) {
@@ -55,7 +62,16 @@ export function ProjectsManager({ projects }: { projects: Project[] }) {
         return;
       }
 
-      setList((prev) => [{ ...data.project, itemCount: 0 }, ...prev]);
+      setList((prev) => [
+        {
+          ...data.project,
+          itemCount: 0,
+          creditsUsed: 0,
+          toolCount: 0,
+          lastActivity: null,
+        },
+        ...prev,
+      ]);
       setCreateOpen(false);
       toast.success("Project created");
       router.refresh();
@@ -102,9 +118,11 @@ export function ProjectsManager({ projects }: { projects: Project[] }) {
         />
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2">
-          {list.map((project) => (
-            <li
+          {list.map((project, i) => (
+            <Reveal
+              as="li"
               key={project.id}
+              delay={Math.min(i, 8) * 0.05}
               className="rounded-xl border border-border bg-card p-5"
             >
               <div className="flex items-start justify-between gap-3">
@@ -127,12 +145,27 @@ export function ProjectsManager({ projects }: { projects: Project[] }) {
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
-              <p className="mt-4 border-t border-border pt-3 text-xs text-muted-foreground">
-                {project.itemCount} saved{" "}
-                {project.itemCount === 1 ? "item" : "items"} · created{" "}
-                {formatDate(project.created_at)}
+              <dl className="mt-4 grid grid-cols-3 gap-3 border-t border-border pt-3.5">
+                <ProjectStat
+                  label={project.itemCount === 1 ? "Item" : "Items"}
+                  value={formatNumber(project.itemCount)}
+                />
+                <ProjectStat
+                  label="Credits"
+                  value={formatNumber(project.creditsUsed)}
+                />
+                <ProjectStat
+                  label={project.toolCount === 1 ? "Tool" : "Tools"}
+                  value={formatNumber(project.toolCount)}
+                />
+              </dl>
+              <p className="mt-3 text-[11px] text-muted-foreground">
+                Created {formatDate(project.created_at)}
+                {project.lastActivity
+                  ? ` · last addition ${timeAgo(project.lastActivity)}`
+                  : ""}
               </p>
-            </li>
+            </Reveal>
           ))}
         </ul>
       )}
@@ -207,5 +240,16 @@ export function ProjectsManager({ projects }: { projects: Project[] }) {
         </DialogContent>
       </Dialog>
     </>
+  );
+}
+
+function ProjectStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <dt className="text-[11px] uppercase tracking-wider text-muted-foreground">
+        {label}
+      </dt>
+      <dd className="mt-0.5 text-[15px] font-semibold tabular-nums">{value}</dd>
+    </div>
   );
 }
