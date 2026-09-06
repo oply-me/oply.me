@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { ChevronRight, Coins } from "lucide-react";
-import { ToolIcon } from "@/components/icon";
+import { ToolTile } from "@/components/tools/tool-tile";
 import { JsonLd } from "@/components/json-ld";
 import { FaqList } from "@/components/marketing/faq";
 import { FooterCta } from "@/components/marketing/cta";
@@ -102,12 +102,15 @@ export default async function ToolPage({
           </nav>
 
           <div className="mt-6 flex flex-col gap-5 sm:flex-row sm:items-start">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-              <ToolIcon name={tool.icon} className="h-6 w-6" />
-            </div>
+            <ToolTile
+              icon={tool.icon}
+              category={tool.category}
+              className="h-14 w-14 rounded-2xl shadow-md"
+              iconClassName="h-6 w-6"
+            />
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-[1.75rem] font-semibold tracking-[-0.028em] sm:text-[2.125rem]">
+                <h1 className="text-[2rem] font-semibold tracking-[-0.03em] sm:text-[2.5rem]">
                   {tool.name}
                 </h1>
                 {isNewTool(tool) && <Badge>New</Badge>}
@@ -162,6 +165,33 @@ export default async function ToolPage({
               </div>
             ))}
           </div>
+        </div>
+      </Section>
+
+      {/* ------------------------------------------------------- Use cases */}
+      {/* The jobs people arrive wanting to do. This is the section the
+          long-tail half of the keyword map describes, so the phrasing here is
+          deliberately task-shaped ("Rewrite a cold email") rather than
+          feature-shaped — and every entry has to be something the tool's own
+          fields actually support. */}
+      {/* Plain background, not `bg-surface`: the next section is already
+          surface-tinted, and two tinted blocks in a row read as one. */}
+      <Section className="border-t border-border">
+        <div className="container">
+          <SectionHeading
+            align="left"
+            title={`What people use the ${tool.name} for`}
+          />
+          <ul className="mt-8 grid gap-x-8 gap-y-6 sm:grid-cols-2">
+            {tool.useCases.map((useCase) => (
+              <li key={useCase.title}>
+                <h3 className="text-[15px] font-semibold">{useCase.title}</h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                  {useCase.body}
+                </p>
+              </li>
+            ))}
+          </ul>
         </div>
       </Section>
 

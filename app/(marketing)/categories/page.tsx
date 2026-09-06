@@ -17,9 +17,9 @@ export const metadata = buildMetadata({
 
 export default async function CategoriesPage() {
   const tools = await listTools();
-  const active = categories.filter(
-    (c) => c.enabled && tools.some((t) => t.category === c.slug),
-  );
+  const active = categories
+    .filter((c) => c.enabled && tools.some((t) => t.category === c.slug))
+    .sort((a, b) => a.sortOrder - b.sortOrder);
 
   return (
     <>
