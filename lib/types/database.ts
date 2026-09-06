@@ -39,6 +39,8 @@ export type Profile = {
   role: UserRole;
   primary_use_case: string | null;
   onboarded_at: string | null;
+  /** Last time the notification bell was opened. Null means never. */
+  notifications_seen_at: string | null;
   disabled: boolean;
   created_at: string;
   updated_at: string;
@@ -214,6 +216,16 @@ export type ContactMessageRow = {
   created_at: string;
 }
 
+export type NewsletterSubscriberRow = {
+  id: string;
+  email: string;
+  user_id: string | null;
+  source: string;
+  confirmed: boolean;
+  unsubscribed_at: string | null;
+  created_at: string;
+}
+
 export type SiteSettingRow = {
   key: string;
   value: Json;
@@ -267,6 +279,7 @@ export type Database = {
       project_items: Table<ProjectItemRow>;
       ai_usage: Table<AiUsageRow>;
       contact_messages: Table<ContactMessageRow>;
+      newsletter_subscribers: Table<NewsletterSubscriberRow>;
       site_settings: Table<SiteSettingRow>;
       announcements: Table<AnnouncementRow>;
     };
