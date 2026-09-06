@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import type { AuthError } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import { siteConfig } from "@/config/site";
 
@@ -45,7 +46,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
         });
 
         if (signUpError) {
-          setError(friendlyAuthError(signUpError.message));
+          setError(friendlyAuthError(signUpError));
           return;
         }
 
@@ -67,7 +68,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
       });
 
       if (signInError) {
-        setError(friendlyAuthError(signInError.message));
+        setError(friendlyAuthError(signInError));
         return;
       }
 
@@ -199,23 +200,46 @@ export function AuthForm({ mode }: { mode: Mode }) {
   );
 }
 
-/** Provider messages are technical; these are the versions users see. */
-function friendlyAuthError(message: string): string {
-  const m = message.toLowerCase();
-  if (m.includes("invalid login credentials")) {
+/**
+ * Provider messages are technical; these are the versions users see.
+ *
+ * Keyed primarily on `error.code` — the machine-readable `error_code` GoTrue
+ * returns (e.g. "over_email_send_rate_limit") — because the human-readable
+ * `message` varies in wording ("For security purposes, you can only request
+ * this after 58 seconds" does not contain the word "rate limit") and previously
+ * fell through to the generic fallback for real, common cases like resubmitting
+ * within a minute of a first attempt.
+ */
+function friendlyAuthError(error: AuthError): string {
+  const code = error.code;
+  const m = error.message.toLowerCase();
+
+  if (code === "invalid_credentials" || m.includes("invalid login credentials")) {
     return "That email and password don't match an account.";
   }
-  if (m.includes("already registered") || m.includes("already been registered")) {
+  if (
+    code === "user_already_exists" ||
+    code === "email_exists" ||
+    code === "identity_already_exists" ||
+    m.includes("already registered") ||
+    m.includes("already been registered")
+  ) {
     return "An account with that email already exists. Try logging in.";
   }
-  if (m.includes("password should be")) {
+  if (code === "weak_password" || m.includes("password should be")) {
     return "Please use a password of at least 8 characters.";
   }
-  if (m.includes("rate limit")) {
+  if (code === "email_address_invalid" || code === "validation_failed") {
+    return "Please enter a valid email address.";
+  }
+  if (code === "over_email_send_rate_limit" || code === "over_request_rate_limit" || m.includes("rate limit")) {
     return "Too many attempts. Please wait a minute and try again.";
   }
-  if (m.includes("email not confirmed")) {
+  if (code === "email_not_confirmed" || m.includes("email not confirmed")) {
     return "Please confirm your email address first — check your inbox.";
+  }
+  if (code === "signup_disabled" || code === "email_provider_disabled") {
+    return "Sign-ups are temporarily unavailable. Please try again later.";
   }
   return "Something went wrong. Please try again.";
 }
