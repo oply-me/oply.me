@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Check, Copy } from "lucide-react";
 import { toast } from "sonner";
 import { Button, type ButtonProps } from "@/components/ui/button";
@@ -45,7 +46,31 @@ export function CopyButton({
       aria-label={label}
       {...props}
     >
-      {copied ? <Check className="text-success" /> : <Copy />}
+      <AnimatePresence mode="wait" initial={false}>
+        {copied ? (
+          <motion.span
+            key="check"
+            initial={{ opacity: 0, scale: 0.5, rotate: -45 }}
+            animate={{ opacity: 1, scale: 1, rotate: 0 }}
+            exit={{ opacity: 0, scale: 0.5 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="inline-flex"
+          >
+            <Check className="text-success" />
+          </motion.span>
+        ) : (
+          <motion.span
+            key="copy"
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.5 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="inline-flex"
+          >
+            <Copy />
+          </motion.span>
+        )}
+      </AnimatePresence>
       {size !== "icon" && size !== "icon-sm" && (copied ? "Copied" : label)}
     </Button>
   );

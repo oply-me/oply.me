@@ -4,7 +4,13 @@ import { siteConfig } from "./site";
 /* Types                                                               */
 /* ------------------------------------------------------------------ */
 
-export type FieldType = "text" | "textarea" | "select" | "number";
+/**
+ * "image" fields hold an object-storage path string (e.g.
+ * "{userId}/uploads/{file}"), not a file or base64 bytes — the browser
+ * uploads directly to Supabase Storage first (see ImageFieldInput), and only
+ * the resulting path travels through the generate request.
+ */
+export type FieldType = "text" | "textarea" | "select" | "number" | "image";
 
 export interface ToolField {
   name: string;
@@ -33,9 +39,10 @@ export type ToolComponent =
   | "prompt"
   | "seo-generator"
   | "schema-generator"
-  | "structured-output";
+  | "structured-output"
+  | "image-generator";
 
-export type OutputType = "text" | "markdown" | "json" | "structured";
+export type OutputType = "text" | "markdown" | "json" | "structured" | "image";
 
 /** Keys into lib/ai/schemas.ts. Server-side only concern. */
 export type OutputSchemaKey =
@@ -48,6 +55,44 @@ export type OutputSchemaKey =
 export interface ToolFaq {
   question: string;
   answer: string;
+}
+
+export interface ImageDimensions {
+  width: number;
+  height: number;
+}
+
+/**
+ * Maps a tool's own field values to the exact pixel size the generate route
+ * should produce — the route looks up `sizes[normalized[sizeField]]`, so the
+ * size is always one of a fixed, server-known set, never a client-supplied
+ * number. `sizes`' keys must match `sizeField`'s select `options[].value`
+ * exactly (checked in tests/image-tools.test.ts).
+ */
+export interface ImageOutputSpec {
+  /** Used when there is no `sizeField`, and as the fallback for an unrecognised value. */
+  defaultSize: ImageDimensions;
+  /** A select field whose value picks the exact pixel size, for tools that offer more than one. */
+  sizeField?: string;
+  sizes?: Record<string, ImageDimensions>;
+  /** Name of the "image" field holding the source to edit — absent for pure generation. */
+  inputImageField?: string;
+  /** Fixed alpha-channel mode, for tools with no user-facing background choice. */
+  background?: "transparent" | "opaque" | "auto";
+  /**
+   * A select field whose value picks the real PNG alpha-channel mode —
+   * distinct from a tool's own "background" *content* field (e.g. Product
+   * Photo's "Studio White" vs "Lifestyle Scene" backdrop, which is prompt
+   * text, not this). Takes priority over the fixed `background` above.
+   */
+  backgroundField?: string;
+  backgroundValues?: Record<string, "transparent" | "opaque" | "auto">;
+  /**
+   * Skip cropping to the exact requested size and keep whatever the provider
+   * natively returned — for edits (e.g. background removal) where cropping
+   * to a fixed size could cut off part of the subject.
+   */
+  skipExactFit?: boolean;
 }
 
 /**
@@ -94,6 +139,12 @@ export interface ToolDefinition {
   component: ToolComponent;
   outputType: OutputType;
   outputSchema?: OutputSchemaKey;
+  /**
+   * Required when outputType is "image". Server-authoritative: the size
+   * actually produced is looked up from the validated value of `sizeField`
+   * (a select field), never taken directly from the client.
+   */
+  imageOutput?: ImageOutputSpec;
   /** Server-only. Never sent to the browser. */
   systemPrompt: string;
   fields: ToolField[];
@@ -112,7 +163,13 @@ export interface ToolDefinition {
   keywords: ToolKeywords;
   benefits: { title: string; body: string }[];
   howItWorks: string[];
-  example: { label: string; value: string };
+  /**
+   * `before` is optional — most tools' idle/preview panels fall back to the
+   * first required field's placeholder as the synthetic "before" state (see
+   * ToolCardPreview/ToolExampleToggle), so authoring it here is only worth
+   * doing where it genuinely clarifies the transform.
+   */
+  example: { label: string; value: string; before?: string };
   faq: ToolFaq[];
 }
 
@@ -1915,6 +1972,883 @@ Cover the topic properly for the stated goal and audience. Do not pad with gener
       },
     ],
   },
+
+  /* ---------------------------------------------------------------- */
+  {
+    slug: "ai-logo-icon-generator",
+    name: "AI Logo Generator",
+    tagline: "Design a logo from a brand name and a few style keywords.",
+    description:
+      "Turn a brand name and style keywords into a downloadable logo, with a transparent background option.",
+    category: "images",
+    icon: "Shapes",
+    creditCost: 55,
+    component: "image-generator",
+    outputType: "image",
+    imageOutput: {
+      defaultSize: { width: 1024, height: 1024 },
+      backgroundField: "background",
+      backgroundValues: { transparent: "transparent", white: "opaque" },
+    },
+    systemPrompt: `You design a single logo mark from a brand name and style direction.
+
+Compose a clean, printable logo: balanced, legible at small sizes, and free of watermarks, placeholder text or stray artifacts. Use only the brand name, style keywords and colour preference supplied — do not invent a tagline, industry claim or symbol unrelated to the brief. If a colour preference is given, use it as the dominant palette; otherwise choose colours that fit the requested style.`,
+    fields: [
+      {
+        name: "brandName",
+        label: "Brand name",
+        type: "text",
+        required: true,
+        placeholder: "Nova Robotics",
+        maxLength: 60,
+      },
+      {
+        name: "styleKeywords",
+        label: "Style keywords",
+        type: "text",
+        required: true,
+        placeholder: "minimalist, geometric, tech",
+        maxLength: 200,
+        helpText: "A few words describing the look you want.",
+      },
+      {
+        name: "style",
+        label: "Style",
+        type: "select",
+        defaultValue: "minimalist-flat",
+        options: [
+          { label: "Minimalist Flat", value: "minimalist-flat" },
+          { label: "Emblem / Badge", value: "emblem-badge" },
+          { label: "Wordmark + Icon", value: "wordmark-icon" },
+          { label: "Mascot", value: "mascot" },
+          { label: "Abstract Geometric", value: "abstract-geometric" },
+        ],
+      },
+      {
+        name: "colorPreference",
+        label: "Colour preference",
+        type: "text",
+        placeholder: "Blue and white",
+        maxLength: 100,
+        helpText: "Optional. Leave blank to let the style guide the colours.",
+      },
+      {
+        name: "background",
+        label: "Background",
+        type: "select",
+        defaultValue: "transparent",
+        options: [
+          { label: "Transparent", value: "transparent" },
+          { label: "White", value: "white" },
+        ],
+      },
+    ],
+    maxInputChars: 500,
+    extraActions: ["download"],
+    seoTitle: "AI Logo Generator — Design a Logo in Seconds | Oply",
+    seoDescription:
+      "Oply's AI logo generator is a logo maker and icon generator: enter a brand name and style keywords, then download a transparent-background PNG.",
+    featured: false,
+    sortOrder: 11,
+    enabled: true,
+    related: ["ai-thumbnail-generator"],
+    keywords: {
+      primary: "ai logo generator",
+      secondary: [
+        "logo maker",
+        "ai logo maker",
+        "icon generator",
+        "brand logo generator",
+        "free logo generator",
+        "logo design tool",
+        "custom logo generator",
+        "startup logo generator",
+      ],
+      longTail: [
+        "generate a logo for a startup",
+        "create a minimalist logo with ai",
+        "design a logo from a brand name",
+        "make a transparent background logo",
+        "generate an app icon with ai",
+        "create a logo without hiring a designer",
+        "ai tool to design a brand logo",
+        "generate logo options from style keywords",
+        "make a geometric abstract logo",
+        "design an emblem style logo",
+      ],
+      entities: [
+        "logo design",
+        "brand identity",
+        "wordmark",
+        "emblem",
+        "icon design",
+        "transparent background",
+        "brand colors",
+        "graphic design",
+        "typography",
+        "visual identity",
+        "PNG",
+      ],
+      questions: [
+        "Can I get exclusive rights to an AI-generated logo?",
+        "Will the logo be unique to my brand?",
+        "What file format do I get?",
+        "Can I regenerate if I don't like the result?",
+        "Does it check for trademark conflicts?",
+      ],
+      intent: "commercial",
+    },
+    benefits: [
+      {
+        title: "From a name to a mark in one run",
+        body: "Enter a brand name and a few style keywords and the logo generator composes a mark around them — no design software required.",
+      },
+      {
+        title: "Transparent background included",
+        body: "Choose a transparent or white background so the logo drops straight onto a site, app icon or business card.",
+      },
+      {
+        title: "Five styles to start from",
+        body: "Minimalist flat, emblem, wordmark and icon, mascot, or abstract geometric — pick the direction closest to your brand.",
+      },
+    ],
+    howItWorks: [
+      "Enter your brand name and a few style keywords.",
+      "Pick a style and, optionally, a colour preference.",
+      "Generate the logo.",
+      "Download the PNG, or regenerate for a different result.",
+    ],
+    example: {
+      label: "Example brief",
+      value: "Nova Robotics · minimalist, geometric, tech",
+    },
+    faq: [
+      {
+        question: "Can I get exclusive rights to an AI-generated logo?",
+        answer:
+          "Oply doesn't provide legal advice on image rights. This is a design tool, not a legal or trademark service — talk to a professional if exclusivity matters for your brand.",
+      },
+      {
+        question: "Will the logo be unique to my brand?",
+        answer:
+          "Each generation is produced fresh from your brand name and style keywords, but similar briefs can produce similar-looking results. Generate a few variations and compare them.",
+      },
+      {
+        question: "What file format do I get?",
+        answer:
+          "A 1024×1024 PNG, with a transparent or white background depending on what you choose before generating.",
+      },
+      {
+        question: "Can I regenerate if I don't like the result?",
+        answer:
+          "Yes. Regenerate runs a fresh generation from the same brief, at the same credit cost as the first run.",
+      },
+      {
+        question: "Does it check for trademark conflicts?",
+        answer:
+          "No. It designs a mark from your brief and does not search trademark databases — run your own check before using a logo commercially.",
+      },
+    ],
+  },
+
+  /* ---------------------------------------------------------------- */
+  {
+    slug: "ai-thumbnail-generator",
+    name: "AI Thumbnail Generator",
+    tagline: "Design a bold thumbnail from a video title.",
+    description:
+      "Turn a video title, style and platform into a downloadable thumbnail sized to fit.",
+    category: "images",
+    icon: "Youtube",
+    creditCost: 60,
+    component: "image-generator",
+    outputType: "image",
+    imageOutput: {
+      sizeField: "platform",
+      sizes: {
+        youtube: { width: 1280, height: 720 },
+        "youtube-shorts": { width: 1080, height: 1920 },
+      },
+      defaultSize: { width: 1280, height: 720 },
+      background: "auto",
+    },
+    systemPrompt: `You design a single YouTube thumbnail image from a video title and style brief.
+
+Compose a bold, high-contrast image that reads clearly at small sizes: strong subject, simple background, no clutter. Reflect the requested style and, where given, the video's subject from the context field. Do not invent a channel name, subscriber count or logo that was not supplied.
+
+If asked to include the title text, render it large, legible and high-contrast — but keep the composition working even if the rendered text is imperfect, since text inside a generated image is not always reliable.`,
+    fields: [
+      {
+        name: "title",
+        label: "Video title",
+        type: "text",
+        required: true,
+        placeholder: "10 Productivity Hacks That Actually Work",
+        maxLength: 150,
+      },
+      {
+        name: "context",
+        label: "What's the video about? (optional)",
+        type: "textarea",
+        rows: 3,
+        placeholder: "A quick-tips video for remote workers",
+        maxLength: 500,
+      },
+      {
+        name: "platform",
+        label: "Platform",
+        type: "select",
+        required: true,
+        defaultValue: "youtube",
+        options: [
+          { label: "YouTube (1280×720)", value: "youtube" },
+          { label: "YouTube Shorts (1080×1920)", value: "youtube-shorts" },
+        ],
+      },
+      {
+        name: "style",
+        label: "Style",
+        type: "select",
+        defaultValue: "bold-bright",
+        options: [
+          { label: "Bold & Bright", value: "bold-bright" },
+          { label: "Minimal", value: "minimal" },
+          { label: "Cinematic", value: "cinematic" },
+          { label: "Tech & Gaming", value: "tech-gaming" },
+          { label: "Tutorial Clean", value: "tutorial-clean" },
+          { label: "Vlog Lifestyle", value: "vlog-lifestyle" },
+        ],
+      },
+      {
+        name: "includeTitleText",
+        label: "Include the title as text on the image",
+        type: "select",
+        defaultValue: "no",
+        options: [
+          { label: "No", value: "no" },
+          { label: "Yes", value: "yes" },
+        ],
+        helpText:
+          "Text rendered inside an AI image is not always accurate. Off by default so the thumbnail never ships with garbled text.",
+      },
+    ],
+    maxInputChars: 700,
+    extraActions: ["download"],
+    seoTitle: "AI Thumbnail Generator — YouTube Thumbnail Maker | Oply",
+    seoDescription:
+      "Oply's AI thumbnail generator is a YouTube thumbnail maker for videos and Shorts: pick a style, generate, and download a bold, click-worthy thumbnail.",
+    featured: false,
+    sortOrder: 12,
+    enabled: true,
+    related: ["ai-social-post-graphic"],
+    keywords: {
+      primary: "ai thumbnail generator",
+      secondary: [
+        "youtube thumbnail maker",
+        "thumbnail maker",
+        "ai thumbnail maker",
+        "youtube thumbnail generator",
+        "video thumbnail creator",
+        "custom thumbnail generator",
+        "thumbnail design tool",
+      ],
+      longTail: [
+        "generate a youtube thumbnail with ai",
+        "create a bold thumbnail for a video",
+        "make a thumbnail for a youtube short",
+        "design a tutorial video thumbnail",
+        "generate a gaming video thumbnail",
+        "create a thumbnail without using photoshop",
+        "make a thumbnail from a video title",
+        "design a cinematic style video thumbnail",
+        "generate a vlog style thumbnail image",
+      ],
+      entities: [
+        "YouTube thumbnail",
+        "click-through rate",
+        "video SEO",
+        "thumbnail dimensions",
+        "aspect ratio",
+        "YouTube Shorts",
+        "video marketing",
+        "graphic design",
+        "composition",
+      ],
+      questions: [
+        "What size is a YouTube thumbnail?",
+        "Will the AI put my title text on the thumbnail accurately?",
+        "Can I make a thumbnail for YouTube Shorts?",
+        "How many credits does this cost?",
+        "Can I regenerate a thumbnail I don't like?",
+      ],
+      intent: "commercial",
+    },
+    benefits: [
+      {
+        title: "Sized to fit, every time",
+        body: "Choose YouTube or YouTube Shorts and the thumbnail generator produces the exact 1280×720 or 1080×1920 pixels the platform expects.",
+      },
+      {
+        title: "Six styles to match your channel",
+        body: "Bold & Bright, Minimal, Cinematic, Tech & Gaming, Tutorial Clean or Vlog Lifestyle — pick the one that matches your channel's look.",
+      },
+      {
+        title: "Text off by default, on request",
+        body: "Rendered text inside an AI image is not always reliable, so title text stays off unless you turn it on.",
+      },
+    ],
+    howItWorks: [
+      "Enter the video title and, optionally, what it's about.",
+      "Choose the platform and a style.",
+      "Generate the thumbnail.",
+      "Download it, or regenerate for a different result.",
+    ],
+    example: {
+      label: "Example title",
+      value: "10 Productivity Hacks That Actually Work · Bold & Bright · YouTube",
+    },
+    faq: [
+      {
+        question: "What size is a YouTube thumbnail?",
+        answer:
+          "YouTube's recommended size is 1280×720 pixels. YouTube Shorts uses the vertical 1080×1920 frame instead — this generator produces both.",
+      },
+      {
+        question: "Will the AI put my title text on the thumbnail accurately?",
+        answer:
+          "Not reliably — text rendered inside a generated image can come out garbled. It is off by default; turn it on only if you plan to review the result closely.",
+      },
+      {
+        question: "Can I make a thumbnail for YouTube Shorts?",
+        answer: "Yes — choose YouTube Shorts as the platform for a 1080×1920 vertical thumbnail.",
+      },
+      {
+        question: "How many credits does this cost?",
+        answer: "60 credits per generation, including any regenerations.",
+      },
+      {
+        question: "Can I regenerate a thumbnail I don't like?",
+        answer: "Yes. Regenerate runs a fresh generation from the same brief, at the same credit cost.",
+      },
+    ],
+  },
+
+  /* ---------------------------------------------------------------- */
+  {
+    slug: "ai-social-post-graphic",
+    name: "AI Social Post Graphic",
+    tagline: "Turn a caption into a sized, on-brand social graphic.",
+    description:
+      "Generate a social media graphic sized for the platform and format you're posting to, from a caption and a style.",
+    category: "images",
+    icon: "Share2",
+    creditCost: 60,
+    component: "image-generator",
+    outputType: "image",
+    imageOutput: {
+      sizeField: "aspectRatio",
+      sizes: {
+        square: { width: 1080, height: 1080 },
+        portrait: { width: 1080, height: 1350 },
+        story: { width: 1080, height: 1920 },
+        landscape: { width: 1200, height: 630 },
+        pin: { width: 1000, height: 1500 },
+      },
+      defaultSize: { width: 1080, height: 1080 },
+      background: "auto",
+    },
+    systemPrompt: `You design a single social media post graphic from a caption and a style brief.
+
+Compose an image that supports the caption's message without needing to render the caption as text on the image — a strong visual that fits the platform and format, in the requested style. Do not invent a brand name, logo or claim that was not supplied.`,
+    fields: [
+      {
+        name: "caption",
+        label: "Caption",
+        type: "textarea",
+        rows: 3,
+        required: true,
+        placeholder: "Our new collection just dropped — cozy, sustainable, made to last.",
+        maxLength: 300,
+      },
+      {
+        name: "platform",
+        label: "Platform",
+        type: "select",
+        defaultValue: "instagram",
+        options: [
+          { label: "Instagram", value: "instagram" },
+          { label: "Facebook", value: "facebook" },
+          { label: "X (Twitter)", value: "x" },
+          { label: "LinkedIn", value: "linkedin" },
+          { label: "Pinterest", value: "pinterest" },
+          { label: "TikTok", value: "tiktok" },
+        ],
+      },
+      {
+        name: "aspectRatio",
+        label: "Format",
+        type: "select",
+        required: true,
+        defaultValue: "square",
+        options: [
+          { label: "Square 1:1 (1080×1080)", value: "square" },
+          { label: "Portrait 4:5 (1080×1350)", value: "portrait" },
+          { label: "Story / Reel 9:16 (1080×1920)", value: "story" },
+          { label: "Landscape (1200×630)", value: "landscape" },
+          { label: "Pin 2:3 (1000×1500)", value: "pin" },
+        ],
+      },
+      {
+        name: "style",
+        label: "Style",
+        type: "select",
+        defaultValue: "bold",
+        options: [
+          { label: "Bold", value: "bold" },
+          { label: "Minimal", value: "minimal" },
+          { label: "Photographic", value: "photographic" },
+          { label: "Illustrated", value: "illustrated" },
+        ],
+      },
+    ],
+    maxInputChars: 500,
+    extraActions: ["download"],
+    seoTitle: "AI Social Post Graphic Generator | Oply",
+    seoDescription:
+      "Oply's AI social post graphic generator is a social media graphic maker and Instagram post generator: turn a caption into a sized, on-brand graphic.",
+    featured: false,
+    sortOrder: 13,
+    enabled: true,
+    related: ["ai-thumbnail-generator"],
+    keywords: {
+      primary: "ai social post graphic generator",
+      secondary: [
+        "social media graphic maker",
+        "instagram post generator",
+        "social post image generator",
+        "ai instagram graphic maker",
+        "social media image generator",
+        "content graphic generator",
+        "social post design tool",
+      ],
+      longTail: [
+        "generate an instagram post graphic with ai",
+        "create a square social media graphic",
+        "make a story image for instagram",
+        "design a pinterest pin with ai",
+        "generate a facebook post image",
+        "create a linkedin post graphic",
+        "make a social graphic from a caption",
+        "generate a photographic style social post",
+        "design an illustrated social media graphic",
+      ],
+      entities: [
+        "social media graphic",
+        "Instagram post",
+        "aspect ratio",
+        "Story format",
+        "Pinterest pin",
+        "engagement",
+        "visual content",
+        "social media marketing",
+        "brand consistency",
+        "graphic design",
+      ],
+      questions: [
+        "What size should an Instagram post be?",
+        "Can I generate a story or reel size graphic?",
+        "Does it work for Pinterest pins?",
+        "Can I use my own caption text?",
+        "How many credits does this cost?",
+      ],
+      intent: "commercial",
+    },
+    benefits: [
+      {
+        title: "Sized for the format you need",
+        body: "Square, portrait, story or reel, landscape, or a Pinterest pin — pick the format and the graphic comes out at the right pixels.",
+      },
+      {
+        title: "Four visual styles",
+        body: "Bold, minimal, photographic or illustrated — matched to your caption and platform.",
+      },
+      {
+        title: "One caption, one graphic",
+        body: "Write the caption once and generate the visual to go with it, instead of starting from a blank canvas.",
+      },
+    ],
+    howItWorks: [
+      "Write the caption for your post.",
+      "Choose the platform, format and style.",
+      "Generate the graphic.",
+      "Download it, or regenerate for a different result.",
+    ],
+    example: {
+      label: "Example caption",
+      value: "Our new collection just dropped — cozy, sustainable, made to last.",
+    },
+    faq: [
+      {
+        question: "What size should an Instagram post be?",
+        answer:
+          "Instagram's feed formats are 1080×1080 (square) or 1080×1350 (portrait) — both are available as a format option here.",
+      },
+      {
+        question: "Can I generate a story or reel size graphic?",
+        answer: "Yes — choose the Story / Reel format for a 1080×1920 vertical graphic.",
+      },
+      {
+        question: "Does it work for Pinterest pins?",
+        answer: "Yes — the Pin format produces a 1000×1500 graphic sized for Pinterest.",
+      },
+      {
+        question: "Can I use my own caption text?",
+        answer:
+          "Your caption guides what the graphic depicts, but the generator does not reliably render caption text onto the image itself — add text in your platform's own post composer if you need it.",
+      },
+      {
+        question: "How many credits does this cost?",
+        answer: "60 credits per generation, including any regenerations.",
+      },
+    ],
+  },
+
+  /* ---------------------------------------------------------------- */
+  {
+    slug: "ai-product-photo-generator",
+    name: "AI Product Photo Generator",
+    tagline: "Restage a product photo for the platform you sell on.",
+    description:
+      "Upload a product photo and generate a new setting around it — studio white, a lifestyle scene, or a platform-sized listing image.",
+    category: "images",
+    icon: "Camera",
+    creditCost: 110,
+    component: "image-generator",
+    outputType: "image",
+    imageOutput: {
+      sizeField: "platform",
+      sizes: {
+        amazon: { width: 1000, height: 1000 },
+        shopify: { width: 2000, height: 2000 },
+        "instagram-shop": { width: 1080, height: 1080 },
+      },
+      defaultSize: { width: 1000, height: 1000 },
+      inputImageField: "productImage",
+      background: "auto",
+    },
+    systemPrompt: `You restage a product photo for e-commerce, using the uploaded image as the subject.
+
+Keep the product itself as the clear subject and change only the setting around it, in line with the requested background. Do not add packaging, labels, text or claims that were not in the source image or the supplied context. This is a generative restaging, not a pixel-exact crop — keep the product recognisable, but treat fine detail as approximate.`,
+    fields: [
+      {
+        name: "productImage",
+        label: "Product photo",
+        type: "image",
+        required: true,
+      },
+      {
+        name: "background",
+        label: "Background",
+        type: "select",
+        required: true,
+        defaultValue: "studio-white",
+        options: [
+          { label: "Studio White", value: "studio-white" },
+          { label: "Lifestyle Scene", value: "lifestyle-scene" },
+          { label: "Outdoor Natural Light", value: "outdoor-natural" },
+          { label: "Marble & Luxury Surface", value: "marble-luxury" },
+          { label: "Solid Color Backdrop", value: "solid-color" },
+          { label: "Custom", value: "custom" },
+        ],
+      },
+      {
+        name: "productContext",
+        label: "Product details (optional)",
+        type: "textarea",
+        rows: 3,
+        placeholder: "A ceramic pour-over coffee dripper, matte black",
+        maxLength: 300,
+        helpText: "Describe the product or the scene you want — useful for any background choice, required for Custom.",
+      },
+      {
+        name: "platform",
+        label: "Platform",
+        type: "select",
+        required: true,
+        defaultValue: "amazon",
+        options: [
+          { label: "Amazon (1000×1000)", value: "amazon" },
+          { label: "Shopify / Website (2000×2000)", value: "shopify" },
+          { label: "Instagram Shop (1080×1080)", value: "instagram-shop" },
+        ],
+      },
+    ],
+    maxInputChars: 500,
+    extraActions: ["download"],
+    seoTitle: "AI Product Photo Generator | Oply",
+    seoDescription:
+      "Oply's AI product photo generator is a product photography generator and ecommerce photo generator: upload a photo, pick a background, get a platform-sized image.",
+    featured: false,
+    sortOrder: 14,
+    enabled: true,
+    related: ["ai-background-remover", "product-description-generator"],
+    keywords: {
+      primary: "ai product photo generator",
+      secondary: [
+        "product photography generator",
+        "ai product photography",
+        "shopify product photo generator",
+        "amazon product image generator",
+        "product background generator",
+        "product photo editor",
+        "ecommerce photo generator",
+      ],
+      longTail: [
+        "generate a product photo with ai",
+        "create a studio product photo online",
+        "make an amazon product listing photo",
+        "generate a lifestyle product photo",
+        "create a white background product photo",
+        "design a product photo for shopify",
+        "generate a marble background product shot",
+        "make a product photo look professionally staged",
+      ],
+      entities: [
+        "product photography",
+        "studio lighting",
+        "ecommerce listing",
+        "white background",
+        "lifestyle photography",
+        "product staging",
+        "Amazon listing image",
+        "conversion rate",
+        "visual merchandising",
+      ],
+      questions: [
+        "Does Amazon require a white background?",
+        "Can I use my own product photo as a starting point?",
+        "What image sizes do I get?",
+        "Will it change my actual product?",
+        "How many credits does this cost?",
+      ],
+      intent: "commercial",
+    },
+    benefits: [
+      {
+        title: "Start from your real product",
+        body: "Upload the photo you already have — the product photo generator restages the setting around it instead of starting from nothing.",
+      },
+      {
+        title: "Sized for where you sell",
+        body: "Amazon, Shopify or a website, and Instagram Shop each get their own exact pixel size.",
+      },
+      {
+        title: "Six background directions",
+        body: "Studio white, a lifestyle scene, outdoor natural light, marble, a solid color, or your own custom description.",
+      },
+    ],
+    howItWorks: [
+      "Upload a photo of your product.",
+      "Choose a background and, optionally, describe the product or scene.",
+      "Pick the platform size and generate.",
+      "Download the result, or regenerate for a different take.",
+    ],
+    example: {
+      before: "A product photo with a cluttered kitchen counter behind it",
+      label: "Example result",
+      value: "The same product, restaged on a clean studio white background",
+    },
+    faq: [
+      {
+        question: "Does Amazon require a white background?",
+        answer:
+          "Amazon's main product image policy calls for a pure white background. Choose Studio White and the Amazon platform size to match it.",
+      },
+      {
+        question: "Can I use my own product photo as a starting point?",
+        answer:
+          "Yes — upload a photo of your product and describe the background you want. This is a generative restaging, not a guaranteed pixel-exact crop, so review the result before using it commercially.",
+      },
+      {
+        question: "What image sizes do I get?",
+        answer:
+          "Amazon (1000×1000), Shopify or a website (2000×2000), or Instagram Shop (1080×1080) — pick the platform and the output matches.",
+      },
+      {
+        question: "Will it change my actual product?",
+        answer:
+          "It is instructed to keep your product as the subject and change only the setting around it, but this is a generative model rather than a background-only crop — always review the result before publishing.",
+      },
+      {
+        question: "How many credits does this cost?",
+        answer: "110 credits per generation, including any regenerations.",
+      },
+    ],
+  },
+
+  /* ---------------------------------------------------------------- */
+  {
+    slug: "ai-background-remover",
+    name: "AI Background Remover",
+    tagline: "Remove or replace the background behind your subject.",
+    description:
+      "Upload an image and remove the background, replace it with a solid color, or describe a new scene.",
+    category: "images",
+    icon: "Eraser",
+    creditCost: 90,
+    component: "image-generator",
+    outputType: "image",
+    imageOutput: {
+      defaultSize: { width: 1024, height: 1024 },
+      inputImageField: "sourceImage",
+      skipExactFit: true,
+      backgroundField: "mode",
+      backgroundValues: {
+        remove: "transparent",
+        "solid-color": "opaque",
+        scene: "opaque",
+      },
+    },
+    systemPrompt: `You edit the background of an uploaded image, keeping the main subject intact.
+
+If asked to remove the background, produce a clean cutout of the subject on a transparent background. If asked to replace it with a solid color or a described scene, keep the subject as the clear foreground and compose the new background around it. Do not alter the subject itself beyond what removing or replacing the background requires.`,
+    fields: [
+      {
+        name: "sourceImage",
+        label: "Image",
+        type: "image",
+        required: true,
+      },
+      {
+        name: "mode",
+        label: "Mode",
+        type: "select",
+        required: true,
+        defaultValue: "remove",
+        options: [
+          { label: "Remove Background (Transparent)", value: "remove" },
+          { label: "Replace with Solid Color", value: "solid-color" },
+          { label: "Replace with Scene Description", value: "scene" },
+        ],
+      },
+      {
+        name: "replacementColor",
+        label: "Replacement color",
+        type: "text",
+        placeholder: "Sky blue",
+        maxLength: 60,
+        showWhen: { field: "mode", equals: ["solid-color"] },
+      },
+      {
+        name: "replacementScene",
+        label: "Describe the new background",
+        type: "textarea",
+        rows: 3,
+        placeholder: "A sunlit wooden desk with soft shadows",
+        maxLength: 300,
+        showWhen: { field: "mode", equals: ["scene"] },
+      },
+    ],
+    maxInputChars: 400,
+    extraActions: ["download"],
+    seoTitle: "AI Background Remover — Remove or Replace | Oply",
+    seoDescription:
+      "Oply's AI background remover is a background removal tool and background replacer: remove it to transparent, or replace it with a color or scene.",
+    featured: false,
+    sortOrder: 15,
+    enabled: true,
+    related: ["ai-product-photo-generator", "ai-rewriter"],
+    keywords: {
+      primary: "ai background remover",
+      secondary: [
+        "background removal tool",
+        "remove image background",
+        "background replacer",
+        "ai background eraser",
+        "transparent background maker",
+        "photo background remover",
+        "change image background",
+      ],
+      longTail: [
+        "remove the background from a photo online",
+        "replace a photo background with ai",
+        "make a product photo background transparent",
+        "change a photo background to a solid color",
+        "generate a new background for a photo",
+        "remove a background without using photoshop",
+        "create a transparent png from a photo",
+        "isolate a subject from its background",
+      ],
+      entities: [
+        "background removal",
+        "image matting",
+        "transparent PNG",
+        "photo editing",
+        "compositing",
+        "alpha channel",
+        "product photography",
+        "image inpainting",
+      ],
+      questions: [
+        "Does this perfectly cut out the subject like a dedicated background remover?",
+        "Can I replace the background with a colour instead of removing it?",
+        "Can I describe a new scene for the background?",
+        "What file format do I get?",
+        "How many credits does this cost?",
+      ],
+      intent: "commercial",
+    },
+    benefits: [
+      {
+        title: "Three ways to change a background",
+        body: "Remove it to transparent, swap it for a solid color, or describe a whole new scene.",
+      },
+      {
+        title: "Keeps the subject as the focus",
+        body: "The subject stays intact while only the background around it changes.",
+      },
+      {
+        title: "One upload, download-ready",
+        body: "Upload an image, pick a mode, and download a PNG sized to match your original.",
+      },
+    ],
+    howItWorks: [
+      "Upload the image you want to edit.",
+      "Choose remove, solid color, or a described scene.",
+      "Generate the result.",
+      "Download it, or regenerate for a different take.",
+    ],
+    example: {
+      before: "A product photo with a cluttered kitchen counter behind it",
+      label: "Example result",
+      value: "The same product, isolated on a transparent background",
+    },
+    faq: [
+      {
+        question: "Does this perfectly cut out the subject like a dedicated background remover?",
+        answer:
+          "Not always. This is a generative-edit approximation, not pixel-perfect matting — check fine detail like hair or transparent edges before using the result commercially.",
+      },
+      {
+        question: "Can I replace the background with a colour instead of removing it?",
+        answer: "Yes — choose Replace with Solid Color and enter the colour you want.",
+      },
+      {
+        question: "Can I describe a new scene for the background?",
+        answer:
+          "Yes — choose Replace with Scene Description and describe the setting you want behind the subject.",
+      },
+      {
+        question: "What file format do I get?",
+        answer:
+          "A PNG file. Transparent mode produces an alpha-channel PNG; the two replace modes produce a flat PNG with the new background.",
+      },
+      {
+        question: "How many credits does this cost?",
+        answer: "90 credits per generation, including any regenerations.",
+      },
+    ],
+  },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -2015,6 +2949,21 @@ export function isNewTool(
   now = new Date(),
 ): boolean {
   return Boolean(tool.newUntil && new Date(tool.newUntil) > now);
+}
+
+/**
+ * True when a conditional field should be shown/used for the given input —
+ * e.g. Background Remover's "replacement colour" only applies when its mode
+ * is set to "Replace with Solid Color". Shared by the workspace's field list
+ * (what renders) and buildUserPrompt (what reaches the model), so a hidden
+ * field's stale value never leaks into a generation it doesn't apply to.
+ */
+export function isFieldVisible(
+  field: ToolField,
+  input: Record<string, string>,
+): boolean {
+  if (!field.showWhen) return true;
+  return field.showWhen.equals.includes(input[field.showWhen.field] ?? "");
 }
 
 /**

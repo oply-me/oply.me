@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ImageFieldInput } from "@/components/tools/image-field-input";
 import type { ToolField } from "@/config/tools";
 import { cn } from "@/lib/utils";
 
@@ -61,7 +62,15 @@ export function FieldRenderer({
         )}
       </div>
 
-      {field.type === "textarea" ? (
+      {field.type === "image" ? (
+        <ImageFieldInput
+          id={id}
+          value={value}
+          onChange={onChange}
+          disabled={disabled}
+          required={field.required}
+        />
+      ) : field.type === "textarea" ? (
         <Textarea
           id={id}
           value={value}

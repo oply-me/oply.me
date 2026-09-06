@@ -12,8 +12,8 @@ import { categories, categoryMap } from "@/config/categories";
 
 describe("tool registry", () => {
   it("ships the ten launch tools", () => {
-    expect(tools).toHaveLength(10);
-    expect(getEnabledTools()).toHaveLength(10);
+    expect(tools).toHaveLength(15);
+    expect(getEnabledTools()).toHaveLength(15);
   });
 
   it("has a unique slug per tool", () => {

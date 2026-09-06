@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getTool, GLOBAL_SYSTEM_RULES } from "@/config/tools";
+import { getTool, GLOBAL_SYSTEM_RULES, isFieldVisible, type ToolField } from "@/config/tools";
 import {
   buildInputPreview,
   buildRefinePrompt,
@@ -53,6 +53,40 @@ describe("prompt construction", () => {
   it("handles a request with no usable input", () => {
     const prompt = buildUserPrompt(writer, { topic: "" });
     expect(prompt).toContain("No input was provided");
+  });
+
+  it("never renders a conditional field's stale value once it is hidden", () => {
+    const remover = getTool("ai-background-remover")!;
+    // The user typed a colour, then switched mode away from "solid-color" —
+    // the field is no longer shown, so its leftover value must not reach the
+    // model either (this was a real bug: showWhen was declared but never
+    // actually enforced anywhere).
+    const prompt = buildUserPrompt(remover, {
+      sourceImage: "u1/uploads/x.png",
+      mode: "remove",
+      replacementColor: "Sky blue",
+    });
+    expect(prompt).not.toContain("Sky blue");
+  });
+});
+
+describe("isFieldVisible", () => {
+  const conditional: ToolField = {
+    name: "replacementColor",
+    label: "Replacement color",
+    type: "text",
+    showWhen: { field: "mode", equals: ["solid-color"] },
+  };
+  const unconditional: ToolField = { name: "caption", label: "Caption", type: "text" };
+
+  it("has no opinion on a field with no showWhen", () => {
+    expect(isFieldVisible(unconditional, {})).toBe(true);
+  });
+
+  it("shows a conditional field only when the referenced field matches", () => {
+    expect(isFieldVisible(conditional, { mode: "solid-color" })).toBe(true);
+    expect(isFieldVisible(conditional, { mode: "remove" })).toBe(false);
+    expect(isFieldVisible(conditional, {})).toBe(false);
   });
 
   it("includes the previous output and the instruction when refining", () => {

@@ -57,6 +57,15 @@ export function buildToolInputSchema(tool: ToolDefinition) {
         .refine((v) => values.includes(v), {
           message: `${field.label} must be one of: ${values.join(", ")}`,
         });
+    } else if (field.type === "image") {
+      // The value is a Storage object path ("{userId}/uploads/{file}"), not
+      // the image itself — the browser uploads directly to Storage first
+      // (ImageFieldInput). This only checks the shape; the generate route
+      // separately verifies the leading segment matches the requesting
+      // user's id, since this schema has no access to that.
+      schema = z
+        .string()
+        .regex(/^[\w-]+\/uploads\/[\w.-]+$/, `${field.label} must be an uploaded image.`);
     } else {
       let s = z.string().max(
         field.maxLength ?? tool.maxInputChars,
@@ -72,6 +81,19 @@ export function buildToolInputSchema(tool: ToolDefinition) {
   }
 
   return z.object(shape);
+}
+
+/**
+ * True when an "image" field's Storage path belongs to the requesting user.
+ * `buildToolInputSchema` only checks the path's shape (it has no user
+ * context) — this is the separate ownership check the generate route runs
+ * for every "image"-type field before calling the provider. Storage RLS
+ * (supabase/migrations/20250101000300_images.sql) already stops a user from
+ * uploading under someone else's folder; this stops a user from simply
+ * typing another user's existing path into the request body.
+ */
+export function isOwnedUploadPath(path: string, userId: string): boolean {
+  return path.startsWith(`${userId}/uploads/`);
 }
 
 /** Applies select defaults and strips unknown keys before validation. */

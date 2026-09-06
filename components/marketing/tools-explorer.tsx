@@ -1,8 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import { Search, X } from "lucide-react";
 import { ToolCard } from "@/components/marketing/tool-card";
+import { ToolCardSkeleton } from "@/components/marketing/tool-card-skeleton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -32,6 +34,22 @@ export function ToolsExplorer({
   const [query, setQuery] = useState(initialQuery);
   const [category, setCategory] = useState(initialCategory);
   const [sort, setSort] = useState<SortKey>("popular");
+  // Brief, honestly-framed transition between two real result sets — never
+  // shown for search-box typing, since that filtering is instant and a fake
+  // loading state there would be dishonest UI.
+  const [switchingCategory, setSwitchingCategory] = useState(false);
+
+  useEffect(() => {
+    if (!switchingCategory) return;
+    const id = setTimeout(() => setSwitchingCategory(false), 220);
+    return () => clearTimeout(id);
+  }, [switchingCategory]);
+
+  function selectCategory(slug: string) {
+    if (slug === category) return;
+    setCategory(slug);
+    setSwitchingCategory(true);
+  }
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -110,24 +128,27 @@ export function ToolsExplorer({
         role="group"
         aria-label="Filter by category"
       >
-        <FilterPill
-          active={category === "all"}
-          onClick={() => setCategory("all")}
-        >
+        <FilterPill active={category === "all"} onClick={() => selectCategory("all")}>
           All
         </FilterPill>
         {availableCategories.map((c) => (
           <FilterPill
             key={c.slug}
             active={category === c.slug}
-            onClick={() => setCategory(c.slug)}
+            onClick={() => selectCategory(c.slug)}
           >
             {c.label}
           </FilterPill>
         ))}
       </div>
 
-      {filtered.length === 0 ? (
+      {switchingCategory ? (
+        <div className="mt-9 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <ToolCardSkeleton key={i} />
+          ))}
+        </div>
+      ) : filtered.length === 0 ? (
         <div className="mt-12 rounded-xl border border-dashed border-border py-16 text-center">
           <p className="text-[15px] font-medium">No tools match that search.</p>
           <p className="mt-1.5 text-sm text-muted-foreground">
@@ -176,13 +197,20 @@ function FilterPill({
       onClick={onClick}
       aria-pressed={active}
       className={cn(
-        "shrink-0 rounded-full border px-3.5 py-1.5 text-[13px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        "relative shrink-0 overflow-hidden rounded-full border px-3.5 py-1.5 text-[13px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         active
-          ? "border-primary bg-primary text-primary-foreground"
+          ? "border-primary text-primary-foreground"
           : "border-border bg-background text-muted-foreground hover:bg-accent hover:text-foreground",
       )}
     >
-      {children}
+      {active && (
+        <motion.span
+          layoutId="active-filter-pill"
+          className="absolute inset-0 bg-primary"
+          transition={{ type: "spring", bounce: 0.15, duration: 0.45 }}
+        />
+      )}
+      <span className="relative">{children}</span>
     </button>
   );
 }

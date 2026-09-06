@@ -144,6 +144,11 @@ export type GenerationRow = {
   input_preview: string | null;
   output_text: string | null;
   output_json: Json | null;
+  output_image_url: string | null;
+  output_image_mime: string | null;
+  output_image_width: number | null;
+  output_image_height: number | null;
+  output_storage_path: string | null;
   credits_used: number;
   model: string | null;
   provider: string | null;

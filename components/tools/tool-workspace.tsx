@@ -15,7 +15,11 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { CopyButton } from "@/components/copy-button";
+import { DownloadButton } from "@/components/tools/download-button";
 import { FieldRenderer } from "@/components/tools/field-renderer";
+import { GenerationProgress } from "@/components/tools/generation-progress";
+import { ImageResultView } from "@/components/tools/image-result-view";
+import { ToolExampleToggle } from "@/components/tools/tool-example-toggle";
 import {
   OutlineOutput,
   ProductOutput,
@@ -27,8 +31,7 @@ import {
 } from "@/components/tools/output-renderers";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import type { PublicTool } from "@/config/tools";
+import { isFieldVisible, type PublicTool } from "@/config/tools";
 import { track } from "@/lib/analytics";
 import { cn, formatNumber } from "@/lib/utils";
 import type {
@@ -43,8 +46,9 @@ type RefineAction = "shorten" | "expand" | "improve";
 
 interface GenerationResult {
   generationId: string;
-  text: string;
-  json: unknown | null;
+  text?: string;
+  json?: unknown | null;
+  image?: { url: string; width: number; height: number; mimeType: string };
   creditsUsed: number;
   balance: number;
 }
@@ -85,7 +89,10 @@ export function ToolWorkspace({
   const missingRequired = useMemo(
     () =>
       tool.fields.some(
-        (f) => f.required && !String(input[f.name] ?? "").trim(),
+        (f) =>
+          f.required &&
+          isFieldVisible(f, input) &&
+          !String(input[f.name] ?? "").trim(),
       ),
     [tool.fields, input],
   );
@@ -177,6 +184,13 @@ export function ToolWorkspace({
     ? result.text || JSON.stringify(result.json, null, 2)
     : "";
 
+  const progressStages =
+    tool.outputType === "image"
+      ? ["Understanding your brief", "Generating the image", "Finishing"]
+      : tool.component === "long-form"
+        ? ["Understanding topic", "Drafting", "Polishing"]
+        : ["Understanding your input", "Generating", "Finishing"];
+
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
       {/* ---------------------------------------------------------- Input */}
@@ -190,15 +204,17 @@ export function ToolWorkspace({
         </div>
 
         <div className="space-y-5 p-5">
-          {tool.fields.map((field) => (
-            <FieldRenderer
-              key={field.name}
-              field={field}
-              value={input[field.name] ?? ""}
-              onChange={(value) => setField(field.name, value)}
-              disabled={loading}
-            />
-          ))}
+          {tool.fields
+            .filter((field) => isFieldVisible(field, input))
+            .map((field) => (
+              <FieldRenderer
+                key={field.name}
+                field={field}
+                value={input[field.name] ?? ""}
+                onChange={(value) => setField(field.name, value)}
+                disabled={loading}
+              />
+            ))}
         </div>
 
         <div className="border-t border-border p-5">
@@ -251,7 +267,11 @@ export function ToolWorkspace({
               <span className="text-xs text-muted-foreground">
                 Used {result.creditsUsed} credits
               </span>
-              <CopyButton value={copyValue} size="sm" />
+              {result.image ? (
+                <DownloadButton url={result.image.url} filename={`${tool.slug}.png`} />
+              ) : (
+                <CopyButton value={copyValue} size="sm" />
+              )}
               <Button
                 size="sm"
                 variant="outline"
@@ -277,7 +297,9 @@ export function ToolWorkspace({
 
         <div className="min-h-[300px] p-5">
           {loading ? (
-            <LoadingState />
+            <div className="flex h-full min-h-[260px] flex-col items-center justify-center gap-6 px-6">
+              <GenerationProgress active={loading} stages={progressStages} className="max-w-sm" />
+            </div>
           ) : error ? (
             <ErrorPanel error={error} onRetry={() => run("generate")} />
           ) : result ? (
@@ -329,6 +351,10 @@ function ResultView({
   result: GenerationResult;
   input: Record<string, string>;
 }) {
+  if (result.image) {
+    return <ImageResultView image={result.image} />;
+  }
+
   // Structured tools render their own layout; everything else is prose.
   if (result.json) {
     switch (tool.slug) {
@@ -357,28 +383,10 @@ function ResultView({
   }
 
   if (tool.component === "schema-generator" || tool.outputType === "json") {
-    return <SchemaOutput text={result.text} />;
+    return <SchemaOutput text={result.text ?? ""} />;
   }
 
-  return <TextOutput text={result.text} />;
-}
-
-function LoadingState() {
-  return (
-    <div className="space-y-3" role="status" aria-live="polite">
-      <span className="sr-only">Generating your result</span>
-      <Skeleton className="h-4 w-3/4" />
-      <Skeleton className="h-4 w-full" />
-      <Skeleton className="h-4 w-5/6" />
-      <Skeleton className="h-4 w-full" />
-      <Skeleton className="h-4 w-2/3" />
-      <div className="pt-4">
-        <Skeleton className="h-4 w-4/5" />
-      </div>
-      <Skeleton className="h-4 w-full" />
-      <Skeleton className="h-4 w-1/2" />
-    </div>
-  );
+  return <TextOutput text={result.text ?? ""} />;
 }
 
 function IdleState({ tool }: { tool: PublicTool }) {
@@ -388,9 +396,7 @@ function IdleState({ tool }: { tool: PublicTool }) {
         <Sparkles className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
       </div>
       <p className="mt-4 text-[15px] font-medium">Your result appears here</p>
-      <p className="mt-1.5 max-w-xs text-sm text-muted-foreground">
-        {tool.example.label}: “{tool.example.value}”
-      </p>
+      <ToolExampleToggle tool={tool} />
     </div>
   );
 }

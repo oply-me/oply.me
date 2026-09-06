@@ -1,5 +1,6 @@
 import {
   GLOBAL_SYSTEM_RULES,
+  isFieldVisible,
   type ToolDefinition,
   type ToolField,
 } from "@/config/tools";
@@ -41,6 +42,11 @@ export function buildUserPrompt(
   const parts: string[] = [];
 
   for (const field of tool.fields) {
+    // An "image" field's value is a Storage path, not prompt-worthy text.
+    if (field.type === "image") continue;
+    // A conditional field the user never actually saw (e.g. a colour typed
+    // before switching modes away from it) should not reach the model.
+    if (!isFieldVisible(field, input)) continue;
     const raw = input[field.name];
     if (raw == null) continue;
     const value = String(raw).trim();

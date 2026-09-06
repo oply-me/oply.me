@@ -1,10 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { getTool } from "@/config/tools";
+import { getTool, type ToolDefinition } from "@/config/tools";
 import {
   buildToolInputSchema,
   contactSchema,
   createPaymentSchema,
   generateRequestSchema,
+  isOwnedUploadPath,
   normalizeToolInput,
   profileSchema,
 } from "@/lib/security/validation";
@@ -79,6 +80,47 @@ describe("per-tool input schemas", () => {
     expect(normalized.tone).toBe("professional");
     expect(normalized.length).toBe("medium");
     expect("injected" in normalized).toBe(false);
+  });
+});
+
+describe("image field validation", () => {
+  // No image tool exists in the registry until Part B's tools land — the
+  // schema builder itself only reads `fields`/`maxInputChars`, so a minimal
+  // stand-in is enough to test the "image" branch in isolation.
+  const imageTool = {
+    maxInputChars: 5_000,
+    fields: [
+      { name: "sourceImage", label: "Source image", type: "image", required: true },
+    ],
+  } as unknown as ToolDefinition;
+
+  it("accepts a well-formed owned upload path", () => {
+    const schema = buildToolInputSchema(imageTool);
+    const result = schema.safeParse({
+      sourceImage: "9f2c1a-user-id/uploads/3b1a9c.png",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects a path missing the uploads segment", () => {
+    const schema = buildToolInputSchema(imageTool);
+    const result = schema.safeParse({
+      sourceImage: "9f2c1a-user-id/generations/3b1a9c.png",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects raw base64 instead of a storage path", () => {
+    const schema = buildToolInputSchema(imageTool);
+    const result = schema.safeParse({
+      sourceImage: "data:image/png;base64,iVBORw0KGgoAAAANSU",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("confirms ownership by the path's leading segment, separately from shape", () => {
+    expect(isOwnedUploadPath("user-a/uploads/photo.png", "user-a")).toBe(true);
+    expect(isOwnedUploadPath("user-b/uploads/photo.png", "user-a")).toBe(false);
   });
 });
 

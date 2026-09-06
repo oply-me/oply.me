@@ -17,7 +17,8 @@ insert into public.tool_categories (slug, name, description, icon, enabled, sort
   ('creator',      'Creator',      'Tools for creators publishing across blogs, video and social.', 'Clapperboard', true, 6),
   ('productivity', 'Productivity', 'Small utilities that remove busywork from your day.', 'Zap',          true, 7),
   ('developer',    'Developer',    'Generators and helpers for people who ship software.', 'Code2',        true, 8),
-  ('utilities',    'Utilities',    'General helpers that do not fit anywhere else.', 'Wrench',       true, 9)
+  ('utilities',    'Utilities',    'General helpers that do not fit anywhere else.', 'Wrench',       true, 9),
+  ('images',       'Images',       'AI image generation tools for thumbnails, social graphics, product photos, logos and background editing.', 'Image', true, 10)
 on conflict (slug) do update set
   name        = excluded.name,
   description = excluded.description,

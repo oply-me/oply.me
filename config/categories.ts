@@ -258,6 +258,35 @@ export const categories: CategoryDefinition[] = [
     sortOrder: 9,
     enabled: true,
   },
+  {
+    slug: "images",
+    name: "Images",
+    label: "Images",
+    description:
+      "AI image generation tools for thumbnails, social graphics, product photos, logos and background editing.",
+    icon: "Image",
+    // 16: a warm coral, in the widest open gap on the hue wheel (340 to 38) —
+    // reads as visual/creative without competing with the brand purple/pink
+    // or any existing category tile.
+    hue: 16,
+    primaryKeyword: "ai image generator",
+    keywords: [
+      "ai image tools",
+      "ai thumbnail maker",
+      "ai social graphic maker",
+      "ai product photo tools",
+      "ai logo maker",
+      "ai background remover",
+      "text to image tools",
+      "ai image editing tools",
+      "free ai image generator",
+      "ai graphic design tools",
+    ],
+    seoDescription:
+      "AI image tools for thumbnails, social graphics, product photos, logos and background editing. Generate an image, download it, or regenerate for a different result.",
+    sortOrder: 10,
+    enabled: true,
+  },
 ];
 
 export const categoryMap = new Map(categories.map((c) => [c.slug, c]));

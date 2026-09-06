@@ -2,11 +2,17 @@ import Link from "next/link";
 import { ArrowRight, Coins, Infinity as InfinityIcon, Sparkles } from "lucide-react";
 import { AskBox } from "@/components/marketing/ask-box";
 import { HeroBackdrop } from "@/components/marketing/backdrop";
+import { HeroHeadline } from "@/components/marketing/hero-headline";
 import { ToolMarquee } from "@/components/marketing/marquee";
 import { Button } from "@/components/ui/button";
 import type { PublicTool } from "@/config/tools";
 import { siteConfig } from "@/config/site";
 import { formatNumber } from "@/lib/utils";
+
+/** Mirrors the site's own description ("Write, rewrite, summarize, optimize
+ * and create...") — the cycling headline restates real product copy, it
+ * doesn't invent new claims. */
+const HERO_HEADLINE_WORDS = ["Write", "Rewrite", "Summarize", "Optimize", "Create"];
 
 export function Hero({
   signedIn = false,
@@ -33,8 +39,13 @@ export function Hero({
           </p>
 
           <h1 className="text-balance mt-6 text-[2.5rem] font-semibold leading-[1.05] tracking-[-0.035em] sm:text-display-sm lg:text-display">
-            AI tools for{" "}
-            <span className="text-gradient">getting things done.</span>
+            <span className="sr-only">
+              AI tools to write, rewrite, summarize, optimize and create.
+            </span>
+            <span aria-hidden="true">
+              AI tools to{" "}
+              <HeroHeadline words={HERO_HEADLINE_WORDS} className="text-gradient" />
+            </span>
           </h1>
 
           <p className="text-pretty mx-auto mt-5 max-w-2xl text-[17px] leading-relaxed text-muted-foreground sm:text-lg">

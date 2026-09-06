@@ -10,6 +10,8 @@ import {
 import { Hero } from "@/components/marketing/hero";
 import { HowItWorks } from "@/components/marketing/how-it-works";
 import { SoftBackdrop, OrbitRing } from "@/components/marketing/backdrop";
+import { Reveal } from "@/components/marketing/reveal";
+import { AnimatedStat } from "@/components/marketing/animated-stat";
 import { Section, SectionHeading } from "@/components/marketing/section";
 import { ToolCard } from "@/components/marketing/tool-card";
 import { CategoryCard } from "@/components/marketing/category-card";
@@ -92,28 +94,27 @@ export default async function HomePage() {
       {/* ------------------------------------------------------- Stat band */}
       <section className="border-b border-border bg-surface">
         <div className="container py-8">
-          <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-border bg-border lg:grid-cols-4">
-            <Stat
-              value={`${allTools.length}`}
-              label="AI tools, one account"
-              hue={258}
-            />
-            <Stat
-              value={`$${startingPrice}`}
-              label="Starting one-time price"
-              hue={288}
-            />
-            <Stat
-              value={formatNumber(bestValue.credits)}
-              label={`Credits in the ${bestValue.name} pack`}
-              hue={322}
-            />
-            <Stat
-              value={formatNumber(siteConfig.signupBonusCredits)}
-              label="Free credits when you sign up"
-              hue={194}
-            />
-          </dl>
+          <Reveal>
+            <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-border bg-border lg:grid-cols-4">
+              <Stat value={allTools.length} label="AI tools, one account" hue={258} />
+              <Stat
+                value={startingPrice}
+                prefix="$"
+                label="Starting one-time price"
+                hue={288}
+              />
+              <Stat
+                value={bestValue.credits}
+                label={`Credits in the ${bestValue.name} pack`}
+                hue={322}
+              />
+              <Stat
+                value={siteConfig.signupBonusCredits}
+                label="Free credits when you sign up"
+                hue={194}
+              />
+            </dl>
+          </Reveal>
         </div>
       </section>
 
@@ -121,27 +122,31 @@ export default async function HomePage() {
       <Section className="relative isolate overflow-hidden">
         <SoftBackdrop />
         <div className="container relative">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <SectionHeading
-              align="left"
-              eyebrow="Most used"
-              title="Start with these"
-              description="The tools people reach for most on Oply."
-              className="max-w-lg"
-            />
-            <Button asChild variant="outline" className="self-start bg-card/70 backdrop-blur sm:self-end">
-              <Link href="/tools">
-                All {allTools.length} tools
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
+          <Reveal>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <SectionHeading
+                align="left"
+                eyebrow="Most used"
+                title="Start with these"
+                description="The tools people reach for most on Oply."
+                className="max-w-lg"
+              />
+              <Button asChild variant="outline" className="self-start bg-card/70 backdrop-blur sm:self-end">
+                <Link href="/tools">
+                  All {allTools.length} tools
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          </Reveal>
 
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {featured.map((tool) => (
-              <ToolCard key={tool.slug} tool={toPublicTool(tool)} />
-            ))}
-          </div>
+          <Reveal delay={0.1}>
+            <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {featured.map((tool) => (
+                <ToolCard key={tool.slug} tool={toPublicTool(tool)} />
+              ))}
+            </div>
+          </Reveal>
         </div>
       </Section>
 
@@ -149,21 +154,25 @@ export default async function HomePage() {
       <Section className="relative isolate overflow-hidden border-t border-border bg-surface">
         <SoftBackdrop dots />
         <div className="container relative">
-          <SectionHeading
-            eyebrow="Browse"
-            title="Everything you need, colour-coded"
-            description="Every tool runs from the same account and the same credit balance. Pick the shelf you are working on."
-          />
+          <Reveal>
+            <SectionHeading
+              eyebrow="Browse"
+              title="Everything you need, colour-coded"
+              description="Every tool runs from the same account and the same credit balance. Pick the shelf you are working on."
+            />
+          </Reveal>
 
-          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {activeCategories.map(({ category, count }) => (
-              <CategoryCard
-                key={category.slug}
-                category={category}
-                toolCount={count}
-              />
-            ))}
-          </div>
+          <Reveal delay={0.1}>
+            <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {activeCategories.map(({ category, count }) => (
+                <CategoryCard
+                  key={category.slug}
+                  category={category}
+                  toolCount={count}
+                />
+              ))}
+            </div>
+          </Reveal>
 
           {/* Every tool, one tap away — and one crawlable link away. */}
           <div className="mt-12">
@@ -198,19 +207,23 @@ export default async function HomePage() {
         </div>
       </Section>
 
-      <HowItWorks />
+      <Reveal>
+        <HowItWorks />
+      </Reveal>
 
       {/* ------------------------------------------------------ Credit model */}
       <Section className="relative isolate overflow-hidden border-t border-border bg-surface">
         <SoftBackdrop />
         <div className="container relative">
-          <SectionHeading
-            eyebrow="Credits"
-            title="Buy once. Spend across every tool."
-            description="Every tool uses a small number of credits, drawn from one shared balance."
-          />
+          <Reveal>
+            <SectionHeading
+              eyebrow="Credits"
+              title="Buy once. Spend across every tool."
+              description="Every tool uses a small number of credits, drawn from one shared balance."
+            />
+          </Reveal>
 
-          <div className="mt-12 grid items-start gap-6 lg:grid-cols-[1.05fr_1fr]">
+          <Reveal delay={0.1} className="mt-12 grid items-start gap-6 lg:grid-cols-[1.05fr_1fr]">
             {/* The graphic: a credit balance with the real per-tool costs. */}
             <div className="border-gradient relative isolate overflow-hidden rounded-3xl bg-card p-7 shadow-brand">
               <OrbitRing className="-right-24 -top-24 h-64 w-64" />
@@ -291,7 +304,7 @@ export default async function HomePage() {
                 body="There is nothing to cancel. Buy another pack when, and only when, you want one."
               />
             </div>
-          </div>
+          </Reveal>
         </div>
       </Section>
 
@@ -299,12 +312,14 @@ export default async function HomePage() {
       <Section className="relative isolate overflow-hidden border-t border-border">
         <SoftBackdrop />
         <div className="container relative">
-          <SectionHeading
-            eyebrow="Pricing"
-            title="Simple, one-time pricing"
-            description="Pick a pack, pay once, and spend the credits whenever you need them."
-          />
-          <div className="mx-auto mt-12 grid max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <Reveal>
+            <SectionHeading
+              eyebrow="Pricing"
+              title="Simple, one-time pricing"
+              description="Pick a pack, pay once, and spend the credits whenever you need them."
+            />
+          </Reveal>
+          <Reveal delay={0.1} className="mx-auto mt-12 grid max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {pricingPlans.map((plan) => {
               const highlighted = Boolean(plan.highlight);
               return (
@@ -355,7 +370,7 @@ export default async function HomePage() {
                 </Link>
               );
             })}
-          </div>
+          </Reveal>
           <div className="mt-10 text-center">
             <Button asChild size="lg" className="shadow-brand">
               <Link href="/pricing">
@@ -370,10 +385,12 @@ export default async function HomePage() {
       {/* ------------------------------------------------------------- FAQ */}
       <Section className="border-t border-border bg-surface">
         <div className="container">
-          <SectionHeading eyebrow="FAQ" title="Questions people ask" />
-          <div className="mx-auto mt-10 max-w-2xl">
+          <Reveal>
+            <SectionHeading eyebrow="FAQ" title="Questions people ask" />
+          </Reveal>
+          <Reveal delay={0.1} className="mx-auto mt-10 max-w-2xl">
             <FaqList items={HOME_FAQ} />
-          </div>
+          </Reveal>
         </div>
       </Section>
 
@@ -389,10 +406,12 @@ export default async function HomePage() {
 
 function Stat({
   value,
+  prefix,
   label,
   hue,
 }: {
-  value: string;
+  value: number;
+  prefix?: string;
   label: string;
   hue: number;
 }) {
@@ -403,9 +422,11 @@ function Stat({
     >
       <dt className="sr-only">{label}</dt>
       <dd>
-        <span className="block text-3xl font-semibold tracking-tight tabular-nums [color:var(--solid)]">
-          {value}
-        </span>
+        <AnimatedStat
+          value={value}
+          prefix={prefix}
+          className="block text-3xl font-semibold tracking-tight tabular-nums [color:var(--solid)]"
+        />
         <span className="mt-1.5 block text-[13px] leading-snug text-muted-foreground">
           {label}
         </span>

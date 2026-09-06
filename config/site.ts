@@ -1,5 +1,5 @@
 export const siteConfig = {
-  name: "Oply",
+  name: "Oply.me",
   shortName: "Oply",
   domain: "oply.me",
   url: process.env.NEXT_PUBLIC_APP_URL ?? "https://oply.me",

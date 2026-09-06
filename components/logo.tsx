@@ -46,10 +46,10 @@ export function Logo({
       <OplyMark className={markClassName} />
       {showWordmark && (
         <span className="text-[17px] font-semibold tracking-tight text-foreground">
-          Oply
+          Oply.me
         </span>
       )}
-      <span className="sr-only">Oply — AI tools for getting things done</span>
+      <span className="sr-only">Oply.me — AI tools for getting things done</span>
     </span>
   );
 }
