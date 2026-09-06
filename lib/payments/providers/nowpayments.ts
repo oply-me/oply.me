@@ -134,6 +134,12 @@ export class NowPaymentsProvider implements PaymentProvider {
         ipn_callback_url: params.webhookUrl,
         success_url: params.successUrl,
         cancel_url: params.cancelUrl,
+        // Without this, NOWPayments deducts its own processing fee from what
+        // we actually receive — on a small order that's enough to land the
+        // payment as "partially received" even though the customer paid the
+        // full quoted price. This shifts that fee onto the customer instead,
+        // so price_amount above is what we're guaranteed to receive.
+        is_fee_paid_by_user: true,
         ...(params.payCurrency ? { pay_currency: params.payCurrency } : {}),
       }),
     });
