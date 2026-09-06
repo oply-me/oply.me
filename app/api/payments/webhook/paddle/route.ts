@@ -1,24 +1,24 @@
 import { NextResponse } from "next/server";
-import { getCryptoProvider } from "@/lib/payments";
+import { getCardProvider } from "@/lib/payments";
 import { processPaymentWebhookEvent } from "@/lib/payments/process-webhook-event";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * NOWPayments' webhook — this exact URL is already configured as the IPN
- * callback in the NOWPayments dashboard and verified working end to end.
- * Do not repurpose this route for another provider; add a sibling route
- * instead (see app/api/payments/webhook/paddle/route.ts).
+ * Paddle's webhook — point Paddle's Notification destination (dashboard, not
+ * per-request) at this exact URL. Sibling to app/api/payments/webhook/route.ts
+ * (NOWPayments); each provider gets its own route because each has its own
+ * signature scheme.
  */
 export async function POST(request: Request) {
-  const provider = getCryptoProvider();
+  const provider = getCardProvider();
   const rawBody = await request.text();
 
   const verification = await provider.verifyWebhook(rawBody, request.headers);
 
   if (!verification || !verification.valid) {
-    console.warn("[payments/webhook] rejected unverified request", {
+    console.warn("[payments/webhook/paddle] rejected unverified request", {
       provider: provider.name,
     });
     // Deliberately vague — an attacker learns nothing from this response.

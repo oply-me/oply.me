@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getApiUser } from "@/lib/auth/guards";
 import { getPlan } from "@/config/pricing";
 import { siteConfig } from "@/config/site";
-import { getPaymentProvider, isPaymentConfigured } from "@/lib/payments";
+import { getCardProvider, getCryptoProvider, isCardConfigured, isCryptoConfigured } from "@/lib/payments";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { rateLimit } from "@/lib/security/rate-limit";
 import { createPaymentSchema } from "@/lib/security/validation";
@@ -28,13 +28,6 @@ export async function POST(request: Request) {
     );
   }
 
-  if (!isPaymentConfigured()) {
-    return NextResponse.json(
-      { error: "Checkout is not available right now." },
-      { status: 503 },
-    );
-  }
-
   let body: unknown;
   try {
     body = await request.json();
@@ -47,15 +40,23 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid plan." }, { status: 400 });
   }
 
-  // The client sends a plan id and nothing else. Price and credit quantity are
-  // read from server configuration — never from the request body.
+  // The client picks a checkout method and a plan id, nothing else. Price and
+  // credit quantity are read from server configuration — never the request body.
   const plan = getPlan(parsed.data.planId);
   if (!plan) {
     return NextResponse.json({ error: "Invalid plan." }, { status: 400 });
   }
 
+  const method = parsed.data.method;
+  if (method === "card" ? !isCardConfigured() : !isCryptoConfigured()) {
+    return NextResponse.json(
+      { error: "That checkout method is not available right now." },
+      { status: 503 },
+    );
+  }
+
   const db = createAdminClient();
-  const provider = getPaymentProvider();
+  const provider = method === "card" ? getCardProvider() : getCryptoProvider();
 
   const { data: order, error: orderError } = await db
     .from("orders")
@@ -92,7 +93,13 @@ export async function POST(request: Request) {
       description: `${siteConfig.name} — ${plan.name} (${plan.credits} credits)`,
       successUrl: `${siteConfig.url}/checkout/${order.id}`,
       cancelUrl: `${siteConfig.url}/pricing`,
-      webhookUrl: `${siteConfig.url}/api/payments/webhook`,
+      // Paddle's webhook destination is configured once in its dashboard
+      // (Notification destinations), not per request — this only matters to
+      // NOWPayments, which reads it back as ipn_callback_url.
+      webhookUrl:
+        method === "card"
+          ? `${siteConfig.url}/api/payments/webhook/paddle`
+          : `${siteConfig.url}/api/payments/webhook`,
       payCurrency: parsed.data.payCurrency,
       customerEmail: user.email,
     });

@@ -5,7 +5,13 @@ import { siteConfig } from "@/config/site";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isAIConfigured } from "@/lib/ai/client";
 import { DEFAULT_MODEL } from "@/lib/ai/models";
-import { getPaymentProvider, isDevPaymentModeEnabled, isPaymentConfigured } from "@/lib/payments";
+import {
+  getCardProvider,
+  getCryptoProvider,
+  isCardConfigured,
+  isCryptoConfigured,
+  isDevPaymentModeEnabled,
+} from "@/lib/payments";
 import { getEmailProvider } from "@/lib/email";
 
 export const dynamic = "force-dynamic";
@@ -33,11 +39,18 @@ export default async function AdminSettingsPage() {
       configured: isAIConfigured(),
     },
     {
-      name: "Payment provider",
+      name: "Crypto payments",
       detail: isDevPaymentModeEnabled()
         ? "development simulator"
-        : getPaymentProvider().name,
-      configured: isPaymentConfigured(),
+        : getCryptoProvider().name,
+      configured: isCryptoConfigured(),
+    },
+    {
+      name: "Card payments",
+      detail: isDevPaymentModeEnabled()
+        ? "development simulator"
+        : `${getCardProvider().name} (${process.env.PADDLE_ENVIRONMENT === "production" ? "live" : "sandbox"})`,
+      configured: isCardConfigured(),
     },
     {
       name: "Email provider",

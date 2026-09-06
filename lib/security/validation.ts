@@ -16,6 +16,7 @@ export type GenerateRequestBody = z.infer<typeof generateRequestSchema>;
 
 export const createPaymentSchema = z.object({
   planId: z.string().min(1).max(50),
+  method: z.enum(["crypto", "card"]).default("crypto"),
   payCurrency: z.string().min(2).max(20).optional(),
 });
 

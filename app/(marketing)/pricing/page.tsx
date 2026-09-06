@@ -3,7 +3,7 @@ import { PricingTable } from "@/components/marketing/pricing-table";
 import { FaqList } from "@/components/marketing/faq";
 import { FooterCta } from "@/components/marketing/cta";
 import { getSessionUser } from "@/lib/auth/guards";
-import { isPaymentConfigured } from "@/lib/payments";
+import { isCardConfigured, isCryptoConfigured } from "@/lib/payments";
 import { listTools } from "@/lib/tools/registry";
 import { buildMetadata } from "@/lib/seo/metadata";
 
@@ -32,7 +32,7 @@ const PRICING_FAQ = [
   {
     question: "What payment methods do you accept?",
     answer:
-      "Checkout is handled by a crypto payment provider. The currencies and networks shown at checkout are the ones that provider is configured to accept.",
+      "Card payments through Paddle, or crypto through our payment provider — pick whichever you prefer at checkout. The specific currencies and networks shown are whatever each provider is configured to accept.",
   },
   {
     question: "When do credits arrive?",
@@ -53,7 +53,9 @@ const PRICING_FAQ = [
 
 export default async function PricingPage() {
   const [user, tools] = await Promise.all([getSessionUser(), listTools()]);
-  const paymentsConfigured = isPaymentConfigured();
+  const cardConfigured = isCardConfigured();
+  const cryptoConfigured = isCryptoConfigured();
+  const paymentsConfigured = cardConfigured || cryptoConfigured;
 
   return (
     <>
@@ -70,7 +72,8 @@ export default async function PricingPage() {
           <div className="mt-12">
             <PricingTable
               signedIn={Boolean(user)}
-              paymentsConfigured={paymentsConfigured}
+              cardConfigured={cardConfigured}
+              cryptoConfigured={cryptoConfigured}
             />
           </div>
 

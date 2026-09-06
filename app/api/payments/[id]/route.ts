@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getApiUser } from "@/lib/auth/guards";
 import { createClient } from "@/lib/supabase/server";
-import { getPaymentProvider } from "@/lib/payments";
+import { getProviderByName } from "@/lib/payments";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
@@ -30,7 +30,7 @@ export async function GET(
   const { data: order } = await supabase
     .from("orders")
     .select(
-      "id, plan_name, amount, currency, credits, status, provider_payment_id, provider_checkout_url, pay_address, pay_amount, pay_currency, expires_at, created_at",
+      "id, plan_name, amount, currency, credits, status, payment_provider, provider_payment_id, provider_checkout_url, pay_address, pay_amount, pay_currency, expires_at, created_at",
     )
     .eq("id", id)
     .maybeSingle();
@@ -46,7 +46,7 @@ export async function GET(
     order.provider_payment_id
   ) {
     try {
-      const remote = await getPaymentProvider().getPaymentStatus(
+      const remote = await getProviderByName(order.payment_provider).getPaymentStatus(
         order.provider_payment_id,
       );
 
