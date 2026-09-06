@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { getApiUser } from "@/lib/auth/guards";
 import { DevPaymentProvider, isDevPaymentModeEnabled } from "@/lib/payments/providers/dev";
 import { createClient } from "@/lib/supabase/server";
-import { siteConfig } from "@/config/site";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -53,7 +52,14 @@ export async function POST(request: Request) {
 
   const signature = new DevPaymentProvider().sign(payload);
 
-  const response = await fetch(`${siteConfig.url}/api/payments/webhook`, {
+  // Self-call, same server that's handling this request — never
+  // siteConfig.url, which in a local/preview environment is typically still
+  // the production origin (NEXT_PUBLIC_APP_URL is shared with .env.local per
+  // DEPLOY-ENV.txt) and would otherwise send a signed simulated payment to
+  // the real production webhook instead of exercising this instance's own.
+  const origin = new URL(request.url).origin;
+
+  const response = await fetch(`${origin}/api/payments/webhook`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
