@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Coins, Sparkles, TrendingUp } from "lucide-react";
 import { AskBox } from "@/components/marketing/ask-box";
 import { ToolCard } from "@/components/marketing/tool-card";
+import { BentoFeature } from "@/components/marketing/bento-feature";
 import { Reveal } from "@/components/reveal";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { ToolTile } from "@/components/tools/tool-tile";
@@ -92,17 +93,31 @@ export default async function DashboardPage() {
 
   return (
     <div className="mx-auto max-w-6xl">
-      {/* Greeting + command bar */}
-      <div className="mb-8">
-        <h1 className="text-[1.75rem] font-semibold tracking-[-0.025em]">
-          {greeting()}
-          {firstName ? `, ${firstName}` : ""}.
-        </h1>
-        <p className="mt-1.5 text-[15px] text-muted-foreground">
-          What would you like to create?
-        </p>
-        <div className="mt-5 max-w-2xl">
-          <AskBox signedIn />
+      {/* Greeting + command bar, on a soft branded band. */}
+      <div className="relative isolate mb-10 overflow-hidden rounded-feature border border-border bg-card px-6 py-8 shadow-card sm:px-8 sm:py-10">
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-16 -top-24 h-64 w-64 rounded-full bg-brand/15 blur-[70px]"
+        />
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute -bottom-24 left-1/3 h-56 w-56 rounded-full bg-brand-2/10 blur-[70px]"
+        />
+
+        <div className="relative">
+          <h1 className="text-[2rem] font-semibold leading-[1.1] tracking-[-0.03em] sm:text-[2.5rem]">
+            {greeting()}
+            {firstName ? `, ${firstName}` : ""}.
+            <br />
+            <span className="text-gradient">What will you make?</span>
+          </h1>
+          <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-muted-foreground">
+            Describe the job and Oply picks the tool, or jump straight into one
+            below.
+          </p>
+          <div className="mt-6 max-w-2xl">
+            <AskBox signedIn />
+          </div>
         </div>
       </div>
 
@@ -210,6 +225,13 @@ export default async function DashboardPage() {
           ))}
         </div>
       </Section>
+
+      {/* Feature tile, using the same component as the public tools page. */}
+      <BentoFeature
+        tools={recommended.map(toPublicTool)}
+        href="/dashboard/tools"
+        className="mb-10"
+      />
 
       {/* Favorite tools */}
       {favoriteTools.length > 0 && (

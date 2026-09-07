@@ -17,14 +17,16 @@
 @layer base {
   :root {
     /* Brand triad. Used for gradients, meshes, glows and graphic accents. */
-    --brand: 258 90% 60%;
-    --brand-2: 322 88% 60%;
+    /* #6D3DF5 / #8B5CF6 as the working pair; -3 stays for the triad mesh. */
+    --brand: 256 90% 60%;
+    --brand-2: 258 90% 66%;
     --brand-3: 194 92% 52%;
 
-    --background: 258 40% 99%;
-    --foreground: 258 30% 9%;
+    /* #F7F8FC — a cool workspace ground, not a violet-tinted white. */
+    --background: 228 44% 98%;
+    --foreground: 222 33% 11%;
 
-    --surface: 258 44% 97%;
+    --surface: 228 40% 96%;
     --card: 0 0% 100%;
     --card-foreground: 258 30% 9%;
 
@@ -32,7 +34,7 @@
     --popover-foreground: 258 30% 9%;
 
     /* Oply accent — violet, used generously */
-    --primary: 258 90% 60%;
+    --primary: 256 90% 60%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 258 30% 95%;
@@ -53,16 +55,30 @@
     --warning: 35 92% 46%;
     --warning-foreground: 0 0% 100%;
 
-    --border: 258 24% 90%;
-    --input: 258 24% 87%;
-    --ring: 258 90% 60%;
+    --border: 228 24% 90%;
+    --input: 228 24% 86%;
+    --ring: 256 90% 60%;
 
     --radius: 0.75rem;
+    /* Cards sit larger than controls — 16px standard, 24px for feature tiles. */
+    --radius-card: 1rem;
+    --radius-feature: 1.5rem;
+
+    /*
+     * The app sidebar is dark in BOTH themes, so it carries its own scale
+     * rather than borrowing --surface. #111827 navy, with a violet-leaning
+     * active state so the brand still reads against it.
+     */
+    --sidebar: 221 39% 11%;
+    --sidebar-foreground: 220 20% 92%;
+    --sidebar-muted: 220 12% 62%;
+    --sidebar-border: 220 22% 20%;
+    --sidebar-accent: 256 60% 24%;
   }
 
   .dark {
-    --brand: 258 95% 72%;
-    --brand-2: 322 90% 68%;
+    --brand: 256 95% 72%;
+    --brand-2: 258 92% 76%;
     --brand-3: 194 95% 60%;
 
     /* Deep indigo, never black. */
@@ -76,8 +92,8 @@
     --popover: 258 40% 11%;
     --popover-foreground: 258 30% 96%;
 
-    --primary: 258 95% 72%;
-    --primary-foreground: 258 60% 10%;
+    --primary: 256 95% 72%;
+    --primary-foreground: 256 60% 10%;
 
     --secondary: 258 28% 16%;
     --secondary-foreground: 258 26% 94%;
@@ -99,7 +115,13 @@
 
     --border: 258 24% 20%;
     --input: 258 24% 23%;
-    --ring: 258 95% 72%;
+    --ring: 256 95% 72%;
+
+    --sidebar: 224 36% 8%;
+    --sidebar-foreground: 220 20% 92%;
+    --sidebar-muted: 220 12% 60%;
+    --sidebar-border: 222 24% 17%;
+    --sidebar-accent: 256 55% 28%;
   }
 }
 

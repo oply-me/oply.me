@@ -43,17 +43,19 @@ export const categories: CategoryDefinition[] = [
       "ai text tools",
       "ai content tools",
       "free ai tools online",
-      "ai writer",
-      "ai rewriter",
-      "ai summarizer",
+      "ai writing assistant",
+      "ai rewriting tools",
+      "ai summarizing tools",
       "ai prompt tools",
       "generative ai tools",
       "ai tools without a subscription",
       "ai tools for everyday writing",
+      "ai productivity tools",
+      "ai tools for content teams",
     ],
     seoDescription:
       "General-purpose AI tools for writing, rewriting, summarizing and prompting. Write a draft, reword a paragraph or condense a long document, all from one Oply account and one credit balance.",
-    sortOrder: 1,
+    sortOrder: 2,
     enabled: true,
   },
   {
@@ -68,19 +70,21 @@ export const categories: CategoryDefinition[] = [
     keywords: [
       "free seo tools online",
       "on-page seo tools",
-      "meta description generator",
+      "meta tag tools",
       "seo title generator",
-      "schema markup generator",
+      "schema markup tools",
       "structured data tools",
       "content outline tools",
       "serp snippet tools",
       "seo copywriting tools",
       "json-ld generator",
       "seo tools for bloggers",
+      "blog seo tools",
+      "seo tools for small sites",
     ],
     seoDescription:
       "On-page SEO tools for the parts of a page search engines actually read: meta descriptions, title tags, schema.org structured data and blog outlines. Character counts included, ranking promises not.",
-    sortOrder: 2,
+    sortOrder: 3,
     enabled: true,
   },
   {
@@ -105,7 +109,7 @@ export const categories: CategoryDefinition[] = [
     ],
     seoDescription:
       "AI marketing tools for campaigns, launches and landing pages — headlines, body copy and messaging you can edit and ship. One credit balance covers every tool in the category.",
-    sortOrder: 3,
+    sortOrder: 4,
     enabled: true,
   },
   {
@@ -127,10 +131,13 @@ export const categories: CategoryDefinition[] = [
       "ai tools for freelancers",
       "ai tools for agencies",
       "ai tools for small teams",
+      "customer support writing tools",
+      "client email tools",
+      "ai tools for consultants",
     ],
     seoDescription:
       "AI business tools for the writing that fills a working day: client replies, support responses, briefs and documents. Draft it in seconds, read it before it goes out.",
-    sortOrder: 4,
+    sortOrder: 5,
     enabled: true,
   },
   {
@@ -142,7 +149,7 @@ export const categories: CategoryDefinition[] = [
     hue: 158,
     primaryKeyword: "ai ecommerce tools",
     keywords: [
-      "product description generator",
+      "product description tools",
       "shopify copywriting tools",
       "amazon listing tools",
       "online store copywriting",
@@ -152,10 +159,13 @@ export const categories: CategoryDefinition[] = [
       "marketplace listing generator",
       "product bullet point tools",
       "ai tools for online sellers",
+      "listing optimization tools",
+      "ai tools for shopify sellers",
+      "store content tools",
     ],
     seoDescription:
       "AI e-commerce tools for online sellers: product descriptions, bullet points, listing copy, SEO tags and calls to action built from the specs you actually have.",
-    sortOrder: 5,
+    sortOrder: 6,
     enabled: true,
   },
   {
@@ -180,7 +190,7 @@ export const categories: CategoryDefinition[] = [
     ],
     seoDescription:
       "AI tools for creators publishing across blogs, video and social — plan a post, draft it, then reshape the same idea for each channel you publish on.",
-    sortOrder: 6,
+    sortOrder: 7,
     enabled: true,
   },
   {
@@ -205,7 +215,7 @@ export const categories: CategoryDefinition[] = [
     ],
     seoDescription:
       "AI productivity tools that take the busywork out of a day — summarize what you have to read, draft what you have to send, and get back to the work that needed you.",
-    sortOrder: 7,
+    sortOrder: 8,
     enabled: true,
   },
   {
@@ -230,7 +240,7 @@ export const categories: CategoryDefinition[] = [
     ],
     seoDescription:
       "AI tools for people who ship software: JSON-LD and structured data generators, prompt tooling for coding assistants, and helpers for the writing around the code.",
-    sortOrder: 8,
+    sortOrder: 9,
     enabled: true,
   },
   {
@@ -255,7 +265,7 @@ export const categories: CategoryDefinition[] = [
     ],
     seoDescription:
       "Small, single-purpose AI utilities that do one thing and get out of the way. Buy credits once and spend them across every Oply tool, including the ones added later.",
-    sortOrder: 9,
+    sortOrder: 10,
     enabled: true,
   },
   {
@@ -276,15 +286,18 @@ export const categories: CategoryDefinition[] = [
       "ai social graphic maker",
       "ai product photo tools",
       "ai logo maker",
-      "ai background remover",
+      "background removal tools",
       "text to image tools",
       "ai image editing tools",
       "free ai image generator",
       "ai graphic design tools",
+      "ai visual content tools",
+      "image tools for marketing",
+      "transparent png tools",
     ],
     seoDescription:
       "AI image tools for thumbnails, social graphics, product photos, logos and background editing. Generate an image, download it, or regenerate for a different result.",
-    sortOrder: 10,
+    sortOrder: 1,
     enabled: true,
   },
 ];

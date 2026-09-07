@@ -65,11 +65,22 @@ const config: Config = {
           foreground: "hsl(var(--popover-foreground))",
         },
         surface: "hsl(var(--surface))",
+        /* The app sidebar is dark in both themes — see globals.css. */
+        sidebar: {
+          DEFAULT: "hsl(var(--sidebar))",
+          foreground: "hsl(var(--sidebar-foreground))",
+          muted: "hsl(var(--sidebar-muted))",
+          border: "hsl(var(--sidebar-border))",
+          accent: "hsl(var(--sidebar-accent))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        /* Cards and feature tiles, kept off the control scale on purpose. */
+        card: "var(--radius-card)",
+        feature: "var(--radius-feature)",
       },
       fontFamily: {
         sans: ["var(--font-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
@@ -126,6 +137,10 @@ const config: Config = {
       boxShadow: {
         brand: "0 18px 40px -18px hsl(var(--brand) / 0.55)",
         "brand-lg": "0 32px 70px -28px hsl(var(--brand) / 0.65)",
+        /* The card resting/hover pair. Soft and low-contrast by design. */
+        card: "0 1px 2px hsl(222 33% 11% / 0.04), 0 8px 24px -12px hsl(222 33% 11% / 0.10)",
+        "card-hover":
+          "0 2px 4px hsl(222 33% 11% / 0.05), 0 20px 44px -16px hsl(256 90% 40% / 0.22)",
       },
     },
   },

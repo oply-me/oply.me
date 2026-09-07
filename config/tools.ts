@@ -162,6 +162,14 @@ export interface ToolDefinition {
   /** Required: a tool cannot ship without its semantic keyword map. */
   keywords: ToolKeywords;
   benefits: { title: string; body: string }[];
+  /**
+   * Concrete jobs people bring to this tool, rendered as their own page
+   * section. Distinct from `benefits`: a benefit is why the tool is good, a
+   * use case is a specific task someone arrives wanting to do — which is what
+   * the long-tail half of `keywords` is actually about. Every entry must
+   * describe something the tool can do today with the fields it ships.
+   */
+  useCases: { title: string; body: string }[];
   howItWorks: string[];
   /**
    * `before` is optional — most tools' idle/preview panels fall back to the
@@ -281,7 +289,7 @@ Length guide: short = roughly 200-300 words, medium = roughly 500-700 words, lon
     seoDescription:
       "Oply's AI Writer is an AI content writer and blog post writer in one: give it a topic, audience, tone and length, then edit the draft it returns.",
     featured: true,
-    sortOrder: 1,
+    sortOrder: 6,
     enabled: true,
     related: ["ai-rewriter", "blog-outline-generator", "ai-summarizer"],
     keywords: {
@@ -295,6 +303,8 @@ Length guide: short = roughly 200-300 words, medium = roughly 500-700 words, lon
         "long form content writer",
         "ai text generator",
         "automatic draft writer",
+        "ai blog writer",
+        "ai copywriting tool",
       ],
       longTail: [
         "write a blog post from a topic",
@@ -308,6 +318,9 @@ Length guide: short = roughly 200-300 words, medium = roughly 500-700 words, lon
         "write a 1000 word article with ai",
         "ai writer for founders and marketers",
         "draft an announcement for a saas launch",
+        "write a newsletter draft from a few notes",
+        "write an about page for a company website",
+        "draft a linkedin post about a product update",
       ],
       entities: [
         "long-form content",
@@ -322,6 +335,9 @@ Length guide: short = roughly 200-300 words, medium = roughly 500-700 words, lon
         "headline",
         "editing",
         "large language model",
+        "blog post",
+        "newsletter",
+        "readability",
       ],
       questions: [
         "How many credits does the AI Writer use?",
@@ -330,6 +346,8 @@ Length guide: short = roughly 200-300 words, medium = roughly 500-700 words, lon
         "How long a piece can the AI writer produce?",
         "Can the AI writer match a specific tone of voice?",
         "Does the AI writer research the topic?",
+        "Is the AI Writer free to use?",
+        "How is this different from the AI Rewriter?",
       ],
       intent: "commercial",
     },
@@ -345,6 +363,28 @@ Length guide: short = roughly 200-300 words, medium = roughly 500-700 words, lon
       {
         title: "One tool for every format",
         body: "Articles, launch copy and long-form drafts all come from the same AI content writer, so you are not switching to a separate blog post writer for the next piece.",
+      },
+    ],
+    useCases: [
+      {
+        title: "Blog posts and articles",
+        body: "Give it the topic, who it is for and a target length, and it returns a structured draft with markdown headings you can edit down.",
+      },
+      {
+        title: "Launch and announcement copy",
+        body: "Describe what shipped and who should care, then pick a persuasive tone — the example brief on this page is a SaaS launch announcement.",
+      },
+      {
+        title: "Newsletters and email updates",
+        body: "Short or medium length in a friendly tone covers most email updates. Put the specifics you want mentioned in the extra instructions.",
+      },
+      {
+        title: "Website and about pages",
+        body: "Describe the company and the reader, and use the extra instructions to hold the draft inside the word count your page design allows.",
+      },
+      {
+        title: "LinkedIn and social posts",
+        body: "Set the length to short and describe the angle. The draft comes back as plain text you can trim before posting.",
       },
     ],
     howItWorks: [
@@ -387,6 +427,16 @@ Length guide: short = roughly 200-300 words, medium = roughly 500-700 words, lon
         question: "Does the AI writer research the topic?",
         answer:
           "No. It writes from the topic and notes you supply and does not browse the web, so check any facts and figures before you publish.",
+      },
+      {
+        question: "Is the AI Writer free to use?",
+        answer:
+          "Each generation costs 20 credits. New accounts start with 50 credits, so the first drafts are covered before you buy a credit pack.",
+      },
+      {
+        question: "How is this different from the AI Rewriter?",
+        answer:
+          "The AI Writer starts from a topic and produces new text. The AI Rewriter starts from text you already have and changes how it reads without changing what it says.",
       },
     ],
   },
@@ -448,7 +498,7 @@ Keep the original formatting (paragraphs, lists, headings) unless the style call
     seoDescription:
       "Oply's AI Rewriter is a text rewriter and paraphrasing tool for emails, articles and product copy. Rewrite text online in a clearer, more professional style.",
     featured: true,
-    sortOrder: 2,
+    sortOrder: 7,
     enabled: true,
     related: ["ai-writer", "reply-generator", "ai-summarizer"],
     keywords: {
@@ -462,6 +512,8 @@ Keep the original formatting (paragraphs, lists, headings) unless the style call
         "ai paraphraser",
         "paragraph rewriter",
         "reword generator",
+        "email rewriter",
+        "tone changer tool",
       ],
       longTail: [
         "rewrite a paragraph to sound more professional",
@@ -474,6 +526,10 @@ Keep the original formatting (paragraphs, lists, headings) unless the style call
         "rewrite a sentence to be more concise",
         "change the tone of an email to be firmer",
         "rewrite a draft for a general audience",
+        "rewrite a cover letter to sound more professional",
+        "make a support reply sound less blunt",
+        "rewrite a job description in plain language",
+        "turn formal writing into casual writing",
       ],
       entities: [
         "paraphrase",
@@ -488,6 +544,9 @@ Keep the original formatting (paragraphs, lists, headings) unless the style call
         "clarity",
         "style guide",
         "large language model",
+        "cover letter",
+        "business email",
+        "text simplification",
       ],
       questions: [
         "Does rewriting change the meaning of my text?",
@@ -496,6 +555,8 @@ Keep the original formatting (paragraphs, lists, headings) unless the style call
         "Is an AI rewriter the same as a paraphrasing tool?",
         "Which rewrite style should I choose?",
         "Can I rewrite text in another language?",
+        "How many credits does a rewrite cost?",
+        "Will the rewriter keep my formatting?",
       ],
       intent: "commercial",
     },
@@ -511,6 +572,28 @@ Keep the original formatting (paragraphs, lists, headings) unless the style call
       {
         title: "Handles long text",
         body: "Paste up to 30,000 characters and rewrite text online in a single pass, which covers most articles and long emails.",
+      },
+    ],
+    useCases: [
+      {
+        title: "Emails you would rather not send as written",
+        body: "Paste the draft and pick professional to take the edge off, or concise to cut it down to something you can send.",
+      },
+      {
+        title: "Cover letters and applications",
+        body: "Rewrite a letter in a professional style when your own draft reads too casual, or too stiff.",
+      },
+      {
+        title: "Landing page and product copy",
+        body: "The persuasive style leads with the benefit and keeps your claims intact, since the rewriter changes wording rather than facts.",
+      },
+      {
+        title: "Plain-language versions of technical text",
+        body: "Simple style shortens sentences and drops jargon, which is useful for help docs and anything aimed at a general reader.",
+      },
+      {
+        title: "Cutting text down to fit a limit",
+        body: "Concise style, or the shorten action on a result, reduces length while keeping the meaning of the original.",
       },
     ],
     howItWorks: [
@@ -554,6 +637,16 @@ Keep the original formatting (paragraphs, lists, headings) unless the style call
         question: "Can I rewrite text in another language?",
         answer:
           "Yes. The output follows the language of the text you paste, so a French paragraph comes back rewritten in French.",
+      },
+      {
+        question: "How many credits does a rewrite cost?",
+        answer:
+          "5 credits per rewrite. Shorten and expand on a result each run again at the same cost.",
+      },
+      {
+        question: "Will the rewriter keep my formatting?",
+        answer:
+          "It is instructed to keep your paragraphs, lists and headings unless the style you picked calls for changing them — concise, for example, may merge short paragraphs.",
       },
     ],
   },
@@ -609,7 +702,7 @@ Preserve important numbers, names and dates. If the source is inconclusive, say 
     seoDescription:
       "Oply's AI Summarizer is a text summarizer and article summarizer in one: paste long text and get a TL;DR, bullet points or a detailed summary you can use.",
     featured: true,
-    sortOrder: 3,
+    sortOrder: 8,
     enabled: true,
     related: ["ai-rewriter", "ai-writer", "reply-generator"],
     keywords: {
@@ -623,6 +716,8 @@ Preserve important numbers, names and dates. If the source is inconclusive, say 
         "bullet point summary tool",
         "document summarizer",
         "transcript summarizer",
+        "meeting notes summarizer",
+        "paragraph summarizer",
       ],
       longTail: [
         "summarize a long article into bullet points",
@@ -635,6 +730,10 @@ Preserve important numbers, names and dates. If the source is inconclusive, say 
         "summarize an article in a few sentences",
         "bullet point summary of a long document",
         "shorten a report into a one paragraph brief",
+        "summarize a customer feedback thread",
+        "turn a webinar transcript into bullet points",
+        "summarize a policy document into key points",
+        "summarize lecture notes into key points",
       ],
       entities: [
         "tldr",
@@ -649,6 +748,9 @@ Preserve important numbers, names and dates. If the source is inconclusive, say 
         "note taking",
         "editing",
         "large language model",
+        "webinar",
+        "customer feedback",
+        "report",
       ],
       questions: [
         "What is the longest text I can summarize?",
@@ -657,6 +759,8 @@ Preserve important numbers, names and dates. If the source is inconclusive, say 
         "What is the difference between a TL;DR and a detailed summary?",
         "Can it summarize meeting notes and transcripts?",
         "Does the summarizer add anything that is not in the source?",
+        "How many credits does a summary cost?",
+        "Can I summarize text in another language?",
       ],
       intent: "commercial",
     },
@@ -672,6 +776,28 @@ Preserve important numbers, names and dates. If the source is inconclusive, say 
       {
         title: "Articles, reports and transcripts",
         body: "The same text summarizer takes a news article, a research report or a meeting transcript — up to 30,000 characters in one run.",
+      },
+    ],
+    useCases: [
+      {
+        title: "Deciding whether something is worth reading",
+        body: "TL;DR returns two or three sentences, which is usually enough to tell whether an article or report deserves your full attention.",
+      },
+      {
+        title: "Meeting notes and call transcripts",
+        body: "Paste the raw transcript and choose bullets for the decisions and actions, or detailed to keep the shape of the discussion.",
+      },
+      {
+        title: "Long email threads",
+        body: "Paste the whole thread and get the current state of it back, instead of scrolling to reconstruct who agreed to what.",
+      },
+      {
+        title: "Reports and research documents",
+        body: "Detailed mode runs to roughly 300 words with subheadings that follow the source, which works as a first pass at an executive summary.",
+      },
+      {
+        title: "Customer feedback and reviews",
+        body: "Paste a batch of responses and summarize them into bullets to see the themes without reading every one.",
       },
     ],
     howItWorks: [
@@ -714,6 +840,16 @@ Preserve important numbers, names and dates. If the source is inconclusive, say 
         question: "Does the summarizer add anything that is not in the source?",
         answer:
           "It is instructed not to. If the source is inconclusive it should say so rather than supply a conclusion of its own.",
+      },
+      {
+        question: "How many credits does a summary cost?",
+        answer:
+          "10 credits per generation, whichever of the four summary types you pick.",
+      },
+      {
+        question: "Can I summarize text in another language?",
+        answer:
+          "Yes. The summary follows the language of the text you paste, so a German report comes back summarized in German.",
       },
     ],
   },
@@ -789,7 +925,7 @@ Rules:
     seoDescription:
       "An AI prompt generator that turns a goal into a structured prompt. Works as a ChatGPT prompt generator, Claude prompt generator and image prompt generator.",
     featured: false,
-    sortOrder: 4,
+    sortOrder: 9,
     enabled: true,
     related: ["prompt-optimizer", "ai-writer", "ai-rewriter"],
     keywords: {
@@ -803,6 +939,8 @@ Rules:
         "image prompt generator",
         "ai prompt maker",
         "prompt builder",
+        "gemini prompt generator",
+        "coding prompt generator",
       ],
       longTail: [
         "write a prompt for chatgpt from a goal",
@@ -815,6 +953,10 @@ Rules:
         "make a reusable prompt for marketing copy",
         "generate a prompt with a clear output format",
         "prompt structure with role context and task",
+        "write an image prompt with style and lighting",
+        "create a prompt for a customer support assistant",
+        "write a prompt that returns json output",
+        "generate a prompt for summarizing documents",
       ],
       entities: [
         "prompt engineering",
@@ -829,6 +971,9 @@ Rules:
         "Gemini",
         "text-to-image model",
         "large language model",
+        "constraints",
+        "placeholder",
+        "AI assistant",
       ],
       questions: [
         "Which AI platforms does this support?",
@@ -836,6 +981,9 @@ Rules:
         "Can I save generated prompts?",
         "What makes a good AI prompt?",
         "Can the AI prompt generator write image prompts?",
+        "How many credits does a prompt cost?",
+        "Can I edit the generated prompt?",
+        "Does it work in languages other than English?",
       ],
       intent: "informational",
     },
@@ -851,6 +999,28 @@ Rules:
       {
         title: "Cheap to iterate",
         body: "At 5 credits a run it is practical to generate several variants and keep the best one as a reusable prompt template.",
+      },
+    ],
+    useCases: [
+      {
+        title: "A reusable prompt for a repeated task",
+        body: "Generate the prompt once, save it to a project, and paste it in each time instead of rewriting the instructions from memory.",
+      },
+      {
+        title: "Image generation briefs",
+        body: "Choose Image AI and the output is built around subject, style, composition and lighting rather than prose sections.",
+      },
+      {
+        title: "Coding assistant instructions",
+        body: "The Coding AI option adds language and runtime detail, which is what most hand-written coding prompts leave out.",
+      },
+      {
+        title: "System prompts for an assistant",
+        body: "Describe the assistant's job and the output opens with a Role and Context section you can paste in as a system prompt.",
+      },
+      {
+        title: "Pinning down an output format",
+        body: "Every generated prompt includes an explicit output format section, which is usually why a prompt returns inconsistent shapes.",
       },
     ],
     howItWorks: [
@@ -888,6 +1058,21 @@ Rules:
         question: "Can the AI prompt generator write image prompts?",
         answer:
           "Yes. Choose Image AI and the output is shaped around subject, style, composition and lighting instead of the standard prose sections.",
+      },
+      {
+        question: "How many credits does a prompt cost?",
+        answer:
+          "5 credits per generation, which makes it cheap enough to generate a few variants and keep the one that works best.",
+      },
+      {
+        question: "Can I edit the generated prompt?",
+        answer:
+          "Yes. The output is plain markdown — edit it, fill in any marked placeholders like [PASTE YOUR TEXT HERE], and paste it wherever you use it.",
+      },
+      {
+        question: "Does it work in languages other than English?",
+        answer:
+          "Yes. Describe your goal in another language and the generated prompt follows it.",
       },
     ],
   },
@@ -938,7 +1123,7 @@ Keep the user's intent. Do not add subject-matter requirements they never asked 
     seoDescription:
       "Paste a prompt into Oply's Prompt Optimizer and get a clearer version plus what changed — a prompt improver and prompt engineering tool in a single run.",
     featured: true,
-    sortOrder: 5,
+    sortOrder: 10,
     enabled: true,
     related: ["prompt-generator", "ai-rewriter", "ai-writer"],
     keywords: {
@@ -952,6 +1137,8 @@ Keep the user's intent. Do not add subject-matter requirements they never asked 
         "prompt refinement tool",
         "prompt debugging tool",
         "better ai prompts",
+        "ai prompt editor",
+        "prompt troubleshooting tool",
       ],
       longTail: [
         "fix a prompt that gives vague answers",
@@ -964,6 +1151,10 @@ Keep the user's intent. Do not add subject-matter requirements they never asked 
         "turn a vague request into a clear instruction",
         "optimize a prompt for a coding assistant",
         "why my ai prompt keeps ignoring instructions",
+        "make a prompt return a consistent format",
+        "improve a prompt for image generation",
+        "add a role and context to a prompt",
+        "review a prompt before using it at scale",
       ],
       entities: [
         "prompt engineering",
@@ -978,6 +1169,9 @@ Keep the user's intent. Do not add subject-matter requirements they never asked 
         "edge case",
         "prompt iteration",
         "large language model",
+        "ambiguity",
+        "prompt structure",
+        "role definition",
       ],
       questions: [
         "Does this work for image prompts?",
@@ -985,6 +1179,9 @@ Keep the user's intent. Do not add subject-matter requirements they never asked 
         "How much does a run cost?",
         "Why does my prompt give inconsistent results?",
         "What does the prompt optimizer actually change?",
+        "How is this different from the Prompt Generator?",
+        "Can I compare the original and the optimized prompt?",
+        "Will it make my prompt longer?",
       ],
       intent: "commercial",
     },
@@ -1000,6 +1197,28 @@ Keep the user's intent. Do not add subject-matter requirements they never asked 
       {
         title: "Side-by-side",
         body: "Your original stays on screen next to the optimized version, so you can see exactly what the prompt engineering tool changed.",
+      },
+    ],
+    useCases: [
+      {
+        title: "A prompt that only works sometimes",
+        body: "Inconsistent output usually traces back to a missing output format or a task that can be read two ways — both show up in the change list.",
+      },
+      {
+        title: "Prompts you are about to reuse a lot",
+        body: "Worth one pass before a prompt becomes the one you paste every day, since the same weakness repeats every run.",
+      },
+      {
+        title: "Learning what makes a prompt work",
+        body: "Each run labels its changes by area, so the pattern transfers to the next prompt you write by hand.",
+      },
+      {
+        title: "Prompts you inherited from someone else",
+        body: "Paste a prompt you did not write and the optimizer makes its implicit assumptions explicit before you rely on it.",
+      },
+      {
+        title: "Prompts headed into a product",
+        body: "Describe what the prompt should produce in the optional goal field, and the rewrite is aimed at that rather than at generic improvement.",
       },
     ],
     howItWorks: [
@@ -1037,6 +1256,21 @@ Keep the user's intent. Do not add subject-matter requirements they never asked 
         question: "What does the prompt optimizer actually change?",
         answer:
           "It returns the rewritten prompt plus three to six labelled changes across clarity, context, structure, constraints, output format and specificity, so you can see the reasoning.",
+      },
+      {
+        question: "How is this different from the Prompt Generator?",
+        answer:
+          "The Prompt Generator writes a new prompt from a goal. This tool takes a prompt you already have and improves it, keeping your intent.",
+      },
+      {
+        question: "Can I compare the original and the optimized prompt?",
+        answer:
+          "Yes. Your original stays on screen next to the rewritten version, alongside the list of what changed and why.",
+      },
+      {
+        question: "Will it make my prompt longer?",
+        answer:
+          "Sometimes. It adds structure where something is missing and cuts wording that is not doing work, so the result can be longer or shorter than what you pasted.",
       },
     ],
   },
@@ -1124,7 +1358,7 @@ Never keyword-stuff. Never promise rankings. Count characters carefully — stay
     seoDescription:
       "A meta description generator and SEO title generator with live character counts. Oply's meta tag generator also writes the URL slug and Open Graph copy.",
     featured: true,
-    sortOrder: 6,
+    sortOrder: 11,
     enabled: true,
     related: ["schema-generator", "blog-outline-generator", "product-description-generator"],
     keywords: {
@@ -1138,6 +1372,8 @@ Never keyword-stuff. Never promise rankings. Count characters carefully — stay
         "serp snippet tool",
         "seo metadata tool",
         "url slug generator",
+        "meta description writer",
+        "seo tag generator",
       ],
       longTail: [
         "write a meta description under 160 characters",
@@ -1150,6 +1386,10 @@ Never keyword-stuff. Never promise rankings. Count characters carefully — stay
         "write metadata for a category page",
         "seo title and description for documentation pages",
         "meta description for an ecommerce product listing",
+        "meta description for a homepage",
+        "write an seo title that fits in google results",
+        "meta description that includes a focus keyword",
+        "generate social card copy for a blog post",
       ],
       entities: [
         "meta description",
@@ -1175,6 +1415,8 @@ Never keyword-stuff. Never promise rankings. Count characters carefully — stay
         "Does the meta description generator use my focus keyword?",
         "Does it generate a URL slug and Open Graph tags?",
         "Can I generate metadata in another language?",
+        "How many credits does one run cost?",
+        "What is the difference between an SEO title and an Open Graph title?",
       ],
       intent: "commercial",
     },
@@ -1190,6 +1432,28 @@ Never keyword-stuff. Never promise rankings. Count characters carefully — stay
       {
         title: "Intent-aware",
         body: "Commercial and informational pages get different phrasing from the meta tag generator rather than one generic template.",
+      },
+    ],
+    useCases: [
+      {
+        title: "Metadata for a new blog post",
+        body: "Describe the post and its primary keyword, choose informational intent, and paste the five fields into your CMS.",
+      },
+      {
+        title: "Product and category pages",
+        body: "Product and category page types shift the phrasing toward what a shopper is deciding between, rather than toward explaining a concept.",
+      },
+      {
+        title: "Titles that are getting cut off in search",
+        body: "The title is written to 50-60 characters and the description to 140-160, with the count shown, so replacements fit the snippet window.",
+      },
+      {
+        title: "Open Graph copy for social sharing",
+        body: "The same run returns a punchier og_title and a 110-character og_description for the link preview card.",
+      },
+      {
+        title: "URL slugs for a new page",
+        body: "Each run proposes a lowercase, hyphenated slug of three to six words, with no date padding or stop-word filler.",
       },
     ],
     howItWorks: [
@@ -1232,6 +1496,16 @@ Never keyword-stuff. Never promise rankings. Count characters carefully — stay
         question: "Can I generate metadata in another language?",
         answer:
           "Yes. Write your topic and keyword in that language and the output will follow it.",
+      },
+      {
+        question: "How many credits does one run cost?",
+        answer:
+          "10 credits, covering the SEO title, meta description, slug and both Open Graph fields together.",
+      },
+      {
+        question: "What is the difference between an SEO title and an Open Graph title?",
+        answer:
+          "The SEO title is written for search results and carries the keyword. The Open Graph title is for the social share card, so it can be shorter and punchier.",
       },
     ],
   },
@@ -1312,7 +1586,7 @@ Do not add aggregateRating or review unless the user supplied real values. Retur
     seoDescription:
       "Oply's schema markup generator is a JSON-LD generator and structured data generator for Article, Product, FAQ and LocalBusiness. Copy or download the output.",
     featured: false,
-    sortOrder: 7,
+    sortOrder: 12,
     enabled: true,
     related: ["seo-meta-generator", "product-description-generator", "blog-outline-generator"],
     keywords: {
@@ -1326,6 +1600,8 @@ Do not add aggregateRating or review unless the user supplied real values. Retur
         "article schema generator",
         "breadcrumb schema generator",
         "local business schema tool",
+        "event schema generator",
+        "organization schema generator",
       ],
       longTail: [
         "generate json-ld for a product page",
@@ -1338,6 +1614,10 @@ Do not add aggregateRating or review unless the user supplied real values. Retur
         "schema markup for a software application page",
         "download structured data as a json file",
         "where to put json-ld on a page",
+        "generate schema markup for an event page",
+        "add organization markup to a homepage",
+        "structured data for a person profile page",
+        "create schema markup without writing code",
       ],
       entities: [
         "schema.org",
@@ -1363,6 +1643,8 @@ Do not add aggregateRating or review unless the user supplied real values. Retur
         "Where do I put the JSON-LD?",
         "What is the difference between JSON-LD and microdata?",
         "Can I download the structured data as a file?",
+        "How many credits does one schema cost?",
+        "Can it generate schema for several pages at once?",
       ],
       intent: "commercial",
     },
@@ -1378,6 +1660,28 @@ Do not add aggregateRating or review unless the user supplied real values. Retur
       {
         title: "Copy or download",
         body: "Take the output of the structured data generator as text, or download a .json file to hand to a developer.",
+      },
+    ],
+    useCases: [
+      {
+        title: "FAQ sections on a page",
+        body: "Paste your real questions and answers as details and the FAQPage type wraps them as valid JSON-LD.",
+      },
+      {
+        title: "Product pages",
+        body: "Supply the values you actually have. Price, availability and rating are omitted rather than invented when you leave them out.",
+      },
+      {
+        title: "Articles and blog posts",
+        body: "Article markup with the author and publication date you supply, formatted as ISO 8601 dates.",
+      },
+      {
+        title: "Local business listings",
+        body: "Address, opening hours and contact details go in as details, and come back as LocalBusiness markup.",
+      },
+      {
+        title: "Handing markup to a developer",
+        body: "Download the result as a .json file so someone else can drop it into the page without retyping it.",
       },
     ],
     howItWorks: [
@@ -1420,6 +1724,16 @@ Do not add aggregateRating or review unless the user supplied real values. Retur
         question: "Can I download the structured data as a file?",
         answer:
           "Yes. Every result copies as text or downloads as a .json file you can hand to a developer.",
+      },
+      {
+        question: "How many credits does one schema cost?",
+        answer:
+          "10 credits per generation, whichever schema type you pick.",
+      },
+      {
+        question: "Can it generate schema for several pages at once?",
+        answer:
+          "One page per generation. For a set of pages, run it once per page — each run is a separate 10 credits.",
       },
     ],
   },
@@ -1512,7 +1826,7 @@ Use only the features and benefits supplied. Do not invent materials, dimensions
     seoDescription:
       "Oply's product description generator is an ecommerce copywriting tool and product copy generator: short and long copy, bullets, SEO tags and a CTA per run.",
     featured: true,
-    sortOrder: 8,
+    sortOrder: 13,
     enabled: true,
     related: ["seo-meta-generator", "ai-rewriter", "ai-writer"],
     keywords: {
@@ -1526,6 +1840,8 @@ Use only the features and benefits supplied. Do not invent materials, dimensions
         "ai product description writer",
         "product bullet point generator",
         "store listing copy tool",
+        "etsy listing description generator",
+        "woocommerce product description generator",
       ],
       longTail: [
         "write a product description for shopify",
@@ -1538,6 +1854,10 @@ Use only the features and benefits supplied. Do not invent materials, dimensions
         "product description in a premium brand tone",
         "write a call to action for a product page",
         "product copy for a marketplace listing",
+        "write an etsy listing description",
+        "product description for a clothing item",
+        "generate product tags for a store listing",
+        "write a product description in a luxury tone",
       ],
       entities: [
         "e-commerce",
@@ -1554,6 +1874,7 @@ Use only the features and benefits supplied. Do not invent materials, dimensions
         "meta description",
         "copywriting",
         "on-page SEO",
+        "Etsy",
       ],
       questions: [
         "What does one generation include?",
@@ -1562,6 +1883,8 @@ Use only the features and benefits supplied. Do not invent materials, dimensions
         "Can I generate copy for a whole catalog?",
         "Can I set the brand tone?",
         "Is the copy unique per product?",
+        "How many credits does one product cost?",
+        "Can I generate product copy in another language?",
       ],
       intent: "commercial",
     },
@@ -1577,6 +1900,28 @@ Use only the features and benefits supplied. Do not invent materials, dimensions
       {
         title: "Ready to paste",
         body: "Each block copies separately, so the ecommerce copywriting tool drops straight into Shopify, WooCommerce or a marketplace listing.",
+      },
+    ],
+    useCases: [
+      {
+        title: "Listings that only have a spec sheet",
+        body: "Paste the raw features and the generator turns each one into a feature-and-benefit pair a shopper can act on.",
+      },
+      {
+        title: "New product launches",
+        body: "One run covers the listing card, the full description, the bullets, the tags and the button text.",
+      },
+      {
+        title: "Marketplace listings with bullet requirements",
+        body: "Four to six bullet points come back without trailing periods, which is the format most marketplace listing fields expect.",
+      },
+      {
+        title: "Refreshing copy that is not converting",
+        body: "Re-run with a different brand tone — premium, playful or technical read very differently from the same feature list.",
+      },
+      {
+        title: "Product page metadata",
+        body: "The SEO title and meta description come out of the same run, sized to the search snippet, so the page ships with its metadata.",
       },
     ],
     howItWorks: [
@@ -1619,6 +1964,16 @@ Use only the features and benefits supplied. Do not invent materials, dimensions
         question: "Is the copy unique per product?",
         answer:
           "Each generation is produced from your inputs, so different products produce different copy. Review it before publishing.",
+      },
+      {
+        question: "How many credits does one product cost?",
+        answer:
+          "15 credits per product, covering all seven blocks the run returns.",
+      },
+      {
+        question: "Can I generate product copy in another language?",
+        answer:
+          "Yes. Write the product name and features in that language and the copy comes back in it.",
       },
     ],
   },
@@ -1686,7 +2041,7 @@ Rules:
     seoDescription:
       "An AI reply generator for email, tickets and client messages. Use it as an email reply generator or customer support reply generator — three lengths per run.",
     featured: true,
-    sortOrder: 9,
+    sortOrder: 14,
     enabled: true,
     related: ["ai-rewriter", "ai-writer", "ai-summarizer"],
     keywords: {
@@ -1700,6 +2055,8 @@ Rules:
         "message reply writer",
         "respond to an email with ai",
         "follow up email writer",
+        "business email reply generator",
+        "chat reply generator",
       ],
       longTail: [
         "write a professional reply to a client email",
@@ -1712,6 +2069,10 @@ Rules:
         "draft three versions of the same reply",
         "reply to a message in a matching tone",
         "write a reply that sets a clear boundary",
+        "reply to a refund request from a customer",
+        "answer an email you have been putting off",
+        "write a reply asking for more information",
+        "respond to a negative review politely",
       ],
       entities: [
         "email etiquette",
@@ -1726,6 +2087,9 @@ Rules:
         "placeholder",
         "business communication",
         "editing",
+        "inbox",
+        "refund request",
+        "escalation",
       ],
       questions: [
         "Does Oply read my inbox?",
@@ -1734,6 +2098,8 @@ Rules:
         "How do I politely decline a request by email?",
         "Can I use this for customer support?",
         "How much does a reply cost?",
+        "Does it write a subject line?",
+        "Can I reply in another language?",
       ],
       intent: "commercial",
     },
@@ -1749,6 +2115,28 @@ Rules:
       {
         title: "Marks what it cannot know",
         body: "Dates, prices and statuses come back as clearly marked placeholders instead of confident guesses.",
+      },
+    ],
+    useCases: [
+      {
+        title: "The client email you have been putting off",
+        body: "Paste it, add the situation in the context field — behind schedule, awkward history — and pick the tone you can actually send.",
+      },
+      {
+        title: "Support tickets",
+        body: "The Customer Support tone drafts a reply that answers the question asked. Read it before sending; it is a draft, not an autoresponder.",
+      },
+      {
+        title: "Saying no to a request",
+        body: "Polite or firm produces a clear decline with a reason, and an alternative where there is one to offer.",
+      },
+      {
+        title: "Chasing something that has gone quiet",
+        body: "Describe the history in the context field and the follow-up lands as a nudge rather than an accusation.",
+      },
+      {
+        title: "Replies where you do not have every fact",
+        body: "Anything the tool cannot know comes back as a marked placeholder such as [DATE], so you fill in the real value rather than catching a guess.",
       },
     ],
     howItWorks: [
@@ -1791,6 +2179,16 @@ Rules:
         question: "How much does a reply cost?",
         answer:
           "5 credits, which covers all three lengths.",
+      },
+      {
+        question: "Does it write a subject line?",
+        answer:
+          "Only when the message you paste is clearly an email thread. Chat and comment replies come back without one, and no placeholder signature is added.",
+      },
+      {
+        question: "Can I reply in another language?",
+        answer:
+          "Yes. Paste the message in the language it arrived in and the reply comes back in that language.",
       },
     ],
   },
@@ -1862,7 +2260,7 @@ Cover the topic properly for the stated goal and audience. Do not pad with gener
     seoDescription:
       "A blog outline generator and article outline generator: H1, intro angle, H2 and H3 structure, key points and FAQ ideas. Doubles as a content brief generator.",
     featured: false,
-    sortOrder: 10,
+    sortOrder: 15,
     enabled: true,
     related: ["ai-writer", "seo-meta-generator", "ai-summarizer"],
     keywords: {
@@ -1876,6 +2274,8 @@ Cover the topic properly for the stated goal and audience. Do not pad with gener
         "content brief generator",
         "blog structure tool",
         "post outline maker",
+        "seo blog outline generator",
+        "content plan generator",
       ],
       longTail: [
         "create an outline for a blog post",
@@ -1888,6 +2288,10 @@ Cover the topic properly for the stated goal and audience. Do not pad with gener
         "outline a post for a specific audience",
         "content brief for a writer to follow",
         "how many sections should a blog post have",
+        "outline a how to guide for beginners",
+        "plan a listicle with a clear structure",
+        "plan a pillar page around a topic cluster",
+        "outline a case study post",
       ],
       entities: [
         "content brief",
@@ -1904,6 +2308,7 @@ Cover the topic properly for the stated goal and audience. Do not pad with gener
         "long-form content",
         "on-page SEO",
         "key points",
+        "pillar page",
       ],
       questions: [
         "Can I turn the outline into a full post?",
@@ -1912,6 +2317,8 @@ Cover the topic properly for the stated goal and audience. Do not pad with gener
         "What is a content brief?",
         "Does the outline include FAQ ideas?",
         "Does it research the topic?",
+        "How many credits does an outline cost?",
+        "How is this different from the AI Writer?",
       ],
       intent: "informational",
     },
@@ -1927,6 +2334,28 @@ Cover the topic properly for the stated goal and audience. Do not pad with gener
       {
         title: "FAQ ideas included",
         body: "Every run of the article outline generator ends with realistic follow-up questions you can answer on the page or turn into future posts.",
+      },
+    ],
+    useCases: [
+      {
+        title: "Planning a post before you write it",
+        body: "Settle the argument and the order of sections first, so drafting is filling in structure rather than deciding it mid-paragraph.",
+      },
+      {
+        title: "Briefing someone else to write",
+        body: "The angle, the audience, the headings and the points each section must cover are exactly what a writer needs to start.",
+      },
+      {
+        title: "Comparison and buying guides",
+        body: "Set the goal to Compare and the sections are ordered to help a reader decide rather than to list features.",
+      },
+      {
+        title: "Pillar pages and topic clusters",
+        body: "The FAQ ideas at the end of each outline are realistic follow-up searches, which is a reasonable starting list for supporting posts.",
+      },
+      {
+        title: "Getting a stalled post moving",
+        body: "Feed the topic back in with a different goal — educate, rank, convert or build authority — and compare the two structures.",
       },
     ],
     howItWorks: [
@@ -1969,6 +2398,16 @@ Cover the topic properly for the stated goal and audience. Do not pad with gener
         question: "Does it research the topic?",
         answer:
           "No. It structures the topic from your inputs and does not browse the web, so verify any specifics you add later.",
+      },
+      {
+        question: "How many credits does an outline cost?",
+        answer:
+          "15 credits per outline, covering the H1, the intro angle, every section and the FAQ ideas.",
+      },
+      {
+        question: "How is this different from the AI Writer?",
+        answer:
+          "This tool plans the structure and does not write prose. The AI Writer produces the draft — take a section and its key points across to it once the outline is settled.",
       },
     ],
   },
@@ -2049,7 +2488,7 @@ Compose a clean, printable logo: balanced, legible at small sizes, and free of w
     seoDescription:
       "Oply's AI logo generator is a logo maker and icon generator: enter a brand name and style keywords, then download a transparent-background PNG.",
     featured: false,
-    sortOrder: 11,
+    sortOrder: 1,
     enabled: true,
     related: [
       "ai-thumbnail-generator",
@@ -2067,6 +2506,8 @@ Compose a clean, printable logo: balanced, legible at small sizes, and free of w
         "logo design tool",
         "custom logo generator",
         "startup logo generator",
+        "app icon generator",
+        "wordmark generator",
       ],
       longTail: [
         "generate a logo for a startup",
@@ -2079,6 +2520,10 @@ Compose a clean, printable logo: balanced, legible at small sizes, and free of w
         "generate logo options from style keywords",
         "make a geometric abstract logo",
         "design an emblem style logo",
+        "make a logo for a coffee shop",
+        "design a mascot style logo",
+        "generate a logo in blue and white",
+        "create a logo for a youtube channel",
       ],
       entities: [
         "logo design",
@@ -2092,6 +2537,10 @@ Compose a clean, printable logo: balanced, legible at small sizes, and free of w
         "typography",
         "visual identity",
         "PNG",
+        "app icon",
+        "mascot",
+        "logo mark",
+        "color palette",
       ],
       questions: [
         "Can I get exclusive rights to an AI-generated logo?",
@@ -2099,6 +2548,9 @@ Compose a clean, printable logo: balanced, legible at small sizes, and free of w
         "What file format do I get?",
         "Can I regenerate if I don't like the result?",
         "Does it check for trademark conflicts?",
+        "How many credits does a logo cost?",
+        "Can I get the logo as an SVG or vector file?",
+        "Can I edit the logo afterwards?",
       ],
       intent: "commercial",
     },
@@ -2114,6 +2566,28 @@ Compose a clean, printable logo: balanced, legible at small sizes, and free of w
       {
         title: "Five styles to start from",
         body: "Minimalist flat, emblem, wordmark and icon, mascot, or abstract geometric — pick the direction closest to your brand.",
+      },
+    ],
+    useCases: [
+      {
+        title: "A mark for a new project",
+        body: "A brand name and three style words are enough to get a usable mark for a side project or a product that has not launched yet.",
+      },
+      {
+        title: "App icons and avatars",
+        body: "The square 1024×1024 output with a transparent background works as an app icon, a channel avatar or a favicon source.",
+      },
+      {
+        title: "Exploring directions before hiring a designer",
+        body: "Generate across the five styles to work out which direction you actually want, then take that to a designer as a reference.",
+      },
+      {
+        title: "Placeholder branding for a mockup",
+        body: "A transparent PNG drops into a pitch deck or a site mockup so the layout is not blocked on final branding.",
+      },
+      {
+        title: "Matching an existing palette",
+        body: "Name the colours you already use in the colour preference field and they become the dominant palette of the mark.",
       },
     ],
     howItWorks: [
@@ -2151,6 +2625,21 @@ Compose a clean, printable logo: balanced, legible at small sizes, and free of w
         question: "Does it check for trademark conflicts?",
         answer:
           "No. It designs a mark from your brief and does not search trademark databases — run your own check before using a logo commercially.",
+      },
+      {
+        question: "How many credits does a logo cost?",
+        answer:
+          "55 credits per generation, including any regenerations.",
+      },
+      {
+        question: "Can I get the logo as an SVG or vector file?",
+        answer:
+          "No. The output is a 1024×1024 PNG. If you need a scalable vector version, have a designer redraw the mark from it.",
+      },
+      {
+        question: "Can I edit the logo afterwards?",
+        answer:
+          "It is a flat PNG rather than layered artwork, so edits happen in an image editor. Choosing the transparent background makes it easier to place on other backgrounds.",
       },
     ],
   },
@@ -2242,7 +2731,7 @@ If asked to include the title text, render it large, legible and high-contrast �
     seoDescription:
       "Oply's AI thumbnail generator is a YouTube thumbnail maker for videos and Shorts: pick a style, generate, and download a bold, click-worthy thumbnail.",
     featured: false,
-    sortOrder: 12,
+    sortOrder: 2,
     enabled: true,
     related: [
       "ai-social-post-graphic",
@@ -2259,6 +2748,9 @@ If asked to include the title text, render it large, legible and high-contrast �
         "video thumbnail creator",
         "custom thumbnail generator",
         "thumbnail design tool",
+        "shorts thumbnail maker",
+        "video cover image generator",
+        "youtube cover art generator",
       ],
       longTail: [
         "generate a youtube thumbnail with ai",
@@ -2270,6 +2762,11 @@ If asked to include the title text, render it large, legible and high-contrast �
         "make a thumbnail from a video title",
         "design a cinematic style video thumbnail",
         "generate a vlog style thumbnail image",
+        "make a thumbnail for a podcast episode",
+        "create a thumbnail for a product review video",
+        "generate a thumbnail with a bold background",
+        "design a thumbnail that reads at small sizes",
+        "make a thumbnail without a design background",
       ],
       entities: [
         "YouTube thumbnail",
@@ -2281,6 +2778,12 @@ If asked to include the title text, render it large, legible and high-contrast �
         "video marketing",
         "graphic design",
         "composition",
+        "contrast",
+        "vertical video",
+        "channel branding",
+        "content creator",
+        "thumbnail text",
+        "visual hierarchy",
       ],
       questions: [
         "What size is a YouTube thumbnail?",
@@ -2288,6 +2791,9 @@ If asked to include the title text, render it large, legible and high-contrast �
         "Can I make a thumbnail for YouTube Shorts?",
         "How many credits does this cost?",
         "Can I regenerate a thumbnail I don't like?",
+        "What file format do I get?",
+        "Does it work for platforms other than YouTube?",
+        "Can I put my own photo on the thumbnail?",
       ],
       intent: "commercial",
     },
@@ -2303,6 +2809,28 @@ If asked to include the title text, render it large, legible and high-contrast �
       {
         title: "Text off by default, on request",
         body: "Rendered text inside an AI image is not always reliable, so title text stays off unless you turn it on.",
+      },
+    ],
+    useCases: [
+      {
+        title: "A thumbnail for a new upload",
+        body: "Paste the video title, add a sentence about what the video covers, and the composition is built around that subject.",
+      },
+      {
+        title: "Shorts and vertical video",
+        body: "The YouTube Shorts option produces the 1080×1920 vertical frame rather than cropping a landscape image into it.",
+      },
+      {
+        title: "Trying two directions before publishing",
+        body: "The same title under Bold & Bright and under Cinematic gives you two very different frames to choose between.",
+      },
+      {
+        title: "Tutorial and how-to videos",
+        body: "Tutorial Clean keeps the frame uncluttered, which is what survives being shown at sidebar size.",
+      },
+      {
+        title: "Gaming and tech channels",
+        body: "Tech & Gaming leans on high contrast and saturation, the look most gaming thumbnails are competing in.",
       },
     ],
     howItWorks: [
@@ -2337,6 +2865,21 @@ If asked to include the title text, render it large, legible and high-contrast �
       {
         question: "Can I regenerate a thumbnail I don't like?",
         answer: "Yes. Regenerate runs a fresh generation from the same brief, at the same credit cost.",
+      },
+      {
+        question: "What file format do I get?",
+        answer:
+          "A PNG, at 1280×720 for YouTube or 1080×1920 for Shorts, ready to upload as a custom thumbnail.",
+      },
+      {
+        question: "Does it work for platforms other than YouTube?",
+        answer:
+          "The two sizes here are YouTube's. For Instagram, LinkedIn, Pinterest or TikTok formats, use the AI Social Post Graphic instead.",
+      },
+      {
+        question: "Can I put my own photo on the thumbnail?",
+        answer:
+          "No. There is no image upload on this tool — it composes a thumbnail from your title and style brief, so it cannot place your own face or photo in the frame.",
       },
     ],
   },
@@ -2425,7 +2968,7 @@ Compose an image that supports the caption's message without needing to render t
     seoDescription:
       "Oply's AI social post graphic generator is a social media graphic maker and Instagram post generator: turn a caption into a sized, on-brand graphic.",
     featured: false,
-    sortOrder: 13,
+    sortOrder: 3,
     enabled: true,
     related: [
       "ai-thumbnail-generator",
@@ -2442,6 +2985,9 @@ Compose an image that supports the caption's message without needing to render t
         "social media image generator",
         "content graphic generator",
         "social post design tool",
+        "pinterest pin generator",
+        "linkedin post image generator",
+        "tiktok graphic maker",
       ],
       longTail: [
         "generate an instagram post graphic with ai",
@@ -2453,6 +2999,11 @@ Compose an image that supports the caption's message without needing to render t
         "make a social graphic from a caption",
         "generate a photographic style social post",
         "design an illustrated social media graphic",
+        "create a graphic for a product announcement post",
+        "make a graphic for an event announcement",
+        "generate a portrait size instagram graphic",
+        "create a social graphic without a designer",
+        "make a vertical story graphic for a promotion",
       ],
       entities: [
         "social media graphic",
@@ -2465,6 +3016,11 @@ Compose an image that supports the caption's message without needing to render t
         "social media marketing",
         "brand consistency",
         "graphic design",
+        "LinkedIn",
+        "TikTok",
+        "content calendar",
+        "caption",
+        "composition",
       ],
       questions: [
         "What size should an Instagram post be?",
@@ -2472,6 +3028,9 @@ Compose an image that supports the caption's message without needing to render t
         "Does it work for Pinterest pins?",
         "Can I use my own caption text?",
         "How many credits does this cost?",
+        "What file format do I get?",
+        "What is the difference between the platform and the format?",
+        "Can I add my logo to the graphic?",
       ],
       intent: "commercial",
     },
@@ -2487,6 +3046,28 @@ Compose an image that supports the caption's message without needing to render t
       {
         title: "One caption, one graphic",
         body: "Write the caption once and generate the visual to go with it, instead of starting from a blank canvas.",
+      },
+    ],
+    useCases: [
+      {
+        title: "Announcement and launch posts",
+        body: "Write the caption you are going to post and generate a visual that supports it, rather than reaching for another stock photo.",
+      },
+      {
+        title: "Filling a content calendar",
+        body: "Each planned caption becomes its own graphic, which keeps a week of posts looking like they belong together when you hold the style fixed.",
+      },
+      {
+        title: "Pinterest pins",
+        body: "The Pin format produces the 1000×1500 vertical frame Pinterest expects, instead of a square crop that wastes the feed space.",
+      },
+      {
+        title: "Stories and reels",
+        body: "Story / Reel gives the full 1080×1920 vertical canvas, so nothing important sits where the interface overlays it.",
+      },
+      {
+        title: "Link preview images",
+        body: "Landscape produces 1200×630, the size used for Open Graph link cards on most platforms.",
       },
     ],
     howItWorks: [
@@ -2521,6 +3102,21 @@ Compose an image that supports the caption's message without needing to render t
       {
         question: "How many credits does this cost?",
         answer: "60 credits per generation, including any regenerations.",
+      },
+      {
+        question: "What file format do I get?",
+        answer:
+          "A PNG at the exact pixel size of the format you picked — 1080×1080, 1080×1350, 1080×1920, 1200×630 or 1000×1500.",
+      },
+      {
+        question: "What is the difference between the platform and the format?",
+        answer:
+          "The format decides the pixel size of the image. The platform steers the look, so a LinkedIn graphic and a TikTok graphic at the same size still come out differently.",
+      },
+      {
+        question: "Can I add my logo to the graphic?",
+        answer:
+          "Not here — there is no image upload, and the generator will not invent a brand name or logo. Add yours afterwards in an image editor or your post composer.",
       },
     ],
   },
@@ -2601,7 +3197,7 @@ Keep the product itself as the clear subject and change only the setting around 
     seoDescription:
       "Oply's AI product photo generator is a product photography generator and ecommerce photo generator: upload a photo, pick a background, get a platform-sized image.",
     featured: false,
-    sortOrder: 14,
+    sortOrder: 4,
     enabled: true,
     related: [
       "ai-background-remover",
@@ -2618,6 +3214,9 @@ Keep the product itself as the clear subject and change only the setting around 
         "product background generator",
         "product photo editor",
         "ecommerce photo generator",
+        "product image generator",
+        "lifestyle product photo generator",
+        "white background photo tool",
       ],
       longTail: [
         "generate a product photo with ai",
@@ -2628,6 +3227,12 @@ Keep the product itself as the clear subject and change only the setting around 
         "design a product photo for shopify",
         "generate a marble background product shot",
         "make a product photo look professionally staged",
+        "restage a product photo on a clean background",
+        "turn a phone photo into a listing image",
+        "generate a product photo for instagram shop",
+        "create a product photo with natural outdoor light",
+        "make product photos for an online store",
+        "product photo on a solid color backdrop",
       ],
       entities: [
         "product photography",
@@ -2639,6 +3244,12 @@ Keep the product itself as the clear subject and change only the setting around 
         "Amazon listing image",
         "conversion rate",
         "visual merchandising",
+        "catalog photography",
+        "background replacement",
+        "Shopify",
+        "Instagram Shop",
+        "image resolution",
+        "props",
       ],
       questions: [
         "Does Amazon require a white background?",
@@ -2646,6 +3257,9 @@ Keep the product itself as the clear subject and change only the setting around 
         "What image sizes do I get?",
         "Will it change my actual product?",
         "How many credits does this cost?",
+        "What file format do I get?",
+        "Do I need a professional photo to start?",
+        "Can I use the result as my main marketplace image?",
       ],
       intent: "commercial",
     },
@@ -2661,6 +3275,28 @@ Keep the product itself as the clear subject and change only the setting around 
       {
         title: "Six background directions",
         body: "Studio white, a lifestyle scene, outdoor natural light, marble, a solid color, or your own custom description.",
+      },
+    ],
+    useCases: [
+      {
+        title: "Listing photos shot at home",
+        body: "A clear phone photo on a kitchen table is enough of a starting point — the setting around the product is what changes.",
+      },
+      {
+        title: "One product across several platforms",
+        body: "Run it once per platform to get the 1000×1000, 2000×2000 and 1080×1080 versions each storefront expects.",
+      },
+      {
+        title: "Lifestyle shots without a photoshoot",
+        body: "Lifestyle Scene or Outdoor Natural Light places the product in a setting, which is the shot most listings are missing.",
+      },
+      {
+        title: "Clearing a distracting background",
+        body: "Studio White drops the clutter behind the product and leaves the product as the subject of the frame.",
+      },
+      {
+        title: "Campaign and seasonal restaging",
+        body: "Describe the scene you want in the product details field with the Custom background, and the same product gets a new setting.",
       },
     ],
     howItWorks: [
@@ -2698,6 +3334,21 @@ Keep the product itself as the clear subject and change only the setting around 
       {
         question: "How many credits does this cost?",
         answer: "110 credits per generation, including any regenerations.",
+      },
+      {
+        question: "What file format do I get?",
+        answer:
+          "A PNG at the platform size you chose — 1000×1000, 2000×2000 or 1080×1080.",
+      },
+      {
+        question: "Do I need a professional photo to start?",
+        answer:
+          "No. A clear, well-lit photo of the product is enough. The clearer the product is in the source, the more recognisable it stays in the result.",
+      },
+      {
+        question: "Can I use the result as my main marketplace image?",
+        answer:
+          "Studio White at the Amazon size matches the white-background requirement, but this is a generative restaging rather than a photo of your product. Check the result still represents the product accurately, and check the marketplace's own image policy before using it as a main listing image.",
       },
     ],
   },
@@ -2771,7 +3422,7 @@ If asked to remove the background, produce a clean cutout of the subject on a tr
     seoDescription:
       "Oply's AI background remover is a background removal tool and background replacer: remove it to transparent, or replace it with a color or scene.",
     featured: false,
-    sortOrder: 15,
+    sortOrder: 5,
     enabled: true,
     related: [
       "ai-product-photo-generator",
@@ -2788,6 +3439,9 @@ If asked to remove the background, produce a clean cutout of the subject on a tr
         "transparent background maker",
         "photo background remover",
         "change image background",
+        "cutout tool",
+        "png background remover",
+        "image background editor",
       ],
       longTail: [
         "remove the background from a photo online",
@@ -2798,6 +3452,12 @@ If asked to remove the background, produce a clean cutout of the subject on a tr
         "remove a background without using photoshop",
         "create a transparent png from a photo",
         "isolate a subject from its background",
+        "remove the background from a logo image",
+        "put a subject on a plain white background",
+        "replace a photo background with an office scene",
+        "remove a background from a portrait photo",
+        "make a headshot background a solid colour",
+        "cut out an object from a photo",
       ],
       entities: [
         "background removal",
@@ -2808,6 +3468,13 @@ If asked to remove the background, produce a clean cutout of the subject on a tr
         "alpha channel",
         "product photography",
         "image inpainting",
+        "subject isolation",
+        "cutout",
+        "headshot",
+        "solid color background",
+        "foreground",
+        "edge detail",
+        "scene generation",
       ],
       questions: [
         "Does this perfectly cut out the subject like a dedicated background remover?",
@@ -2815,6 +3482,9 @@ If asked to remove the background, produce a clean cutout of the subject on a tr
         "Can I describe a new scene for the background?",
         "What file format do I get?",
         "How many credits does this cost?",
+        "Does it work on photos of people?",
+        "How is this different from the Product Photo Generator?",
+        "Can I process several images at once?",
       ],
       intent: "commercial",
     },
@@ -2829,7 +3499,29 @@ If asked to remove the background, produce a clean cutout of the subject on a tr
       },
       {
         title: "One upload, download-ready",
-        body: "Upload an image, pick a mode, and download a PNG sized to match your original.",
+        body: "Upload an image, pick a mode, and download a PNG. This tool is not cropped to a fixed size, so a background edit does not cut part of the subject away.",
+      },
+    ],
+    useCases: [
+      {
+        title: "Product cutouts for listings",
+        body: "Remove mode returns the product on transparency, which is what most storefront and catalog templates expect.",
+      },
+      {
+        title: "Headshots and profile photos",
+        body: "Swap a busy room for a solid colour. Check the edges around hair before publishing — fine detail is approximate.",
+      },
+      {
+        title: "Assets for slides and mockups",
+        body: "A transparent PNG drops onto any slide or page background without a white box around it.",
+      },
+      {
+        title: "Photos with a distracting background",
+        body: "Replace with Solid Color keeps the subject and removes whatever was competing with it behind.",
+      },
+      {
+        title: "Putting a subject somewhere else",
+        body: "Scene mode takes a description — a sunlit desk, a studio wall — and composes that behind the subject in one pass.",
       },
     ],
     howItWorks: [
@@ -2866,6 +3558,21 @@ If asked to remove the background, produce a clean cutout of the subject on a tr
       {
         question: "How many credits does this cost?",
         answer: "90 credits per generation, including any regenerations.",
+      },
+      {
+        question: "Does it work on photos of people?",
+        answer:
+          "Yes, with the same caveat as any subject: hair, glasses and soft edges are approximated rather than matted exactly, so check those areas before publishing.",
+      },
+      {
+        question: "How is this different from the Product Photo Generator?",
+        answer:
+          "This tool changes the background behind whatever you upload. The Product Photo Generator restages a product specifically, and outputs at fixed marketplace sizes.",
+      },
+      {
+        question: "Can I process several images at once?",
+        answer:
+          "One image per generation. Batch processing is not available, so a set of images means running it once per image at 90 credits each.",
       },
     ],
   },

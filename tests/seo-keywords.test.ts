@@ -179,6 +179,34 @@ describe("on-page honesty", () => {
     }
   });
 
+  it("gives every tool a use-case section with real entries", () => {
+    for (const tool of enabled) {
+      expect(tool.useCases.length, tool.slug).toBeGreaterThanOrEqual(4);
+      expect(tool.useCases.length, tool.slug).toBeLessThanOrEqual(6);
+      for (const useCase of tool.useCases) {
+        expect(useCase.title.trim().length, tool.slug).toBeGreaterThan(0);
+        expect(
+          useCase.body.trim().length,
+          `${tool.slug}: ${useCase.title}`,
+        ).toBeGreaterThan(20);
+      }
+    }
+  });
+
+  it("does not repeat a use-case title, or restate a benefit as one", () => {
+    for (const tool of enabled) {
+      const titles = tool.useCases.map((u) => normalise(u.title));
+      expect(new Set(titles).size, tool.slug).toBe(titles.length);
+      const benefits = new Set(tool.benefits.map((b) => normalise(b.title)));
+      for (const title of titles) {
+        expect(
+          benefits.has(title),
+          `${tool.slug} lists "${title}" as both a benefit and a use case`,
+        ).toBe(false);
+      }
+    }
+  });
+
   it("gives every FAQ entry a real answer", () => {
     for (const tool of enabled) {
       for (const faq of tool.faq) {
@@ -212,6 +240,12 @@ describe("on-page honesty", () => {
         haystacks.push([
           `${tool.slug}.benefits`,
           `${benefit.title} ${benefit.body}`,
+        ]);
+      }
+      for (const useCase of tool.useCases) {
+        haystacks.push([
+          `${tool.slug}.useCases`,
+          `${useCase.title} ${useCase.body}`,
         ]);
       }
       haystacks.push([`${tool.slug}.howItWorks`, tool.howItWorks.join(" ")]);
@@ -266,6 +300,28 @@ describe("category hubs", () => {
         toolPrimaries.has(category.primaryKeyword.toLowerCase()),
         `${category.slug} claims a tool's head term`,
       ).toBe(false);
+    }
+  });
+
+  /**
+   * The weaker half of the same rule. A hub that lists a spoke's exact head
+   * term in its own cluster is still two Oply pages aimed at one query, which
+   * is what the pillar/spoke split in app/sitemap.ts exists to avoid. Hubs
+   * take the broader phrasing ("schema markup tools"), spokes keep the head
+   * term ("schema markup generator").
+   */
+  it("does not let a hub cluster target a tool's primary term either", () => {
+    const toolPrimaries = new Map(
+      enabled.map((t) => [t.keywords.primary.toLowerCase(), t.slug]),
+    );
+    for (const category of categories) {
+      for (const keyword of category.keywords) {
+        const owner = toolPrimaries.get(keyword.toLowerCase());
+        expect(
+          owner,
+          `${category.slug} clusters on "${keyword}", which ${owner} owns`,
+        ).toBeUndefined();
+      }
     }
   });
 });

@@ -11,7 +11,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export function ThemeToggle({ align = "end" }: { align?: "start" | "end" }) {
+export function ThemeToggle({
+  align = "end",
+  className,
+}: {
+  align?: "start" | "end";
+  /** Lets the dark sidebar override the light `ghost` hover. */
+  className?: string;
+}) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -21,7 +28,13 @@ export function ThemeToggle({ align = "end" }: { align?: "start" | "end" }) {
 
   if (!mounted) {
     return (
-      <Button variant="ghost" size="icon" aria-label="Change theme" disabled>
+      <Button
+        variant="ghost"
+        size="icon"
+        aria-label="Change theme"
+        disabled
+        className={className}
+      >
         <Sun className="h-4 w-4" />
       </Button>
     );
@@ -30,7 +43,7 @@ export function ThemeToggle({ align = "end" }: { align?: "start" | "end" }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label="Change theme">
+        <Button variant="ghost" size="icon" aria-label="Change theme" className={className}>
           {theme === "dark" ? (
             <Moon className="h-4 w-4" />
           ) : theme === "light" ? (

@@ -10,7 +10,10 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "db:sync-tools": "tsx --env-file=.env.local scripts/sync-tools.ts"
+    "db:sync-tools": "tsx --env-file=.env.local scripts/sync-tools.ts",
+    "gen:samples": "tsx --tsconfig tsconfig.script.json --env-file=.env.local scripts/gen-samples.ts",
+    "gen:illustrations": "tsx --tsconfig tsconfig.script.json --env-file=.env.local scripts/gen-illustrations.ts",
+    "optimise:assets": "tsx --tsconfig tsconfig.script.json scripts/optimise-assets.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.124.0",

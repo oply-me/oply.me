@@ -50,6 +50,7 @@ export default async function FavoritesPage() {
           icon={Star}
           title="No saved results yet."
           description="Star a result from any tool or from your history and it will be waiting here."
+          illustration="/illustrations/empty-favorites.webp"
           action={{ label: "Browse tools", href: "/dashboard/tools" }}
         />
       ) : (

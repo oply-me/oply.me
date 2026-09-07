@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { PublicTool } from "@/config/tools";
@@ -14,6 +15,30 @@ const HOLD_MS = 2200;
  * tool's own page, never fabricated for this component.
  */
 export function ToolCardPreview({ tool }: { tool: PublicTool }) {
+  /*
+   * Image tools show what they actually produce. The file in public/samples is
+   * a real generation from this tool's own prompt (scripts/gen-samples.ts), not
+   * a designed mock-up — a picture of the output beats a sentence describing it.
+   */
+  if (tool.outputType === "image") {
+    // `contain`, not `cover`: these are whole deliverables — a cropped logo or
+    // a headline missing its first word misrepresents the output.
+    return (
+      <div className="relative mt-3 aspect-[16/10] overflow-hidden rounded-lg border border-border bg-[repeating-conic-gradient(hsl(var(--muted))_0%_25%,hsl(var(--card))_0%_50%)] bg-[length:16px_16px]">
+        <Image
+          src={`/samples/${tool.slug}.webp`}
+          alt={`Example output from the ${tool.name}`}
+          fill
+          sizes="(max-width: 640px) 100vw, 380px"
+          className="object-contain p-2"
+        />
+        <span className="absolute left-2 top-2 rounded-full bg-background/85 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground backdrop-blur">
+          Example output
+        </span>
+      </div>
+    );
+  }
+
   const before =
     tool.example.before ??
     tool.fields.find((f) => f.required && f.placeholder)?.placeholder;

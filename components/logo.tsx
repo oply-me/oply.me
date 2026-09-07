@@ -44,8 +44,10 @@ export function Logo({
   return (
     <span className={cn("inline-flex items-center gap-2", className)}>
       <OplyMark className={markClassName} />
+      {/* `text-current` rather than `text-foreground`: the sidebar is dark in
+          both themes, and body already sets foreground everywhere else. */}
       {showWordmark && (
-        <span className="text-[17px] font-semibold tracking-tight text-foreground">
+        <span className="text-[17px] font-semibold tracking-tight text-current">
           Oply.me
         </span>
       )}

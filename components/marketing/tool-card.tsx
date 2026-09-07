@@ -48,7 +48,7 @@ export function ToolCard({
         } as React.CSSProperties
       }
       className={cn(
-        "group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card p-5",
+        "group relative flex flex-col overflow-hidden rounded-feature border border-border bg-card p-6 shadow-card",
         "transition-[border-color,box-shadow] duration-200 hover:[border-color:var(--edge)] hover:[box-shadow:var(--glow)]",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         className,
@@ -61,8 +61,8 @@ export function ToolCard({
       />
 
       <div className="relative flex items-start justify-between gap-3">
-        <span className="flex h-11 w-11 items-center justify-center rounded-xl text-white shadow-sm transition-transform duration-300 group-hover:rotate-6 group-hover:scale-105 [background-image:var(--tile)]">
-          <ToolIcon name={tool.icon} />
+        <span className="flex h-12 w-12 items-center justify-center rounded-2xl text-white shadow-sm transition-transform duration-300 group-hover:rotate-6 group-hover:scale-105 [background-image:var(--tile)]">
+          <ToolIcon name={tool.icon} className="h-[22px] w-[22px]" />
         </span>
         <span className="flex items-center gap-2">
           {tool.featured && <Badge variant="secondary">Popular</Badge>}
@@ -75,10 +75,10 @@ export function ToolCard({
         </span>
       </div>
 
-      <h3 className="relative mt-4 text-[15px] font-semibold tracking-tight">
+      <h3 className="relative mt-5 text-[17px] font-semibold tracking-[-0.01em]">
         {tool.name}
       </h3>
-      <p className="relative mt-1.5 flex-1 text-sm leading-relaxed text-muted-foreground">
+      <p className="relative mt-2 flex-1 text-[14px] leading-[1.6] text-muted-foreground">
         {tool.description}
       </p>
 

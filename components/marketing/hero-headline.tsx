@@ -15,9 +15,13 @@ const INTERVAL_MS = 2200;
 export function HeroHeadline({
   words,
   className,
+  punctuate = true,
 }: {
   words: string[];
   className?: string;
+  /** The trailing full stop, wanted when this ends a sentence and not when
+   *  it sits mid-clause (the hero's supporting line). */
+  punctuate?: boolean;
 }) {
   const [index, setIndex] = useState(0);
   const reduceMotion = useReducedMotion();
@@ -47,7 +51,8 @@ export function HeroHeadline({
           }
           className="col-start-1 row-start-1"
         >
-          {words[index]}.
+          {words[index]}
+          {punctuate ? "." : ""}
         </motion.span>
       </AnimatePresence>
     </span>

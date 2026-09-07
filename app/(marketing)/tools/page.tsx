@@ -1,4 +1,6 @@
 import { ToolsExplorer } from "@/components/marketing/tools-explorer";
+import { BentoFeature } from "@/components/marketing/bento-feature";
+import { SoftBackdrop } from "@/components/marketing/backdrop";
 import { FooterCta } from "@/components/marketing/cta";
 import { Section, SectionHeading } from "@/components/marketing/section";
 import { ToolIcon } from "@/components/icon";
@@ -25,22 +27,37 @@ export default async function ToolsPage({
 
   return (
     <>
-      <Section className="pb-10">
+      {/* Page hero. The head term stays in the H1 — this page ranks for it. */}
+      <section className="relative isolate overflow-hidden border-b border-border">
+        <SoftBackdrop dots />
+        <div className="container relative py-14 sm:py-16">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-brand">
+            Tool library
+          </p>
+          <h1 className="text-balance mt-3 max-w-3xl text-[2.25rem] font-semibold leading-[1.06] tracking-[-0.032em] sm:text-display-sm">
+            Every AI tool in{" "}
+            <span className="text-gradient">one workspace</span>
+          </h1>
+          <p className="text-pretty mt-4 max-w-2xl text-[17px] leading-relaxed text-muted-foreground">
+            {tools.length} tools, one account, one credit balance. Pick one and
+            start — nothing here needs a separate subscription.
+          </p>
+        </div>
+      </section>
+
+      <Section className="pb-10 pt-12">
         <div className="container">
-          <SectionHeading
-            align="left"
-            title="AI tools"
-            description="Every Oply tool runs from the same account and the same credit balance. Pick one and start."
+          <ToolsExplorer
+            tools={tools.map(toPublicTool)}
+            categories={categories}
+            initialQuery={params.q ?? ""}
+            initialCategory={params.category ?? "all"}
           />
 
-          <div className="mt-10">
-            <ToolsExplorer
-              tools={tools.map(toPublicTool)}
-              categories={categories}
-              initialQuery={params.q ?? ""}
-              initialCategory={params.category ?? "all"}
-            />
-          </div>
+          <BentoFeature
+            tools={tools.map(toPublicTool)}
+            className="mt-14"
+          />
         </div>
       </Section>
 
@@ -55,7 +72,7 @@ export default async function ToolsPage({
             {comingSoonTools.map((tool) => (
               <div
                 key={tool.name}
-                className="rounded-xl border border-dashed border-border bg-card/50 p-5"
+                className="rounded-card border border-dashed border-border bg-card/50 p-5"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted text-muted-foreground">

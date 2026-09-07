@@ -65,6 +65,7 @@ describe("tool registry", () => {
       expect(tool.seoDescription.length, tool.slug).toBeGreaterThan(40);
       expect(tool.faq.length, tool.slug).toBeGreaterThanOrEqual(3);
       expect(tool.benefits.length, tool.slug).toBeGreaterThanOrEqual(3);
+      expect(tool.useCases.length, tool.slug).toBeGreaterThanOrEqual(4);
       expect(tool.howItWorks.length, tool.slug).toBeGreaterThanOrEqual(3);
       expect(tool.example.value.length, tool.slug).toBeGreaterThan(5);
     }

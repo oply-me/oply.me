@@ -18,7 +18,7 @@ import type { CategoryDefinition } from "@/config/categories";
 import type { PublicTool } from "@/config/tools";
 import { cn } from "@/lib/utils";
 
-type SortKey = "popular" | "newest" | "az";
+type SortKey = "curated" | "newest" | "az";
 
 export function ToolsExplorer({
   tools,
@@ -33,7 +33,7 @@ export function ToolsExplorer({
 }) {
   const [query, setQuery] = useState(initialQuery);
   const [category, setCategory] = useState(initialCategory);
-  const [sort, setSort] = useState<SortKey>("popular");
+  const [sort, setSort] = useState<SortKey>("curated");
   // Brief, honestly-framed transition between two real result sets — never
   // shown for search-box typing, since that filtering is instant and a fake
   // loading state there would be dishonest UI.
@@ -71,17 +71,22 @@ export function ToolsExplorer({
         const bNew = b.newUntil ? new Date(b.newUntil).getTime() : 0;
         return bNew - aNew || b.sortOrder - a.sortOrder;
       }
-      // "popular": featured first, then the curated order.
-      if (a.featured !== b.featured) return a.featured ? -1 : 1;
+      // "curated": the editorial order, and nothing else. `sortOrder` is what
+      // /admin/tools edits, so it alone decides what leads the grid —
+      // `featured` no longer reorders the list, it only drives the "Popular"
+      // badge and the homepage showcase. Sorting featured tools to the front
+      // here would have meant flagging a tool as popular to move it up.
       return a.sortOrder - b.sortOrder;
     });
 
     return list;
   }, [tools, query, category, sort]);
 
-  const availableCategories = categories.filter((c) =>
-    tools.some((t) => t.category === c.slug),
-  );
+  // Pills follow the same curated order as the grid, so the category leading
+  // the results is not the one sitting last in the filter row.
+  const availableCategories = categories
+    .filter((c) => tools.some((t) => t.category === c.slug))
+    .sort((a, b) => a.sortOrder - b.sortOrder);
 
   return (
     <div>
@@ -116,7 +121,7 @@ export function ToolsExplorer({
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="popular">Popular</SelectItem>
+            <SelectItem value="curated">Recommended</SelectItem>
             <SelectItem value="newest">Newest</SelectItem>
             <SelectItem value="az">A–Z</SelectItem>
           </SelectContent>
