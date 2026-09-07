@@ -196,16 +196,16 @@ export function ToolWorkspace({
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
       {/* ---------------------------------------------------------- Input */}
-      <div className="rounded-xl border border-border bg-card">
-        <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-4">
-          <h2 className="text-[15px] font-semibold">Input</h2>
+      <div className="rounded-feature border border-border bg-card shadow-card">
+        <div className="flex items-center justify-between gap-3 border-b border-border px-6 py-5">
+          <h2 className="text-[15px] font-semibold tracking-[-0.01em]">Input</h2>
           <Badge variant="outline">
             <Coins className="h-3 w-3" />
             {tool.creditCost} credits
           </Badge>
         </div>
 
-        <div className="space-y-5 p-5">
+        <div className="space-y-5 p-6">
           {tool.fields
             .filter((field) => isFieldVisible(field, input))
             .map((field) => (
@@ -219,7 +219,7 @@ export function ToolWorkspace({
             ))}
         </div>
 
-        <div className="border-t border-border p-5">
+        <div className="border-t border-border p-6">
           {notEnoughCredits ? (
             <div className="space-y-3">
               <p className="text-sm text-muted-foreground">
@@ -235,7 +235,7 @@ export function ToolWorkspace({
             <Button
               onClick={() => run("generate")}
               disabled={loading || missingRequired}
-              className="w-full"
+              className="w-full bg-gradient-to-r from-brand to-brand-2 shadow-brand transition-shadow hover:shadow-brand-lg"
               size="lg"
             >
               {loading && pendingAction === "generate" ? (
@@ -261,9 +261,9 @@ export function ToolWorkspace({
       </div>
 
       {/* --------------------------------------------------------- Output */}
-      <div className="rounded-xl border border-border bg-card">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-5 py-4">
-          <h2 className="text-[15px] font-semibold">Result</h2>
+      <div className="rounded-feature border border-border bg-card shadow-card">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-6 py-5">
+          <h2 className="text-[15px] font-semibold tracking-[-0.01em]">Result</h2>
           {result && (
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs text-muted-foreground">
@@ -297,7 +297,7 @@ export function ToolWorkspace({
           )}
         </div>
 
-        <div className="min-h-[300px] p-5">
+        <div className="min-h-[340px] p-6">
           {loading ? (
             <div className="flex h-full min-h-[260px] flex-col items-center justify-center gap-6 px-6">
               <GenerationProgress active={loading} stages={progressStages} className="max-w-sm" />
@@ -315,7 +315,7 @@ export function ToolWorkspace({
 
         {/* Refinement actions, where the tool declares them */}
         {result && !loading && tool.extraActions?.length ? (
-          <div className="flex flex-wrap gap-2 border-t border-border px-5 py-4">
+          <div className="flex flex-wrap gap-2 border-t border-border px-6 py-4">
             {tool.extraActions.includes("shorten") && (
               <Button size="sm" variant="secondary" onClick={() => run("shorten")}>
                 <Shrink />

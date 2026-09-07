@@ -46,6 +46,7 @@ export default async function HistoryPage({
           icon={History}
           title="No generations yet."
           description="Run any Oply tool and the result will appear here with its inputs, so you can find it again later."
+          illustration="/illustrations/empty-history.webp"
           action={{ label: "Browse tools", href: "/dashboard/tools" }}
         />
       ) : (

@@ -83,7 +83,7 @@ export function Sidebar({
   const low = balance <= siteConfig.lowCreditThreshold;
 
   const content = (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
       <div className="flex h-16 items-center justify-between px-5">
         <Link
           href="/dashboard"
@@ -96,7 +96,7 @@ export function Sidebar({
         <Button
           variant="ghost"
           size="icon"
-          className="lg:hidden"
+          className="text-sidebar-muted hover:bg-white/[0.06] hover:text-sidebar-foreground lg:hidden"
           onClick={() => setMobileOpen(false)}
           aria-label="Close menu"
         >
@@ -121,7 +121,7 @@ export function Sidebar({
         </ul>
 
         <div>
-          <p className="px-3 pb-2 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+          <p className="px-3 pb-2 text-[10.5px] font-semibold uppercase tracking-[0.12em] text-sidebar-muted/70">
             Account
           </p>
           <ul className="space-y-0.5">
@@ -138,7 +138,7 @@ export function Sidebar({
 
         {user.isAdmin && (
           <div>
-            <p className="px-3 pb-2 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+            <p className="px-3 pb-2 text-[10.5px] font-semibold uppercase tracking-[0.12em] text-sidebar-muted/70">
               Admin
             </p>
             <ul className="space-y-0.5">
@@ -156,49 +156,61 @@ export function Sidebar({
 
       {/* Credit balance */}
       <div className="px-3 pb-2">
-        <Link
-          href="/dashboard/credits"
-          onClick={() => setMobileOpen(false)}
+        {/* Real balance from `credit_balances` — there is no plan tier to
+            upgrade to, so this promotes credits, which is what Oply sells. */}
+        <div
           className={cn(
-            "block rounded-lg border p-3.5 transition-colors",
+            "relative overflow-hidden rounded-2xl border p-4",
             low
-              ? "border-warning/40 bg-warning/5 hover:bg-warning/10"
-              : "border-border bg-card hover:bg-accent",
+              ? "border-warning/30 bg-warning/[0.08]"
+              : "border-white/10 bg-gradient-to-br from-brand/25 via-brand/10 to-transparent",
           )}
         >
-          <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-            Credits
-          </p>
-          <p
-            className={cn(
-              "mt-1 text-xl font-semibold tabular-nums",
-              low && "text-warning",
-            )}
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute -right-8 -top-10 h-24 w-24 rounded-full bg-brand-2/30 blur-2xl"
+          />
+          <Link
+            href="/dashboard/credits"
+            onClick={() => setMobileOpen(false)}
+            className="relative block"
           >
-            {formatNumber(balance)}
-          </p>
-          {low && (
-            <p className="mt-1.5 text-[11px] leading-snug text-muted-foreground">
-              You&apos;re running low on credits.
+            <p className="text-[10.5px] font-semibold uppercase tracking-[0.12em] text-sidebar-muted">
+              Credits
             </p>
-          )}
-        </Link>
-        {low && (
-          <Button asChild size="sm" className="mt-2 w-full">
+            <p
+              className={cn(
+                "mt-1 text-2xl font-semibold tabular-nums text-white",
+                low && "text-warning",
+              )}
+            >
+              {formatNumber(balance)}
+            </p>
+          </Link>
+          <p className="relative mt-1 text-[11px] leading-snug text-sidebar-muted">
+            {low
+              ? "You're running low. Tools stop at zero."
+              : "Shared across every tool."}
+          </p>
+          <Button
+            asChild
+            size="sm"
+            className="relative mt-3 w-full bg-gradient-to-r from-brand to-brand-2 text-white shadow-[0_8px_20px_-10px_hsl(var(--brand)/0.9)] hover:opacity-95"
+          >
             <Link href="/pricing" onClick={() => setMobileOpen(false)}>
-              Buy Credits
+              Buy credits
             </Link>
           </Button>
-        )}
+        </div>
       </div>
 
       {/* Footer */}
-      <div className="flex items-center gap-1 border-t border-border p-3">
+      <div className="flex items-center gap-1 border-t border-sidebar-border p-3">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
               type="button"
-              className="flex min-w-0 flex-1 items-center gap-2.5 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="flex min-w-0 flex-1 items-center gap-2.5 rounded-xl px-2 py-1.5 text-left transition-colors hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
             >
               <Avatar>
                 {user.avatarUrl && <AvatarImage src={user.avatarUrl} alt="" />}
@@ -208,7 +220,7 @@ export function Sidebar({
                 <span className="block truncate text-[13px] font-medium">
                   {user.name ?? user.email.split("@")[0]}
                 </span>
-                <span className="block truncate text-[11px] text-muted-foreground">
+                <span className="block truncate text-[11px] text-sidebar-muted">
                   {user.email}
                 </span>
               </span>
@@ -246,8 +258,15 @@ export function Sidebar({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <NotificationBell items={notifications} unreadCount={unreadCount} />
-        <ThemeToggle align="end" />
+        <NotificationBell
+          items={notifications}
+          unreadCount={unreadCount}
+          className="text-sidebar-muted hover:bg-white/[0.06] hover:text-sidebar-foreground"
+        />
+        <ThemeToggle
+          align="end"
+          className="text-sidebar-muted hover:bg-white/[0.06] hover:text-sidebar-foreground"
+        />
       </div>
     </div>
   );
@@ -285,14 +304,18 @@ export function Sidebar({
       {/* Mobile drawer. Radix Dialog under the hood, so escape, the focus
           trap and scroll lock come for free; Framer gives it the spring. */}
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-        <SheetContent side="left" portalClassName="lg:hidden">
+        <SheetContent
+          side="left"
+          portalClassName="lg:hidden"
+          className="border-sidebar-border bg-sidebar"
+        >
           <SheetTitle className="sr-only">Dashboard menu</SheetTitle>
           {content}
         </SheetContent>
       </Sheet>
 
       {/* Desktop sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-[260px] border-r border-border bg-surface lg:block print:hidden">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-[260px] border-r border-sidebar-border bg-sidebar lg:block print:hidden">
         {content}
       </aside>
     </>
@@ -319,14 +342,28 @@ function NavItem({
         onClick={onNavigate}
         aria-current={active ? "page" : undefined}
         className={cn(
-          "flex items-center gap-2.5 rounded-md px-3 py-2 text-[13.5px] font-medium transition-colors",
+          "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13.5px] font-medium transition-colors duration-150",
           active
-            ? "bg-primary/10 text-primary"
-            : "text-muted-foreground hover:bg-accent hover:text-foreground",
+            ? "text-white"
+            : "text-sidebar-muted hover:bg-white/[0.06] hover:text-sidebar-foreground",
         )}
       >
-        <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
-        {title}
+        {/* The active pill is its own layer so the gradient can sit under the
+            label without tinting the icon or the text. */}
+        {active && (
+          <span
+            aria-hidden="true"
+            className="absolute inset-0 rounded-xl bg-gradient-to-r from-brand/90 to-brand-2/80 shadow-[0_6px_18px_-8px_hsl(var(--brand)/0.9)]"
+          />
+        )}
+        <Icon
+          className={cn(
+            "relative h-[17px] w-[17px] shrink-0 transition-transform duration-200",
+            !active && "group-hover:scale-105",
+          )}
+          aria-hidden="true"
+        />
+        <span className="relative">{title}</span>
       </Link>
     </li>
   );
