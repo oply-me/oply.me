@@ -37,6 +37,7 @@ export const siteConfig = {
     product: [
       { title: "Pricing", href: "/pricing" },
       { title: "Features", href: "/features" },
+      { title: "Refer a friend", href: "/referrals" },
       { title: "Roadmap", href: "/roadmap" },
     ],
     company: [

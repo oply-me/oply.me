@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 import { EmptyStateIcon } from "@/components/empty-state-icon";
@@ -9,6 +10,12 @@ interface EmptyStateProps {
   title: string;
   description: string;
   action?: { label: string; href: string };
+  /**
+   * Optional illustration from `public/illustrations`. When present it
+   * replaces the icon badge — the icon stays required so every empty state
+   * still has a fallback if the asset is ever removed.
+   */
+  illustration?: string;
   className?: string;
 }
 
@@ -17,6 +24,7 @@ export function EmptyState({
   title,
   description,
   action,
+  illustration,
   className,
 }: EmptyStateProps) {
   return (
@@ -26,8 +34,20 @@ export function EmptyState({
         className,
       )}
     >
-      <EmptyStateIcon>
-        <Icon className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+      <EmptyStateIcon variant={illustration ? "illustration" : "icon"}>
+        {illustration ? (
+          <Image
+            src={illustration}
+            alt=""
+            width={168}
+            height={168}
+            /* Decorative: the heading below carries the meaning. */
+            aria-hidden="true"
+            className="h-full w-full object-contain"
+          />
+        ) : (
+          <Icon className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+        )}
       </EmptyStateIcon>
       <h3 className="text-[15px] font-semibold">{title}</h3>
       <p className="mt-1.5 max-w-sm text-sm leading-relaxed text-muted-foreground">

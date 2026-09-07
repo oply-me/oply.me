@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { attachReferralFromRequest } from "@/lib/referrals-attach";
 
 /** Exchanges the emailed code for a session, then continues to `next`. */
 export async function GET(request: Request) {
@@ -13,8 +14,18 @@ export async function GET(request: Request) {
 
   if (code) {
     const supabase = await createClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
+      // First point at which a confirmed account has a session, so it is where
+      // a referral can be attributed. Never allowed to fail the sign-in.
+      if (data.user) {
+        await attachReferralFromRequest(
+          data.user.id,
+          typeof data.user.user_metadata?.referral_code === "string"
+            ? data.user.user_metadata.referral_code
+            : null,
+        ).catch(() => false);
+      }
       return NextResponse.redirect(`${origin}${safeNext}`);
     }
   }

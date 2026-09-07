@@ -13,6 +13,7 @@ import { siteConfig } from "@/config/site";
  *   - the balance is at or below `lowCreditThreshold`
  *   - a generation failed and its credits were refunded
  *   - an order completed and credits landed
+ *   - a referral qualified and paid out
  *
  * Low balance is a standing condition rather than an event, so it is listed
  * but deliberately does not drive the unread badge — the sidebar already
@@ -22,7 +23,11 @@ import { siteConfig } from "@/config/site";
 
 const WINDOW_DAYS = 30;
 
-export type NotificationKind = "low_balance" | "refund" | "order_completed";
+export type NotificationKind =
+  | "low_balance"
+  | "refund"
+  | "order_completed"
+  | "referral_earned";
 
 export interface NotificationItem {
   id: string;
@@ -48,7 +53,7 @@ export async function getNotifications(
   const supabase = await createClient();
   const sinceIso = new Date(Date.now() - WINDOW_DAYS * 864e5).toISOString();
 
-  const [refunds, orders] = await Promise.all([
+  const [refunds, orders, referralRewards] = await Promise.all([
     supabase
       .from("credit_transactions")
       .select("id, amount, description, created_at")
@@ -64,6 +69,15 @@ export async function getNotifications(
       .eq("status", "completed")
       .gte("created_at", sinceIso)
       .order("created_at", { ascending: false })
+      .limit(10),
+    // A referral paying out is a real event the user would otherwise only
+    // discover by opening the referrals page.
+    supabase
+      .from("referral_rewards")
+      .select("id, credits, granted_at")
+      .eq("user_id", userId)
+      .gte("granted_at", sinceIso)
+      .order("granted_at", { ascending: false })
       .limit(10),
   ]);
 
@@ -104,6 +118,18 @@ export async function getNotifications(
       body: `Your ${row.plan_name} purchase completed.`,
       createdAt: at,
       href: "/dashboard/billing",
+      countsAsUnread: true,
+    });
+  }
+
+  for (const row of referralRewards.data ?? []) {
+    items.push({
+      id: `referral-${row.id}`,
+      kind: "referral_earned",
+      title: `${row.credits} referral credits earned`,
+      body: "Someone you referred made their first purchase.",
+      createdAt: row.granted_at,
+      href: "/dashboard/referrals",
       countsAsUnread: true,
     });
   }

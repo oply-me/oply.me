@@ -9,6 +9,7 @@ import {
   Coins,
   CreditCard,
   FolderKanban,
+  Gift,
   HelpCircle,
   History,
   LayoutGrid,
@@ -54,6 +55,7 @@ const NAV = [
 
 const ACCOUNT_NAV = [
   { title: "Credits", href: "/dashboard/credits", icon: Coins },
+  { title: "Refer & earn", href: "/dashboard/referrals", icon: Gift },
   { title: "Billing", href: "/dashboard/billing", icon: CreditCard },
   { title: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
