@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/logo";
@@ -8,7 +9,16 @@ export default function NotFound() {
       <Link href="/" aria-label="Oply home">
         <Logo />
       </Link>
-      <p className="mt-10 text-[13px] font-medium tabular-nums text-primary">404</p>
+      <Image
+        src="/illustrations/not-found.webp"
+        alt=""
+        width={168}
+        height={168}
+        /* Decorative: the heading below carries the meaning. */
+        aria-hidden="true"
+        className="mt-6 h-40 w-40 object-contain"
+      />
+      <p className="text-[13px] font-medium tabular-nums text-primary">404</p>
       <h1 className="mt-2 text-[1.75rem] font-semibold tracking-[-0.025em]">
         Looks like this tool doesn&apos;t exist.
       </h1>
