@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { attachReferralFromRequest } from "@/lib/referrals-attach";
+import { absoluteUrl } from "@/lib/utils";
 
 /** Exchanges the emailed code for a session, then continues to `next`. */
 export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url);
+  const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
   const next = searchParams.get("next") ?? "/dashboard";
 
@@ -26,9 +27,11 @@ export async function GET(request: Request) {
             : null,
         ).catch(() => false);
       }
-      return NextResponse.redirect(`${origin}${safeNext}`);
+      // Built from NEXT_PUBLIC_APP_URL, not the request's Host header: see
+      // the note in app/auth/signout/route.ts.
+      return NextResponse.redirect(absoluteUrl(safeNext));
     }
   }
 
-  return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
+  return NextResponse.redirect(absoluteUrl("/login?error=auth_callback_failed"));
 }
