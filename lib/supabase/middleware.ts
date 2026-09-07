@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { absoluteUrl } from "@/lib/utils";
 
 /** Referral link capture. Kept in sync with lib/referrals.ts. */
 const REFERRAL_COOKIE = "oply_ref";
@@ -57,18 +58,17 @@ export async function updateSession(request: NextRequest) {
     !request.cookies.has(REFERRAL_COOKIE) &&
     REFERRAL_CODE_PATTERN.test(ref.trim().toUpperCase());
 
+  // Built from NEXT_PUBLIC_APP_URL rather than `request.nextUrl`'s origin:
+  // behind a proxy that doesn't forward the original host, that origin
+  // resolves to the app's own bind address instead of the public site.
   if (!user && PROTECTED_PREFIXES.some((p) => pathname.startsWith(p))) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    url.searchParams.set("next", pathname);
-    return NextResponse.redirect(url);
+    return NextResponse.redirect(
+      absoluteUrl(`/login?next=${encodeURIComponent(pathname)}`),
+    );
   }
 
   if (user && AUTH_ROUTES.some((p) => pathname.startsWith(p))) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/dashboard";
-    url.search = "";
-    return NextResponse.redirect(url);
+    return NextResponse.redirect(absoluteUrl("/dashboard"));
   }
 
   if (captureRef) {
