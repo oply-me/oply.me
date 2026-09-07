@@ -35,6 +35,17 @@ suite("security invariants (live database)", () => {
   let alice: TestUser;
   let bob: TestUser;
   let aliceGenerationId: string;
+  /** Users created inline by a test, deleted in afterAll like alice and bob. */
+  const throwaway: string[] = [];
+
+  async function balanceOf(userId: string): Promise<number> {
+    const { data } = await admin
+      .from("credit_balances")
+      .select("balance")
+      .eq("user_id", userId)
+      .single();
+    return data!.balance;
+  }
 
   async function makeUser(label: string): Promise<TestUser> {
     const email = `oply-test-${label}-${Date.now()}@example.com`;
@@ -93,6 +104,9 @@ suite("security invariants (live database)", () => {
     if (!configured) return;
     for (const user of [alice, bob]) {
       if (user?.id) await admin.auth.admin.deleteUser(user.id);
+    }
+    for (const id of throwaway) {
+      await admin.auth.admin.deleteUser(id).catch(() => {});
     }
   }, 60_000);
 
@@ -163,6 +177,293 @@ suite("security invariants (live database)", () => {
       .eq("user_id", alice.id);
     expect(data ?? []).toHaveLength(0);
   });
+
+  /* ------------------------------------------- signup metadata sanitising */
+
+  /**
+   * `options.data` on signUp becomes `raw_user_meta_data`, and the anon key is
+   * public — so these values are attacker-controlled, not form-controlled.
+   * `handle_new_user()` has to sanitise them, because it is the one write path
+   * into `profiles` that does not go through `profileSchema`.
+   */
+  async function signUpWithMetadata(
+    label: string,
+    metadata: Record<string, unknown>,
+  ) {
+    const email = `oply-test-${label}-${Date.now()}@example.com`;
+    const anon = createClient(url!, anonKey!, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const { data, error } = await anon.auth.signUp({
+      email,
+      password,
+      options: { data: metadata },
+    });
+    if (error || !data.user) throw error ?? new Error("signup failed");
+    throwaway.push(data.user.id);
+
+    const { data: profile } = await admin
+      .from("profiles")
+      .select("full_name, avatar_url")
+      .eq("id", data.user.id)
+      .single();
+    return profile!;
+  }
+
+  it("truncates an oversized full_name supplied at signup", async () => {
+    const profile = await signUpWithMetadata("longname", {
+      full_name: "A".repeat(5_000),
+    });
+
+    expect(profile.full_name).not.toBeNull();
+    expect(profile.full_name!.length).toBeLessThanOrEqual(120);
+  }, 30_000);
+
+  it("strips control characters from a full_name supplied at signup", async () => {
+    const profile = await signUpWithMetadata("ctrlname", {
+      full_name: "Oply Support\n\nAccount verified",
+    });
+
+    expect(profile.full_name).not.toMatch(/[\r\n\t]/);
+  }, 30_000);
+
+  it("discards a non-URL avatar_url supplied at signup", async () => {
+    const profile = await signUpWithMetadata("badavatar", {
+      avatar_url: "javascript:alert(1)",
+    });
+
+    expect(profile.avatar_url).toBeNull();
+  }, 30_000);
+
+  it("discards an oversized avatar_url supplied at signup", async () => {
+    const profile = await signUpWithMetadata("longavatar", {
+      avatar_url: `https://example.com/${"a".repeat(5_000)}.png`,
+    });
+
+    expect(profile.avatar_url).toBeNull();
+  }, 30_000);
+
+  it("keeps a legitimate https avatar_url supplied at signup", async () => {
+    const profile = await signUpWithMetadata("okavatar", {
+      full_name: "Ada Lovelace",
+      avatar_url: "https://example.com/ada.png",
+    });
+
+    expect(profile.full_name).toBe("Ada Lovelace");
+    expect(profile.avatar_url).toBe("https://example.com/ada.png");
+  }, 30_000);
+
+  it("stops a user writing an oversized full_name directly", async () => {
+    await bob.client
+      .from("profiles")
+      .update({ full_name: "B".repeat(5_000) })
+      .eq("id", bob.id);
+
+    const { data } = await admin
+      .from("profiles")
+      .select("full_name")
+      .eq("id", bob.id)
+      .single();
+    expect((data!.full_name ?? "").length).toBeLessThanOrEqual(120);
+  });
+
+  it("stops a user writing a non-URL avatar_url directly", async () => {
+    await bob.client
+      .from("profiles")
+      .update({ avatar_url: "javascript:alert(1)" })
+      .eq("id", bob.id);
+
+    const { data } = await admin
+      .from("profiles")
+      .select("avatar_url")
+      .eq("id", bob.id)
+      .single();
+    expect(data!.avatar_url).not.toBe("javascript:alert(1)");
+  });
+
+  /* --------------------------------------------------------- referrals */
+
+  it("stops a user inserting their own referral", async () => {
+    const { error } = await bob.client.from("referrals").insert({
+      referrer_id: bob.id,
+      referred_id: alice.id,
+    });
+    expect(error).not.toBeNull();
+  });
+
+  it("stops a user granting themselves a referral reward", async () => {
+    const { data: referral } = await admin
+      .from("referrals")
+      .select("id")
+      .limit(1)
+      .maybeSingle();
+
+    const { error } = await bob.client.from("referral_rewards").insert({
+      referral_id: referral?.id ?? crypto.randomUUID(),
+      user_id: bob.id,
+      credits: 100_000,
+    });
+    expect(error).not.toBeNull();
+  });
+
+  it("stops a user issuing themselves a referral code", async () => {
+    const { error } = await bob.client
+      .from("referral_codes")
+      .insert({ user_id: bob.id, code: "HACKED11" });
+    expect(error).not.toBeNull();
+  });
+
+  it("refuses a self-referral", async () => {
+    const code = `SELF${Date.now().toString().slice(-4)}`.toUpperCase();
+    await admin.from("referral_codes").insert({ user_id: bob.id, code });
+
+    const { data } = await admin.rpc("attach_referral", {
+      p_referred_id: bob.id,
+      p_code: code,
+    });
+    expect(data).toBe(false);
+
+    const { data: rows } = await admin
+      .from("referrals")
+      .select("id")
+      .eq("referred_id", bob.id);
+    expect(rows ?? []).toHaveLength(0);
+  });
+
+  it("refuses an unknown referral code", async () => {
+    const { data } = await admin.rpc("attach_referral", {
+      p_referred_id: bob.id,
+      p_code: "NOSUCH11",
+    });
+    expect(data).toBe(false);
+  });
+
+  it("attributes a valid code exactly once, first touch winning", async () => {
+    const first = `AAAA${Date.now().toString().slice(-4)}`.toUpperCase();
+    const second = `BBBB${Date.now().toString().slice(-4)}`.toUpperCase();
+    await admin.from("referral_codes").insert([
+      { user_id: alice.id, code: first },
+      { user_id: bob.id, code: second },
+    ]);
+
+    const referred = await makeUser("referred");
+    throwaway.push(referred.id);
+
+    const { data: attached } = await admin.rpc("attach_referral", {
+      p_referred_id: referred.id,
+      p_code: first,
+    });
+    expect(attached).toBe(true);
+
+    // A second link must not re-attribute an account that already has one.
+    const { data: again } = await admin.rpc("attach_referral", {
+      p_referred_id: referred.id,
+      p_code: second,
+    });
+    expect(again).toBe(false);
+
+    const { data: rows } = await admin
+      .from("referrals")
+      .select("referrer_id")
+      .eq("referred_id", referred.id);
+    expect(rows).toHaveLength(1);
+    expect(rows![0].referrer_id).toBe(alice.id);
+  }, 30_000);
+
+  it("pays the referrer once on a first order, and claws it back on refund", async () => {
+    const code = `CCCC${Date.now().toString().slice(-4)}`.toUpperCase();
+    await admin.from("referral_codes").insert({ user_id: alice.id, code });
+
+    const referred = await makeUser("buyer");
+    throwaway.push(referred.id);
+    await admin.rpc("attach_referral", {
+      p_referred_id: referred.id,
+      p_code: code,
+    });
+
+    const reward = 500;
+    await admin
+      .from("site_settings")
+      .upsert({ key: "referral_reward_credits", value: reward });
+
+    const before = await balanceOf(alice.id);
+
+    async function completeOrder() {
+      const { data: order } = await admin
+        .from("orders")
+        .insert({
+          user_id: referred.id,
+          plan_id: "starter",
+          plan_name: "Starter",
+          amount: 9,
+          currency: "USD",
+          credits: 500,
+          status: "pending",
+          payment_provider: "dev",
+        })
+        .select("id")
+        .single();
+      await admin.rpc("complete_order_and_credit", { p_order_id: order!.id });
+      return order!.id;
+    }
+
+    const firstOrder = await completeOrder();
+    expect(await balanceOf(alice.id)).toBe(before + reward);
+
+    // A second purchase by the same person must not pay again.
+    await completeOrder();
+    expect(await balanceOf(alice.id)).toBe(before + reward);
+
+    // Reversing the qualifying order takes the reward back.
+    await admin.rpc("refund_order", { p_order_id: firstOrder });
+    expect(await balanceOf(alice.id)).toBe(before);
+
+    const { data: referral } = await admin
+      .from("referrals")
+      .select("qualified_at")
+      .eq("referred_id", referred.id)
+      .single();
+    expect(referral!.qualified_at).toBeNull();
+  }, 60_000);
+
+  it("never lets a referral clawback push a balance negative", async () => {
+    const code = `DDDD${Date.now().toString().slice(-4)}`.toUpperCase();
+    const referrer = await makeUser("poorreferrer");
+    throwaway.push(referrer.id);
+    await admin.from("referral_codes").insert({ user_id: referrer.id, code });
+
+    const referred = await makeUser("buyer2");
+    throwaway.push(referred.id);
+    await admin.rpc("attach_referral", {
+      p_referred_id: referred.id,
+      p_code: code,
+    });
+
+    const { data: order } = await admin
+      .from("orders")
+      .insert({
+        user_id: referred.id,
+        plan_id: "starter",
+        plan_name: "Starter",
+        amount: 9,
+        currency: "USD",
+        credits: 500,
+        status: "pending",
+        payment_provider: "dev",
+      })
+      .select("id")
+      .single();
+    await admin.rpc("complete_order_and_credit", { p_order_id: order!.id });
+
+    // Referrer spends everything before the refund lands.
+    await admin
+      .from("credit_balances")
+      .update({ balance: 0 })
+      .eq("user_id", referrer.id);
+
+    await admin.rpc("refund_order", { p_order_id: order!.id });
+    expect(await balanceOf(referrer.id)).toBe(0);
+  }, 60_000);
 
   it("stops a user promoting themselves to admin", async () => {
     await bob.client.from("profiles").update({ role: "admin" }).eq("id", bob.id);

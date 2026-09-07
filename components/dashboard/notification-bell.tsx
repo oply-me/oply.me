@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Bell, CircleAlert, CreditCard, RotateCcw } from "lucide-react";
+import { Bell, CircleAlert, CreditCard, Gift, RotateCcw } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   Popover,
@@ -16,6 +16,7 @@ const ICON: Record<NotificationKind, typeof Bell> = {
   low_balance: CircleAlert,
   refund: RotateCcw,
   order_completed: CreditCard,
+  referral_earned: Gift,
 };
 
 /**

@@ -216,6 +216,32 @@ export type ContactMessageRow = {
   created_at: string;
 }
 
+export type ReferralCodeRow = {
+  id: string;
+  user_id: string;
+  code: string;
+  enabled: boolean;
+  created_at: string;
+}
+
+export type ReferralRow = {
+  id: string;
+  referrer_id: string;
+  referred_id: string;
+  referral_code: string | null;
+  /** Null until the referred user's first order completes. */
+  qualified_at: string | null;
+  created_at: string;
+}
+
+export type ReferralRewardRow = {
+  id: string;
+  referral_id: string;
+  user_id: string;
+  credits: number;
+  granted_at: string;
+}
+
 export type NewsletterSubscriberRow = {
   id: string;
   email: string;
@@ -280,6 +306,9 @@ export type Database = {
       ai_usage: Table<AiUsageRow>;
       contact_messages: Table<ContactMessageRow>;
       newsletter_subscribers: Table<NewsletterSubscriberRow>;
+      referral_codes: Table<ReferralCodeRow>;
+      referrals: Table<ReferralRow>;
+      referral_rewards: Table<ReferralRewardRow>;
       site_settings: Table<SiteSettingRow>;
       announcements: Table<AnnouncementRow>;
     };
@@ -311,6 +340,12 @@ export type Database = {
         Returns: boolean;
       };
       refund_order: { Args: { p_order_id: string }; Returns: number };
+      attach_referral: {
+        Args: { p_referred_id: string; p_code: string };
+        Returns: boolean;
+      };
+      grant_referral_reward: { Args: { p_order_id: string }; Returns: undefined };
+      reverse_referral_reward: { Args: { p_user_id: string }; Returns: number };
       admin_adjust_credits: {
         Args: {
           p_user_id: string;

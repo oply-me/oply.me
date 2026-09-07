@@ -13,7 +13,18 @@ import { siteConfig } from "@/config/site";
 
 type Mode = "login" | "signup";
 
-export function AuthForm({ mode }: { mode: Mode }) {
+export function AuthForm({
+  mode,
+  referralCode = null,
+}: {
+  mode: Mode;
+  /**
+   * Read from the `oply_ref` cookie by the signup page. Forwarded as signup
+   * metadata so attribution survives confirming the email in another browser;
+   * it is resolved against `referral_codes` server-side either way.
+   */
+  referralCode?: string | null;
+}) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next") ?? "/dashboard";
@@ -40,7 +51,10 @@ export function AuthForm({ mode }: { mode: Mode }) {
           email,
           password,
           options: {
-            data: { full_name: fullName || null },
+            data: {
+              full_name: fullName || null,
+              ...(referralCode ? { referral_code: referralCode } : {}),
+            },
             emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent("/dashboard/onboarding")}`,
           },
         });
@@ -55,6 +69,11 @@ export function AuthForm({ mode }: { mode: Mode }) {
           setConfirmationSent(true);
           return;
         }
+
+        // Confirmation disabled, so there is a session now and this is the
+        // only place attribution can run. The confirmation flow goes through
+        // /auth/callback instead; both are idempotent.
+        await fetch("/api/referral/attach", { method: "POST" }).catch(() => {});
 
         toast.success(`Welcome to ${siteConfig.name}`);
         router.push("/dashboard/onboarding");

@@ -12,6 +12,7 @@ const LINKS = [
   { title: "Tools", href: "/admin/tools" },
   { title: "Usage", href: "/admin/usage" },
   { title: "Credits", href: "/admin/credits" },
+  { title: "Referrals", href: "/admin/referrals" },
   { title: "Settings", href: "/admin/settings" },
 ];
 
