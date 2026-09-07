@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -395,10 +396,16 @@ function ResultView({
 function IdleState({ tool }: { tool: PublicTool }) {
   return (
     <div className="flex h-full min-h-[260px] flex-col items-center justify-center text-center">
-      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-muted">
-        <Sparkles className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
-      </div>
-      <p className="mt-4 text-[15px] font-medium">Your result appears here</p>
+      <Image
+        src="/illustrations/empty-result.webp"
+        alt=""
+        width={128}
+        height={128}
+        /* Decorative: the heading below carries the meaning. */
+        aria-hidden="true"
+        className="h-32 w-32 object-contain"
+      />
+      <p className="mt-2 text-[15px] font-medium">Your result appears here</p>
       <ToolExampleToggle tool={tool} />
     </div>
   );
