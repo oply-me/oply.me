@@ -111,6 +111,11 @@ export default async function AdminSettingsPage() {
               ai_rate_limit_per_min: Number(values.ai_rate_limit_per_min ?? 10),
               support_email: String(values.support_email ?? siteConfig.supportEmail),
               maintenance_mode: Boolean(values.maintenance_mode ?? false),
+              referral_enabled: values.referral_enabled !== false,
+              referral_reward_credits: Number(values.referral_reward_credits ?? 0),
+              referral_referred_bonus_credits: Number(
+                values.referral_referred_bonus_credits ?? 0,
+              ),
             }}
           />
         </div>

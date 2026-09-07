@@ -14,12 +14,16 @@ interface Values {
   ai_rate_limit_per_min: number;
   support_email: string;
   maintenance_mode: boolean;
+  referral_enabled: boolean;
+  referral_reward_credits: number;
+  referral_referred_bonus_credits: number;
 }
 
 export function AdminSettingsForm({ values }: { values: Values }) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [maintenance, setMaintenance] = useState(values.maintenance_mode);
+  const [referralEnabled, setReferralEnabled] = useState(values.referral_enabled);
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -36,6 +40,11 @@ export function AdminSettingsForm({ values }: { values: Values }) {
           ai_rate_limit_per_min: Number(form.get("ai_rate_limit_per_min")),
           support_email: String(form.get("support_email") ?? ""),
           maintenance_mode: maintenance,
+          referral_enabled: referralEnabled,
+          referral_reward_credits: Number(form.get("referral_reward_credits")),
+          referral_referred_bonus_credits: Number(
+            form.get("referral_referred_bonus_credits"),
+          ),
         }),
       });
       const data = await response.json();
@@ -88,6 +97,30 @@ export function AdminSettingsForm({ values }: { values: Values }) {
           />
         </div>
         <div className="space-y-2">
+          <Label htmlFor="referral_reward_credits">
+            Referral reward (referrer)
+          </Label>
+          <Input
+            id="referral_reward_credits"
+            name="referral_reward_credits"
+            type="number"
+            min={0}
+            defaultValue={values.referral_reward_credits}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="referral_referred_bonus_credits">
+            Referral bonus (referred user)
+          </Label>
+          <Input
+            id="referral_referred_bonus_credits"
+            name="referral_referred_bonus_credits"
+            type="number"
+            min={0}
+            defaultValue={values.referral_referred_bonus_credits}
+          />
+        </div>
+        <div className="space-y-2">
           <Label htmlFor="support_email">Support email</Label>
           <Input
             id="support_email"
@@ -110,6 +143,21 @@ export function AdminSettingsForm({ values }: { values: Values }) {
           checked={maintenance}
           onCheckedChange={setMaintenance}
           aria-label="Maintenance mode"
+        />
+      </div>
+
+      <div className="flex items-center justify-between gap-4 rounded-lg border border-border p-4">
+        <div>
+          <p className="text-sm font-medium">Referral program</p>
+          <p className="text-xs text-muted-foreground">
+            When off, new signups from a referral link are not attributed.
+            Referrals already earned are unaffected.
+          </p>
+        </div>
+        <Switch
+          checked={referralEnabled}
+          onCheckedChange={setReferralEnabled}
+          aria-label="Referral program"
         />
       </div>
 

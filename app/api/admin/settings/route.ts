@@ -12,6 +12,10 @@ const bodySchema = z.object({
   ai_rate_limit_per_min: z.number().int().min(1).max(1_000).optional(),
   support_email: z.string().email().max(200).optional(),
   maintenance_mode: z.boolean().optional(),
+  referral_enabled: z.boolean().optional(),
+  /* Capped well below a pack so a mistyped rate cannot mint a fortune. */
+  referral_reward_credits: z.number().int().min(0).max(10_000).optional(),
+  referral_referred_bonus_credits: z.number().int().min(0).max(10_000).optional(),
 });
 
 export async function PATCH(request: Request) {

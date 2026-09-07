@@ -1,6 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
+/** Referral link capture. Kept in sync with lib/referrals.ts. */
+const REFERRAL_COOKIE = "oply_ref";
+const REFERRAL_COOKIE_MAX_AGE = 60 * 60 * 24 * 30;
+const REFERRAL_CODE_PATTERN = /^[23456789ABCDEFGHJKMNPQRSTUVWXYZ]{8}$/;
+
 /** Route prefixes that require a signed-in user. */
 const PROTECTED_PREFIXES = ["/dashboard", "/admin", "/checkout"];
 /** Auth pages a signed-in user should not sit on. */
@@ -37,6 +42,21 @@ export async function updateSession(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
+  /*
+   * `?ref=CODE` on any public page is remembered so the code survives the walk
+   * from a landing page to /signup, and the round trip through an emailed
+   * confirmation link. Only the shape is checked here — the code is resolved
+   * against `referral_codes` server-side by `attach_referral`, which is where
+   * self-referral and unknown codes are rejected. First touch wins: an
+   * existing cookie is not overwritten, matching `unique (referred_id)`.
+   */
+  const ref = request.nextUrl.searchParams.get("ref");
+  const captureRef =
+    ref !== null &&
+    !user &&
+    !request.cookies.has(REFERRAL_COOKIE) &&
+    REFERRAL_CODE_PATTERN.test(ref.trim().toUpperCase());
+
   if (!user && PROTECTED_PREFIXES.some((p) => pathname.startsWith(p))) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
@@ -49,6 +69,16 @@ export async function updateSession(request: NextRequest) {
     url.pathname = "/dashboard";
     url.search = "";
     return NextResponse.redirect(url);
+  }
+
+  if (captureRef) {
+    response.cookies.set(REFERRAL_COOKIE, ref!.trim().toUpperCase(), {
+      maxAge: REFERRAL_COOKIE_MAX_AGE,
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+    });
   }
 
   return response;

@@ -16,8 +16,19 @@ import type { ReactNode } from "react";
  * `useReducedMotion` is client-only, so a structural branch would not survive
  * hydration. See the same note in components/reveal.tsx.
  */
-export function EmptyStateIcon({ children }: { children: ReactNode }) {
+export function EmptyStateIcon({
+  children,
+  /** Illustrations need room; a lucide glyph does not. */
+  variant = "icon",
+}: {
+  children: ReactNode;
+  variant?: "icon" | "illustration";
+}) {
   const reduceMotion = useReducedMotion();
+  const shell =
+    variant === "illustration"
+      ? "flex h-[168px] w-[168px] items-center justify-center"
+      : "flex h-11 w-11 items-center justify-center rounded-full bg-muted";
 
   return (
     <motion.div
@@ -31,7 +42,7 @@ export function EmptyStateIcon({ children }: { children: ReactNode }) {
       }
     >
       <motion.div
-        className="flex h-11 w-11 items-center justify-center rounded-full bg-muted"
+        className={shell}
         animate={reduceMotion ? { y: 0 } : { y: [0, -5, 0] }}
         transition={
           reduceMotion
